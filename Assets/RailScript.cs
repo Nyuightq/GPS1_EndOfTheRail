@@ -11,9 +11,11 @@ using Unity.VisualScripting;
 public class RailScript : MonoBehaviour
 {
 
-    [SerializeField] private LayerMask railLayer; 
+    [SerializeField] private LayerMask railLayer;
     [SerializeField] private Sprite[] slices;
 
+    private Vector2 mousePos;
+    private Vector2? prevMousePos = null;
     private int adjacencyMapIndex;
     private Sprite railSprite;
 
@@ -22,17 +24,35 @@ public class RailScript : MonoBehaviour
     {
         //immediately change the rail once placed 
         changeRail(new HashSet<RailScript>());
+
+        Debug.Log(mousePos);
+        Debug.Log(prevMousePos); 
     }
 
     // Update is called once per frame
     void Update()
     {
-       
+
     }
 
     private void OnDestroy()
     {
         changeRail(new HashSet<RailScript>());
+    }
+
+    public void setMousePos(Vector2 mousePos)
+    {
+        this.mousePos = mousePos;
+    }
+
+    public void setPrevMousePos(Vector2? prevMousePos)
+    {
+        this.prevMousePos = prevMousePos;
+    }
+
+    private bool isCurve(int adjacency)
+    {
+        if (adjacency == 5 || adjacency == 6 || adjacency == 9 || adjacency == 10) return true; else return false;
     }
 
     //get the adjacent rails
@@ -56,6 +76,7 @@ public class RailScript : MonoBehaviour
         return adjacentList;
     }
 
+
     //changes the rails sprite based on adjacent rails
     private void changeRail(HashSet<RailScript> visitedRails)
     {
@@ -66,36 +87,48 @@ public class RailScript : MonoBehaviour
         List<RailScript> adjacentRails = getAdjacent();
 
         int right = 0, left = 0, up = 0, down = 0;
+        int connections = 0;
 
         //get which side has adjacent rails
-        foreach(RailScript rail in adjacentRails)
+
+        if(prevMousePos != null)
         {
-            Vector2 direction = (Vector2)rail.transform.position - (Vector2)gameObject.transform.position;
-            if (direction.x == 1) right = 1;
-            if (direction.x == -1) left = 1;
-            if (direction.y == 1) up = 1;
-            if (direction.y == -1) down = 1;
+            
+            if (Mathf.Abs(mousePos.x - (prevMousePos?.x ?? 0))*Mathf.Sign(mousePos.x) > 0) right = 1; else if(Mathf.Abs(mousePos.x - (prevMousePos?.x ?? 0)) * Mathf.Sign(mousePos.x) < 0) left = 1;
+            if (Mathf.Abs(mousePos.y - (prevMousePos?.y ?? 0))*Mathf.Sign(mousePos.y) > 0) up = 1; else if(Mathf.Abs(mousePos.y - (prevMousePos?.y ?? 0)) * Mathf.Sign(mousePos.y) < 0) down = 1;
         }
+
+
+        //foreach (RailScript rail in adjacentRails)
+        //{
+        //    if (connections >= 2) break;
+
+        //    Vector2 direction = (Vector2)rail.transform.position - (Vector2)gameObject.transform.position;
+        //    if (direction.x == 1) { right = 1; connections++; }
+        //    if (direction.x == -1) { left = 1; connections++; }
+        //    if (direction.y == 1) { up = 1; connections++; }
+        //    if (direction.y == -1) { down = 1; connections++; }
+        //}
 
         //curves would have 1 vertical and 1 horizontal
         bool curve = (right + left == 1) && (up + down == 1);
 
         //force straight rails if connected both sides horizontally || vertically
-        if (!curve)
-        {
-            if (right + left >= 2)
-            {
-                //ensures a curve doesnt happen
-                up = 0;
-                down = 0;
-            }
-            else if (up + down >= 2)
-            {
-                //ensures a curve doesnt happen
-                right = 0;
-                left = 0;
-            }
-        }
+        //if (!curve)
+        //{
+        //    if (right + left >= 2)
+        //    {
+        //        //ensures a curve doesnt happen
+        //        up = 0;
+        //        down = 0;
+        //    }
+        //    else if (up + down >= 2)
+        //    {
+        //        //ensures a curve doesnt happen
+        //        right = 0;
+        //        left = 0;
+        //    }
+        //}
 
         //calculate the map index which determines the sprite of the rail
         adjacencyMapIndex = right + (left * 2) + (up * 4) + (down * 8);
