@@ -64,7 +64,10 @@ public class BuildRails : MonoBehaviour
             RailData data = new RailData();
             GameManager.spawnTile(tilePos, defaultTile, data);
         }
+
+        if (Input.GetMouseButton(1) && onRail)
+        {
+            GameManager.DestroyTile(tilePos);
+        }
     }
-
-
 }

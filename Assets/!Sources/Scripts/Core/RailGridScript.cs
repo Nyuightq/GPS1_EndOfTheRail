@@ -10,14 +10,17 @@ using UnityEngine.Tilemaps;
 
 public class RailData
 {
+    public enum railTypes {normal, start, end}
+    public enum directionType { Incoming, Outgoing }
+
+    public railTypes railType = railTypes.normal;
     public Vector2 directionIn;
     public Vector2 directionOut;
     public Tile tile;
 
-    public enum directionType
+    public RailData(railTypes railType = railTypes.normal)
     {
-        Incoming,
-        Outgoing
+        this.railType = railType;
     }
 
     public void setDirection(Vector2 dir,directionType dirType)
@@ -48,6 +51,11 @@ public class RailGridScript : MonoBehaviour
     private Grid grid;
     [SerializeField] private Tilemap railTileMap;
     [SerializeField] private Tile defaultRail;
+    [SerializeField] private Tile startPoint;
+    [SerializeField] private Tile endPoint;
+
+    [SerializeField] private GameObject train;
+
     public Dictionary<Vector3Int,RailData> railDataMap = new Dictionary<Vector3Int,RailData>();
 
     void Awake()
@@ -58,16 +66,39 @@ public class RailGridScript : MonoBehaviour
     private void OnEnable()
     {
         GameManager.onSpawnTile += spawnTile;
+        GameManager.onDestroyTile += destroyTile;
     }
 
     private void OnDisable()
     {
         GameManager.onSpawnTile -= spawnTile;
+        GameManager.onDestroyTile -= destroyTile;
     }
 
     void Start()
     {
-       
+        registerRails();
+    }
+
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            foreach(var rail in railDataMap)
+            {
+                Vector3Int pos = rail.Key;
+                RailData data = rail.Value;
+                if(data.railType == RailData.railTypes.start)
+                {
+                    Vector3 worldPos = snapToGrid(pos);
+                    GameObject trainIns = Instantiate(train,worldPos,Quaternion.identity);
+                    TrainMovement tm = trainIns.GetComponent<TrainMovement>();
+
+                    tm.gridManager = gameObject;
+                    break;
+                }
+            }
+        }
     }
 
     public Vector3 snapToGrid(Vector3 worldPos)
@@ -83,19 +114,39 @@ public class RailGridScript : MonoBehaviour
 
     private void spawnTile(Vector3Int tilePos, Tile sprite, RailData data)
     {
-        if (sprite == null)
-        {
-            Debug.LogWarning($"⚠️ Tried to place NULL sprite at {tilePos}, RailData connection {data.getConnection()}");
-        }
-        else
-        {
-            railTileMap.SetTile(tilePos, sprite);
-            railDataMap[tilePos] = data;
-        }
+        railTileMap.SetTile(tilePos, sprite);
+        railDataMap[tilePos] = data;
     }
 
-    void Update()
+    private void destroyTile(Vector3Int tilePos)
     {
-        
+        railTileMap.SetTile(tilePos, null);
+        if(railDataMap.ContainsKey(tilePos)) railDataMap.Remove(tilePos);
+    }
+
+    private void registerRails()
+    {
+        BoundsInt bounds = railTileMap.cellBounds;
+
+        for (int x = bounds.xMin; x < bounds.xMax; x++)
+        {
+            for(int y = bounds.yMin; y < bounds.yMax; y++)
+            {
+                Vector3Int tilePos = new Vector3Int(x, y, 0);
+                if(railTileMap.HasTile(tilePos))
+                {
+                    TileBase tile = railTileMap.GetTile(tilePos);
+
+                    if (tile == startPoint)
+                    {
+                        railDataMap[tilePos] = new RailData(RailData.railTypes.start);
+                    }
+                    else if(tile == endPoint)
+                    {
+                        railDataMap[tilePos] = new RailData(RailData.railTypes.end);
+                    }
+                }
+            }
+        }
     }
 }

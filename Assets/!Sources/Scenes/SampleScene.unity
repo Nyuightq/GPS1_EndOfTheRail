@@ -293,7 +293,7 @@ MonoBehaviour:
   m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
-  m_ApplyToSortingLayers: 00000000991c4fa8
+  m_ApplyToSortingLayers: 00000000991c4fa8afa06f13
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -434,7 +434,7 @@ Tilemap:
   m_GameObject: {fileID: 621970894}
   m_Enabled: 1
   m_Tiles:
-  - first: {x: -13, y: 5, z: 0}
+  - first: {x: -10, y: 1, z: 0}
     second:
       serializedVersion: 2
       m_TileIndex: 1
@@ -444,11 +444,11 @@ Tilemap:
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
-  - first: {x: -12, y: 5, z: 0}
+  - first: {x: 4, y: 5, z: 0}
     second:
       serializedVersion: 2
-      m_TileIndex: 1
-      m_TileSpriteIndex: 7
+      m_TileIndex: 0
+      m_TileSpriteIndex: 6
       m_TileMatrixIndex: 4
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -456,10 +456,10 @@ Tilemap:
       m_AllTileFlags: 1073741825
   m_AnimatedTiles: {}
   m_TileAssetArray:
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
-  - m_RefCount: 2
-    m_Data: {fileID: 11400000, guid: 22d3f5b22d1fb8048a36df991ebb32dc, type: 2}
+  - m_RefCount: 1
+    m_Data: {fileID: 11400000, guid: d547f48115b19754fb29d846b563ed95, type: 2}
+  - m_RefCount: 1
+    m_Data: {fileID: 11400000, guid: 168c36d42842b4846b15004b46e51664, type: 2}
   m_TileSpriteArray:
   - m_RefCount: 0
     m_Data: {fileID: 0}
@@ -473,10 +473,10 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
-  - m_RefCount: 2
-    m_Data: {fileID: -722444350209975644, guid: 18d91a242b0275946a0ab82bd4744fd7, type: 3}
+  - m_RefCount: 1
+    m_Data: {fileID: 21300000, guid: cb35d34daeb576c4abeb6034e49dc0cc, type: 3}
+  - m_RefCount: 1
+    m_Data: {fileID: 21300000, guid: fc217586ace9f004f96597ac15e930d3, type: 3}
   m_TileMatrixArray:
   - m_RefCount: 0
     m_Data:
@@ -713,6 +713,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7e251abd3eb71cc46be8d9da26b4666a, type: 2}
   - {fileID: 11400000, guid: c989c552d7c4b794996d19f9e3b8da0e, type: 2}
   - {fileID: 11400000, guid: 9bc4aec4c2ece78409b31ab862f55cd0, type: 2}
+  - {fileID: 11400000, guid: c9723f53eba0cd548be83b752b320e0b, type: 2}
+  - {fileID: 11400000, guid: 3aae087ec2cc7994a9be45e438398ea7, type: 2}
   mouseHoldReference: {fileID: -8267893273561798208, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
 --- !u!1 &1978963955
 GameObject:
@@ -746,6 +748,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   railTileMap: {fileID: 621970897}
   defaultRail: {fileID: 11400000, guid: 29e7a9e41aea4b04995ff859ba91f1a7, type: 2}
+  startPoint: {fileID: 11400000, guid: 168c36d42842b4846b15004b46e51664, type: 2}
+  endPoint: {fileID: 11400000, guid: d547f48115b19754fb29d846b563ed95, type: 2}
+  train: {fileID: 6589955524157421207, guid: c37e54ec1fb11ae47a9182e5ac19653c, type: 3}
 --- !u!156049354 &1978963957
 Grid:
   m_ObjectHideFlags: 0

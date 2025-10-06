@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     public static GameManager instance { get; private set;}
 
     public static event Action<Vector3Int, Tile,RailData> onSpawnTile;
+    public static event Action<Vector3Int> onDestroyTile;
 
     void Awake()
     {
@@ -28,5 +29,10 @@ public class GameManager : MonoBehaviour
     public static void spawnTile(Vector3Int cellPos,Tile sprite ,RailData data)
     {
         onSpawnTile?.Invoke(cellPos,sprite,data);
+    }
+
+    public static void DestroyTile(Vector3Int cellPos)
+    {
+        onDestroyTile?.Invoke(cellPos);
     }
 }

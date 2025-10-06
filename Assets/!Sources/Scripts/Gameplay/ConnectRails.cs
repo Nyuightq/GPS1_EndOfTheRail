@@ -1,4 +1,4 @@
-// --------------------------------------------------------------
+﻿// --------------------------------------------------------------
 // Creation Date: 2025-10-03 07:50
 // Author: Black Ninja std
 // Description: -
@@ -14,7 +14,10 @@ public class ConnectRails : MonoBehaviour
     [SerializeField] GameObject gridManager;
     [SerializeField] Tile[] tiles;
     [SerializeField] private InputActionReference mouseHoldReference;
+    [SerializeField] private float mouseDirThreshold = 0.3f;
     private Vector2 mouse;
+    private Vector2 mouseDelta;
+    private Vector2 prevMousePos;
     private Vector3Int prevTile;
     private Vector3Int currentTile;
     private RailGridScript gridScript;
@@ -24,13 +27,11 @@ public class ConnectRails : MonoBehaviour
     private void OnEnable()
     {
         mouseHoldReference.action.started += setStartingPoint;
-        //mouseHoldReference.action.performed += settingDirection;
     }
 
     private void OnDisable()
     {
         mouseHoldReference.action.started -= setStartingPoint;
-        //mouseHoldReference.action.performed -= settingDirection;
     }
 
     void Start()
@@ -48,23 +49,43 @@ public class ConnectRails : MonoBehaviour
 
     private void settingDirection()
     {
-        mouse = Mouse.current.position.ReadValue();
-        Vector3 WorldMouse = Camera.main.ScreenToWorldPoint(mouse);
+        Vector2 mouse = Mouse.current.position.ReadValue();
+        Vector3 worldMouse = Camera.main.ScreenToWorldPoint(mouse);
+        worldMouse.z = 0f;
 
-        cursorGridPos = Vector3Int.FloorToInt(gridScript.snapToGrid(WorldMouse));
+        currentTile = Vector3Int.FloorToInt(gridScript.snapToGrid(worldMouse));
 
-        currentTile = cursorGridPos;
+        mouseDelta = (mouse - prevMousePos).normalized;
+
+        if (currentTile == prevTile && gridScript.railAtPos(currentTile))
+        {
+            if (mouseDelta.magnitude > mouseDirThreshold)
+            {
+                Vector2 dir = GetDominantDirection(mouseDelta);
+                changeRail(currentTile, dir, false);
+            }
+        }
 
         if (currentTile != prevTile && gridScript.railAtPos(currentTile))
         {
             Vector2 direction = new Vector2(currentTile.x - prevTile.x, currentTile.y - prevTile.y);
-            changeRail(prevTile,direction,false);
+            changeRail(prevTile, direction, false);
 
-            Vector2 directionPrev = new Vector2(prevTile.x-currentTile.x,prevTile.y-currentTile.y);
-            changeRail(currentTile, directionPrev,true);
+            Vector2 directionPrev = new Vector2(prevTile.x - currentTile.x, prevTile.y - currentTile.y);
+            changeRail(currentTile, directionPrev, true);
 
             prevTile = currentTile;
         }
+
+        prevMousePos = mouse;
+    }
+
+    private Vector2 GetDominantDirection(Vector2 delta)
+    {
+        if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
+            return delta.x > 0 ? Vector2.right : Vector2.left;
+        else
+            return delta.y > 0 ? Vector2.up : Vector2.down;
     }
 
     private void setStartingPoint(InputAction.CallbackContext context)
@@ -92,7 +113,7 @@ public class ConnectRails : MonoBehaviour
                 case false:
                     currentRail.setDirection(direction,RailData.directionType.Outgoing); break;
             }
-
+            //Debug.Log(currentRail.getConnection());
             tileName = $"rail_{currentRail.getConnection()}";
         }
         Tile selectedTile = null;
@@ -111,6 +132,6 @@ public class ConnectRails : MonoBehaviour
         else selectedTile = tiles[0];
 
         RailData data = gridScript.railDataMap[tilePos];
-        GameManager.spawnTile(tilePos, selectedTile, data);
+        if (gridScript.railDataMap[tilePos].railType == RailData.railTypes.normal) GameManager.spawnTile(tilePos, selectedTile, data);
     }
 }
