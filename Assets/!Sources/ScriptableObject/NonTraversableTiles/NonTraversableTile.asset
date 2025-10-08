@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c0906de83e94cc44a4f919dc3479ac1, type: 3}
-  m_Name: CombatTile
+  m_Script: {fileID: 11500000, guid: 811563fb803ecdf4e8b2c3dbce293235, type: 3}
+  m_Name: NonTraversableTile
   m_EditorClassIdentifier: 
   m_Sprite: {fileID: 2891247693787962197, guid: 900583c8bd1ce73479e85fb59960f43c, type: 3}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Color: {r: 0.7386131, g: 0, b: 1, a: 1}
   m_Transform:
     e00: 1
     e01: 0
@@ -34,3 +34,5 @@ MonoBehaviour:
   m_InstancedGameObject: {fileID: 0}
   m_Flags: 1
   m_ColliderType: 1
+  note: Player cannot build rails on this tile.
+  isTraversable: 0

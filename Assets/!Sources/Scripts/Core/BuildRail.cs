@@ -17,6 +17,8 @@ public class BuildRails : MonoBehaviour
     [SerializeField] private LayerMask railLayer;
     [SerializeField] private Tile defaultTile;
 
+    [SerializeField] private Tilemap eventTilemap; //NEW
+
     private Grid grid;
     private RailGridScript gridScript;
     private Vector2 mouse;
@@ -49,18 +51,21 @@ public class BuildRails : MonoBehaviour
 
         bool onRail = gridScript.railAtPos(tilePos);
 
-        if (!onRail) previewRenderer.color = Color.cyan; else previewRenderer.color = Color.red;
+
+        TileBase eventTile = eventTilemap.GetTile(tilePos); //NEW
+        bool isNonTraversable = eventTile is NonTraversableTile;//NEW
+
+        if (!onRail && !isNonTraversable/*NEW*/) previewRenderer.color = Color.cyan; else previewRenderer.color = Color.red;
 
         Color c = previewRenderer.color;
         c.a = previewTransparency;
         previewRenderer.color = c;
 
+        
 
-
-        if(Input.GetMouseButton(0) && !onRail)
+        if (Input.GetMouseButton(0) && !onRail && !isNonTraversable)
         {
             Debug.Log("WOO THERES A TILE THAT SPAWNED!!!");
-
             RailData data = new RailData();
             GameManager.spawnTile(tilePos, defaultTile, data);
         }
