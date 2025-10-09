@@ -61,7 +61,12 @@ public class BuildRails : MonoBehaviour
         c.a = previewTransparency;
         previewRenderer.color = c;
 
-        
+        // Check tile is normal or not, else cannot delete.
+        RailData tileProperty = gridScript.GetRailAtPos(tilePos);
+        bool notStartnEndPoint = true;
+        if (tileProperty != null)
+            notStartnEndPoint = tileProperty.railType == RailData.railTypes.normal;
+
 
         if (Input.GetMouseButton(0) && !onRail && !isNonTraversable)
         {
@@ -70,7 +75,7 @@ public class BuildRails : MonoBehaviour
             GameManager.spawnTile(tilePos, defaultTile, data);
         }
 
-        if (Input.GetMouseButton(1) && onRail)
+        if (Input.GetMouseButton(1) && onRail && notStartnEndPoint)
         {
             GameManager.DestroyTile(tilePos);
         }

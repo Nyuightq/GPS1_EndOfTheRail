@@ -112,6 +112,16 @@ public class RailGridScript : MonoBehaviour
         return railDataMap.ContainsKey(tilePos);
     }
 
+    public RailData GetRailAtPos(Vector3Int tilePos)
+    {
+        if (railDataMap.TryGetValue(tilePos, out RailData data))
+        {
+            return data;
+        }
+
+        return null;
+    }
+
     private void spawnTile(Vector3Int tilePos, Tile sprite, RailData data)
     {
         railTileMap.SetTile(tilePos, sprite);
