@@ -6,12 +6,12 @@ public class CombatTile : EventTile
     public override void OnPlayerEnter(GameObject player)
     {
         Debug.Log("Player stepped on a Combat Tile!");
-        CombatManager.Instance.StartCombat(player);
+        CombatManager.Instance.StartCombat();
     }
 
     public override void OnPlayerExit(GameObject player)
     {
         // Optional: Close UI when player leaves the tile
-        CombatManager.Instance.EndCombat();
+        CombatManager.Instance.EndCombat(); // Delete this line when TrainMovement interrupt is done
     }
 }

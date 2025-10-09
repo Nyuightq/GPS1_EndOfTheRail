@@ -13,13 +13,13 @@ public class CombatEntity : MonoBehaviour
     public static int COMBAT_MAX_SPEED = 10;
     // Basic Properties define
     public string entityName;
-    [SerializeField] private int _maxHp;
-    private int _hp;
-    [SerializeField] private int _evasion;
-    [SerializeField] private int _defense;
-    [SerializeField] private int _attackSpeed; // 1 speed = 0.6sec
-    [SerializeField] private int _attackDamage;
-    [SerializeField] private int _attackDamageVariance;
+    [SerializeField] protected int _maxHp;
+    [SerializeField] protected int _hp;
+    [SerializeField] protected int _evasion;
+    [SerializeField] protected int _defense;
+    [SerializeField] protected int _attackSpeed; // 1 speed = 0.6sec
+    [SerializeField] protected int _attackDamage;
+    [SerializeField] protected int _attackDamageVariance;
     // Extra Properties
     public bool IsDead => _hp <= 0;
     private float _attackTimer = 0.0f;
@@ -46,11 +46,11 @@ public class CombatEntity : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        _hp = _maxHp;
+        if (_hp == 0) _hp = _maxHp;
     }
     void Awake()
     {
-        _hp = _maxHp;
+        if (_hp == 0) _hp = _maxHp;
         combatEntityUI = GetComponentInChildren<UI_CombatEntity>();
     }
 

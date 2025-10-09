@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class CombatManagers : MonoBehaviour
+public class CombatSystem : MonoBehaviour
 {
     public CombatPlayerEntity player;
     public List<CombatEnemyEntity> enemies = new List<CombatEnemyEntity>();
@@ -16,12 +16,41 @@ public class CombatManagers : MonoBehaviour
     private float battleSpeed = 1.0f;
 
     private bool isBattling = false;
-    private Action<bool> onBattleEnd;
+   
+    public delegate void GameEvent(bool value);
+    public event GameEvent onBattleEnd;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    // void Start()
+    // {
+    //     StartBattle();
+    // }
+
+    public void InitializeBattle(CombatPlayerEntity playerEntity, List<CombatEnemyEntity> enemyEntities)
     {
+        player = playerEntity;
+        enemies = enemyEntities;
+
+        if (player != null)
+        {
+            player.OnAttackReady += HandleAttack;
+            player.OnDeath += HandleDeath;
+        }
+
+        foreach (var enemy in enemies)
+        {
+            enemy.OnAttackReady += HandleAttack;
+            enemy.OnDeath += HandleDeath;
+        }
+
+        Debug.Log("[CombatSystem] Battle initialized. Ready to start.");
         StartBattle();
+    }
+
+    public void StartBattle()
+    {
+        Debug.Log("[CombatManager] Battle Start");
+        isBattling = true;
     }
 
     // Update is called once per frame
@@ -42,34 +71,11 @@ public class CombatManagers : MonoBehaviour
                 enemy.UpdateCombat(delta);
         }
     }
-
-    public void StartBattle()
-    {
-        if (player != null)
-        {
-            player.OnAttackReady += HandleAttack;
-            player.OnDeath += HandleDeath;
-        }
-
-        foreach (var enemy in enemies)
-        {
-            if (enemy != null)
-            {
-                enemy.OnAttackReady += HandleAttack;
-                enemy.OnDeath += HandleDeath;
-            }
-        }
-
-        Debug.Log("[CombatManager] Battle Start");
-        isBattling = true;
-    }
     
 
     // Subscribed event from StartBattle(), instance.OnAttackReady return (CombatEntity this);
     private void HandleAttack(CombatEntity attacker)
     {
-        if (attacker.IsDead) return;
-
         if (attacker == player)
         {
             var target = enemies.Find(e => e != null && !e.IsDead);
@@ -78,12 +84,10 @@ public class CombatManagers : MonoBehaviour
                 attacker.Attack(target);
             }
         }
-        else
+        // Assume attacker == enemy
+        else if (player != null && !player.IsDead)
         {
-            if (player != null && !player.IsDead)
-            {
-                attacker.Attack(player);
-            }
+            attacker.Attack(player);
         }
     }
 
@@ -124,6 +128,7 @@ public class CombatManagers : MonoBehaviour
     private void EndBattle(bool playerWon)
     {
         Debug.Log("[CombatManager] Battle End. PlayerWon: " + playerWon);
+        isBattling = false;
 
         if (playerWon)
         {
@@ -143,6 +148,24 @@ public class CombatManagers : MonoBehaviour
         enemies.Clear();
 
         onBattleEnd?.Invoke(playerWon);
+    }
+
+    
+    public void Test_BattleForceCancel()
+    {
+        if (player != null)
+        {
+            Destroy(player.gameObject);
+        }
+
+        foreach (var enemy in enemies)
+        {
+            if (enemy != null)
+                Destroy(enemy.gameObject);
+        }
+        enemies.Clear();
+
+        onBattleEnd?.Invoke(true);
     }
     
     
