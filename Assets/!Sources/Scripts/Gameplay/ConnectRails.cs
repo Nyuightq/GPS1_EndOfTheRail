@@ -55,16 +55,16 @@ public class ConnectRails : MonoBehaviour
 
         currentTile = Vector3Int.FloorToInt(gridScript.snapToGrid(worldMouse));
 
-        mouseDelta = (mouse - prevMousePos).normalized;
+        //mouseDelta = (mouse - prevMousePos).normalized;
 
-        if (currentTile == prevTile && gridScript.railAtPos(currentTile))
-        {
-            if (mouseDelta.magnitude > mouseDirThreshold)
-            {
-                Vector2 dir = GetDominantDirection(mouseDelta);
-                changeRail(currentTile, dir, false);
-            }
-        }
+        //if (currentTile == prevTile && gridScript.railAtPos(currentTile))
+        //{
+        //    if (mouseDelta.magnitude > mouseDirThreshold)
+        //    {
+        //        Vector2 dir = GetDominantDirection(mouseDelta);
+        //        changeRail(currentTile, dir, false);
+        //    }
+        //}
 
         if (currentTile != prevTile && gridScript.railAtPos(currentTile))
         {

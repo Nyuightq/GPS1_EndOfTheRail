@@ -16,6 +16,7 @@ public class BuildRails : MonoBehaviour
     [SerializeField] private float previewTransparency;
     [SerializeField] private LayerMask railLayer;
     [SerializeField] private Tile defaultTile;
+    [SerializeField] private InputActionReference mouseHoldReference;
 
     [SerializeField] private Tilemap eventTilemap; //NEW
 
@@ -23,6 +24,33 @@ public class BuildRails : MonoBehaviour
     private RailGridScript gridScript;
     private Vector2 mouse;
     private SpriteRenderer previewRenderer;
+
+    RailLine railLine;
+    private bool canBuild = false;
+    private bool isHolding = false;
+
+
+    //private void OnEnable()
+    //{
+    //    mouseHoldReference.action.performed += OnMouseHoldPerformed;
+    //    mouseHoldReference.action.canceled += OnMouseHoldCanceled;
+    //}
+
+    //private void OnDisable()
+    //{
+    //    mouseHoldReference.action.performed -= OnMouseHoldPerformed;
+    //    mouseHoldReference.action.canceled -= OnMouseHoldCanceled;
+    //}
+
+    private void OnMouseHoldPerformed(InputAction.CallbackContext ctx)
+    {
+        isHolding = true;
+    }
+
+    private void OnMouseHoldCanceled(InputAction.CallbackContext ctx)
+    {
+        isHolding = false;
+    }
 
     void Start()
     {
@@ -61,18 +89,33 @@ public class BuildRails : MonoBehaviour
         c.a = previewTransparency;
         previewRenderer.color = c;
 
+        if (Input.GetMouseButton(0)) isHolding = true; else isHolding = false;
+
+        if (gridScript.railAtPos(tilePos)) railLine = gridScript.railDataMap[tilePos].line;
+
+        if (!onRail && !isNonTraversable && (gridScript.onConnection(gridScript.startPoint, tilePos) || gridScript.onConnection(railLine.line[^1], tilePos))) canBuild = true; else canBuild = false;
+
         
 
-        if (Input.GetMouseButton(0) && !onRail && !isNonTraversable)
+
+
+        if (isHolding && canBuild)
         {
             Debug.Log("WOO THERES A TILE THAT SPAWNED!!!");
+            if (gridScript.onConnection(gridScript.startPoint, tilePos))
+            {
+                railLine = new RailLine();
+            }
             RailData data = new RailData();
             GameManager.spawnTile(tilePos, defaultTile, data);
+            gridScript.railDataMap[tilePos].setLine(railLine);
+            railLine.line.Add(tilePos);
         }
 
-        if (Input.GetMouseButton(1) && onRail)
+        if (Input.GetMouseButton(1) && onRail && gridScript.railDataMap[tilePos].railType == RailData.railTypes.normal)
         {
             GameManager.DestroyTile(tilePos);
         }
     }
+
 }
