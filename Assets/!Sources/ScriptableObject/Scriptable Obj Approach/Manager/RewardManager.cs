@@ -16,6 +16,9 @@ public class RewardManager : MonoBehaviour
     [SerializeField] private TMP_Text componentText;
     [SerializeField] private TMP_Text scrapText;
 
+        // NEW EVENT
+    public static event System.Action OnRewardClosed;
+
     private PlayerInventory currentPlayer;
 
     private void Awake()
@@ -54,13 +57,17 @@ public class RewardManager : MonoBehaviour
         }
     }
 
-    public void CloseRewardUI()
-    {
-        if (uiPanel != null)
-            uiPanel.SetActive(false);
+public void CloseRewardUI()
+{
+    if (uiPanel != null)
+        uiPanel.SetActive(false);
 
-        currentPlayer = null;
-    }
+    currentPlayer = null;
+
+    // Trigger event
+    OnRewardClosed?.Invoke();
+}
+
 
     private void UpdateUI()
     {

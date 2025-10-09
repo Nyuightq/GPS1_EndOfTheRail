@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 6014170368045839963}
   - component: {fileID: 7733662953233204255}
   - component: {fileID: 5417253279827366164}
+  - component: {fileID: -4801662321844265022}
   m_Layer: 5
   m_Name: TrainOverworld
   m_TagString: Player
@@ -219,3 +220,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHP: 100
   currentHP: 0
+--- !u!114 &-4801662321844265022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6589955524157421207}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01de9c880415c17478b06fc7e29c35d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

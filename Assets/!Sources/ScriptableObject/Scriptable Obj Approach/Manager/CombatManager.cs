@@ -1,11 +1,12 @@
 using UnityEngine;
 using System.Collections.Generic;
+
 public class CombatManager : MonoBehaviour
 {
     public static CombatManager Instance { get; private set; }
 
     [Header("Combat UI")]
-    [SerializeField] private GameObject combatUIPanel; // Assign your UI Panel here
+    [SerializeField] private GameObject combatUIPanel;
 
     [Header("Player & Enemy Prefabs")]
     [SerializeField] private GameObject playerPrefab;
@@ -13,11 +14,11 @@ public class CombatManager : MonoBehaviour
     [SerializeField] private Transform playerSpawnPoint;
     [SerializeField] private Transform enemySpawnParent;
 
-    // [Header("Enemy Data")]
-    // [SerializeField] private List<EnemyData> enemyWaves;
-
     [Header("System")]
     [SerializeField] private CombatSystem combatSystem;
+
+    // Event for TrainFreezeController
+    public static event System.Action OnCombatClosed;
 
     private void Awake()
     {
@@ -32,18 +33,10 @@ public class CombatManager : MonoBehaviour
             combatUIPanel.SetActive(false);
     }
 
-    public void StartCombat(GameObject player)
+    public void StartCombat()
     {
         Debug.Log("Combat started against enemies!");
 
-        if (combatUIPanel != null)
-            combatUIPanel.SetActive(true);
-
-        // Here you can add logic to initialize combat stats, enemies, etc.
-    }
-
-    public void StartCombat()
-    {
         if (combatUIPanel != null)
             combatUIPanel.SetActive(true);
 
@@ -53,12 +46,10 @@ public class CombatManager : MonoBehaviour
 
         // Generate enemies
         List<CombatEnemyEntity> enemies = new List<CombatEnemyEntity>();
-        //foreach (var enemyData in enemyWaves)
-        for (int a=0; a<1; a++)
+        for (int i = 0; i < 1; i++)
         {
             GameObject enemyObj = Instantiate(enemyPrefab, enemySpawnParent);
             CombatEnemyEntity enemyEntity = enemyObj.GetComponent<CombatEnemyEntity>();
-            // enemyEntity.Initialize(enemyData);
             enemies.Add(enemyEntity);
         }
 
@@ -76,16 +67,21 @@ public class CombatManager : MonoBehaviour
 
         combatSystem.onBattleEnd -= EndCombat;
         Debug.Log("Combat ended.");
+
+        // Notify TrainFreezeController to resume movement
+        OnCombatClosed?.Invoke();
     }
 
-    // Delete it when TrainMovement interruption is done
     public void EndCombat()
     {
         combatSystem.Test_BattleForceCancel();
+
         if (combatUIPanel != null)
             combatUIPanel.SetActive(false);
 
-        
         Debug.Log("Combat forced to end.");
+
+        // Notify TrainFreezeController to resume movement
+        OnCombatClosed?.Invoke();
     }
 }
