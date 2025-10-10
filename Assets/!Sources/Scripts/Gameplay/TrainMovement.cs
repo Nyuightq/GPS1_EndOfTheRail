@@ -12,7 +12,7 @@ public class TrainMovement : MonoBehaviour
     [SerializeField] float moveSpeed;
     RailGridScript gridScript;
     bool moving = false;
-    private bool reversed = false;
+    //private bool reversed = false;
     Vector2 direction;
     Vector3Int tilePos;
     Vector3Int targetTile;
@@ -48,35 +48,36 @@ public class TrainMovement : MonoBehaviour
                 Vector2 prevRailDir = Vector2.zero, currentRailDir = Vector2.zero;
                 Vector2 chosenDir;
 
-                Debug.Log(reversed);
+                //Debug.Log(reversed);
 
                 if (prevRail != null)
                 {
-                    if (reversed)
-                    {
-                        prevRailDir = prevRail.directionOut;
-                        currentRailDir = currentRail.directionOut;
-                    }
-                    else
-                    {
-                        prevRailDir = prevRail.directionOut;
-                        currentRailDir = currentRail.directionIn;
-                    }
+                    //if (reversed)
+                    //{
+                    //    prevRailDir = prevRail.directionOut;
+                    //    currentRailDir = currentRail.directionOut;
+                    //}
+                    //else
+                    //{
+                    //    prevRailDir = prevRail.directionOut;
+                    //    currentRailDir = currentRail.directionIn;
+                    //}
 
-                    if (reversed && currentRail.directionOut != prevRail.directionOut) reversed = false;
+                    //if (reversed && currentRail.directionOut != prevRail.directionOut) reversed = false;
 
-                    if (AreOpposite(prevRailDir, currentRailDir))
-                    {
-                        // We confirmed prevRail points into this tile, so continue forwards (use outgoing)
-                        chosenDir = currentRail.directionOut;
-                        reversed = false;
-                    }
-                    else
-                    {
-                        // either prevRail missing or doesn't point in -> fallback to incoming (or choose outgoing if that's your intended behavior)
-                        chosenDir = currentRail.directionIn;
-                        reversed = true;
-                    }
+                    //if (AreOpposite(prevRailDir, currentRailDir))
+                    //{
+                    //    // We confirmed prevRail points into this tile, so continue forwards (use outgoing)
+                    //    chosenDir = currentRail.directionOut;
+                    //    reversed = false;
+                    //}
+                    //else
+                    //{
+                    //    // either prevRail missing or doesn't point in -> fallback to incoming (or choose outgoing if that's your intended behavior)
+                    //    chosenDir = currentRail.directionIn;
+                    //    reversed = true;
+                    //}
+                    chosenDir = currentRail.directionOut;
                 }
                 else
                 {

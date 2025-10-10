@@ -68,7 +68,9 @@ public class RailGridScript : MonoBehaviour
 
     [SerializeField] private GameObject train;
 
+
     public Vector3Int startPoint;
+    public Vector3Int endPoint;
 
     public Dictionary<Vector3Int,RailData> railDataMap = new Dictionary<Vector3Int,RailData>();
 
@@ -93,13 +95,14 @@ public class RailGridScript : MonoBehaviour
     void Start()
     {
         registerRails();
-        startPoint = findStartPoint(railDataMap);
+        startPoint = findPoint(railDataMap,RailData.railTypes.start);
+        endPoint = findPoint(railDataMap,RailData.railTypes.end);
 
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && validatePath(startPoint))
         {
             foreach(var rail in railDataMap)
             {
@@ -116,6 +119,36 @@ public class RailGridScript : MonoBehaviour
                 }
             }
         }
+    }
+
+    public bool validatePath(Vector3Int startPoint)
+    {
+        Vector3Int[] directions = new Vector3Int[]
+        {
+            new Vector3Int(1,0,0),
+            new Vector3Int(-1,0,0),
+            new Vector3Int(0,1,0),
+            new Vector3Int(0,-1,0)
+        };
+
+        foreach (Vector3Int direction in directions)
+        {
+            Vector3Int tile = startPoint + direction;
+            if (railAtPos(tile))
+            {
+                List<Vector3Int> lineList = railDataMap[tile].line.line;
+                if (lineList != null)
+                {
+                    if (railDataMap[lineList[0]].railType == RailData.railTypes.start && railDataMap[lineList[^1]].railType == RailData.railTypes.end)
+                    {
+                        railDataMap[lineList[0]].directionOut = new Vector2(lineList[1].x - lineList[0].x, lineList[1].y - lineList[0].y);
+                        railDataMap[lineList[^2]].directionOut = new Vector2(lineList[^1].x - lineList[^2].x, lineList[^1].y - lineList[^2].y);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public Vector3 snapToGrid(Vector3 worldPos)
@@ -149,25 +182,44 @@ public class RailGridScript : MonoBehaviour
         return !(railAtPos(connectedTileOutgoing) && railAtPos(connectedTileIngoing));
     }
 
-    public Vector3Int findStartPoint(Dictionary<Vector3Int,RailData> railDataMap)
+    public Vector3Int findPoint(Dictionary<Vector3Int,RailData> railDataMap, RailData.railTypes railType)
     {
         if(railDataMap.Count == 0) Debug.Log("nothing in yet");
 
         foreach (KeyValuePair<Vector3Int, RailData> rail in railDataMap)
         {
-            if(rail.Value.railType == RailData.railTypes.start)
+            if(rail.Value.railType == railType)
             {
                 Debug.Log(rail.Key);
                 return rail.Key;
             }
             else
             {
-                Debug.Log("cant find sjot");
+                Debug.Log("cant find shit");
             }
         }
         return new Vector3Int(500,500,500);
     }
 
+    public bool hasConnection(Vector3Int tilePos)
+    {
+        Vector3Int[] directions = new Vector3Int[]
+        {
+            new Vector3Int(1,0,0),
+            new Vector3Int(-1,0,0),
+            new Vector3Int(0,1,0),
+            new Vector3Int(0,-1,0)
+        };
+
+        foreach (Vector3Int direction in directions)
+        {
+            if (railAtPos(tilePos+direction))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
     public bool onConnection(Vector3Int tileSource, Vector3Int tilePos)
     {
         Vector3Int[] directions = new Vector3Int[]
@@ -186,7 +238,6 @@ public class RailGridScript : MonoBehaviour
             }
         }
         return false;
-
     }
 
     private void registerRails()

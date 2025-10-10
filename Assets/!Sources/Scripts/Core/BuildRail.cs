@@ -83,7 +83,7 @@ public class BuildRails : MonoBehaviour
         TileBase eventTile = eventTilemap.GetTile(tilePos); //NEW
         bool isNonTraversable = eventTile is NonTraversableTile;//NEW
 
-        if (!onRail && !isNonTraversable/*NEW*/) previewRenderer.color = Color.cyan; else previewRenderer.color = Color.red;
+        if (!onRail && !isNonTraversable && canBuild/*NEW*/) previewRenderer.color = Color.cyan; else previewRenderer.color = Color.red;
 
         Color c = previewRenderer.color;
         c.a = previewTransparency;
@@ -93,10 +93,29 @@ public class BuildRails : MonoBehaviour
 
         if (gridScript.railAtPos(tilePos)) railLine = gridScript.railDataMap[tilePos].line;
 
-        if (!onRail && !isNonTraversable && (gridScript.onConnection(gridScript.startPoint, tilePos) || gridScript.onConnection(railLine.line[^1], tilePos))) canBuild = true; else canBuild = false;
+        bool emptyStart = !gridScript.hasConnection(gridScript.startPoint);
+        bool validConnection = false;
 
-        
+        // Safety checks for nulls
+        if (gridScript != null)
+        {
+            // Check if starting from start point
+            if (gridScript.onConnection(gridScript.startPoint, tilePos) && emptyStart)
+            {
+                validConnection = true;
+            }
+            // Check if continuing an existing line safely
+            else if (railLine != null && railLine.line != null && railLine.line.Count > 0)
+            {
+                Vector3Int lastTile = railLine.line[^1];
+                if (gridScript.onConnection(lastTile, tilePos))
+                {
+                    validConnection = true;
+                }
+            }
+        }
 
+        canBuild = (!onRail && !isNonTraversable && validConnection);
 
 
         if (isHolding && canBuild)
@@ -105,16 +124,33 @@ public class BuildRails : MonoBehaviour
             if (gridScript.onConnection(gridScript.startPoint, tilePos))
             {
                 railLine = new RailLine();
+                railLine.line.Add(gridScript.startPoint);
             }
             RailData data = new RailData();
             GameManager.spawnTile(tilePos, defaultTile, data);
             gridScript.railDataMap[tilePos].setLine(railLine);
             railLine.line.Add(tilePos);
+            if(gridScript.onConnection(gridScript.endPoint, tilePos)) railLine.line.Add(gridScript.endPoint);
+            foreach(Vector3Int Line in railLine.line) Debug.Log(Line);
         }
 
-        if (Input.GetMouseButton(1) && onRail && gridScript.railDataMap[tilePos].railType == RailData.railTypes.normal)
+        if (Input.GetMouseButtonDown(1))//&& onRail && gridScript.railDataMap[tilePos].railType == RailData.railTypes.normal)
         {
-            GameManager.DestroyTile(tilePos);
+            if(railLine != null && railLine.line.Count > 1)
+            {
+                if (gridScript.railDataMap[railLine.line[^1]].railType == RailData.railTypes.normal)
+                {
+                    GameManager.DestroyTile(railLine.line[^1]);
+                    railLine.line.Remove(railLine.line[^1]);
+                }
+                else
+                {
+                    GameManager.DestroyTile(railLine.line[^2]);
+                    railLine.line.Remove(railLine.line[^2]);
+                    railLine.line.Remove(railLine.line[^1]);
+                }
+            }
+            
         }
     }
 

@@ -3,7 +3,9 @@
 // Author: Black Ninja std
 // Description: -
 // --------------------------------------------------------------
+using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
@@ -14,7 +16,7 @@ public class ConnectRails : MonoBehaviour
     [SerializeField] GameObject gridManager;
     [SerializeField] Tile[] tiles;
     [SerializeField] private InputActionReference mouseHoldReference;
-    [SerializeField] private float mouseDirThreshold = 0.3f;
+    //[SerializeField] private float mouseDirThreshold = 0.3f;
     private Vector2 mouse;
     private Vector2 mouseDelta;
     private Vector2 prevMousePos;
@@ -54,19 +56,9 @@ public class ConnectRails : MonoBehaviour
         worldMouse.z = 0f;
 
         currentTile = Vector3Int.FloorToInt(gridScript.snapToGrid(worldMouse));
+       
 
-        //mouseDelta = (mouse - prevMousePos).normalized;
-
-        //if (currentTile == prevTile && gridScript.railAtPos(currentTile))
-        //{
-        //    if (mouseDelta.magnitude > mouseDirThreshold)
-        //    {
-        //        Vector2 dir = GetDominantDirection(mouseDelta);
-        //        changeRail(currentTile, dir, false);
-        //    }
-        //}
-
-        if (currentTile != prevTile && gridScript.railAtPos(currentTile))
+        if (currentTile != prevTile && gridScript.railAtPos(currentTile) && gridScript.railDataMap[currentTile].directionIn == Vector2.zero)
         {
             Vector2 direction = new Vector2(currentTile.x - prevTile.x, currentTile.y - prevTile.y);
             changeRail(prevTile, direction, false);
@@ -80,12 +72,19 @@ public class ConnectRails : MonoBehaviour
         prevMousePos = mouse;
     }
 
-    private Vector2 GetDominantDirection(Vector2 delta)
+    private void connectLine(List<Vector3Int> line)
     {
-        if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
-            return delta.x > 0 ? Vector2.right : Vector2.left;
-        else
-            return delta.y > 0 ? Vector2.up : Vector2.down;
+        for(int i =0;i<line.Count;i++)
+        {
+            if(i!=0)
+            {
+                Vector2 direction = new Vector2(line[i].x - line[i-1].x, line[i].y - line[i-1].y);
+                changeRail(line[i-1], direction, false);
+
+                Vector2 directionPrev = new Vector2(line[i - 1].x - line[i].x, line[i - 1].y - line[i].y);
+                changeRail(line[i], directionPrev, true);
+            }
+        }
     }
 
     private void setStartingPoint(InputAction.CallbackContext context)
@@ -97,21 +96,33 @@ public class ConnectRails : MonoBehaviour
         prevTile = cursorGridPos;
     }
 
-    private void changeRail(Vector3Int tilePos,Vector2 direction, bool incoming)
+    public void changeRail(Vector3Int tilePos,Vector2 direction, bool incoming)
     {
         RailData currentRail;
         string tileName = null;
+        RailLine line = gridScript.railDataMap[tilePos].line;
 
-        if (gridScript.railDataMap.ContainsKey(tilePos))
+        bool tileAtLineEnd; //checks for the last,second last && third last(if validated) in the rail line
+
+        if (gridScript.railDataMap[line.line[^1]].railType == RailData.railTypes.normal)
+        {
+            tileAtLineEnd = (tilePos == line.line[^1] || tilePos == line.line[^2]);
+        }
+        else
+        {
+            tileAtLineEnd = (tilePos == line.line[^2] || tilePos == line.line[^3] || tilePos == line.line[^4]);
+        }
+
+        if (gridScript.railDataMap.ContainsKey(tilePos) && (gridScript.railDataMap[tilePos].directionIn == Vector2.zero || gridScript.railDataMap[tilePos].directionOut == Vector2.zero) && tileAtLineEnd)
         {
             currentRail = gridScript.railDataMap[tilePos];
 
-            switch(incoming)
+            switch (incoming)
             {
                 case true:
-                    currentRail.setDirection(direction,RailData.directionType.Incoming); break;
+                    currentRail.setDirection(direction, RailData.directionType.Incoming); break;
                 case false:
-                    currentRail.setDirection(direction,RailData.directionType.Outgoing); break;
+                    currentRail.setDirection(direction, RailData.directionType.Outgoing); break;
             }
             //Debug.Log(currentRail.getConnection());
             tileName = $"rail_{currentRail.getConnection()}";
@@ -131,7 +142,9 @@ public class ConnectRails : MonoBehaviour
         }
         else selectedTile = tiles[0];
 
+        
+
         RailData data = gridScript.railDataMap[tilePos];
-        if (gridScript.railDataMap[tilePos].railType == RailData.railTypes.normal) GameManager.spawnTile(tilePos, selectedTile, data);
+        if (gridScript.railDataMap[tilePos].railType == RailData.railTypes.normal && tileAtLineEnd ) GameManager.spawnTile(tilePos, selectedTile, data);
     }
 }
