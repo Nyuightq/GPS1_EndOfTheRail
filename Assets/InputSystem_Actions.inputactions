@@ -34,7 +34,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Mouse_Click",
+                    "name": "Mouse_Hold",
                     "type": "Button",
                     "id": "7d6b41d5-e20a-4d33-9d25-98f2764e68d3",
                     "expectedControlType": "",
@@ -244,10 +244,10 @@
                     "name": "",
                     "id": "a76d69da-0054-4591-9bc0-0d3d7d64fc34",
                     "path": "<Mouse>/leftButton",
-                    "interactions": "",
+                    "interactions": "Hold",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Mouse_Click",
+                    "action": "Mouse_Hold",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
