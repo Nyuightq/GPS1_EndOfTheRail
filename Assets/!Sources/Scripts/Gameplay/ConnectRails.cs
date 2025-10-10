@@ -60,6 +60,8 @@ public class ConnectRails : MonoBehaviour
 
         if (currentTile != prevTile && gridScript.railAtPos(currentTile) && gridScript.railDataMap[currentTile].directionIn == Vector2.zero)
         {
+            Debug.Log("look");
+
             Vector2 direction = new Vector2(currentTile.x - prevTile.x, currentTile.y - prevTile.y);
             changeRail(prevTile, direction, false);
 
@@ -98,53 +100,56 @@ public class ConnectRails : MonoBehaviour
 
     public void changeRail(Vector3Int tilePos,Vector2 direction, bool incoming)
     {
-        RailData currentRail;
-        string tileName = null;
-        RailLine line = gridScript.railDataMap[tilePos].line;
-
-        bool tileAtLineEnd; //checks for the last,second last && third last(if validated) in the rail line
-
-        if (gridScript.railDataMap[line.line[^1]].railType == RailData.railTypes.normal)
+        if (gridScript.railDataMap[tilePos].railType == RailData.railTypes.normal)
         {
-            tileAtLineEnd = (tilePos == line.line[^1] || tilePos == line.line[^2]);
-        }
-        else
-        {
-            tileAtLineEnd = (tilePos == line.line[^2] || tilePos == line.line[^3] || tilePos == line.line[^4]);
-        }
+            RailData currentRail;
+            string tileName = null;
+            RailLine line = gridScript.railDataMap[tilePos].line;
 
-        if (gridScript.railDataMap.ContainsKey(tilePos) && (gridScript.railDataMap[tilePos].directionIn == Vector2.zero || gridScript.railDataMap[tilePos].directionOut == Vector2.zero) && tileAtLineEnd)
-        {
-            currentRail = gridScript.railDataMap[tilePos];
+            bool tileAtLineEnd; //checks for the last,second last && third last(if validated) in the rail line
 
-            switch (incoming)
+            if (gridScript.railDataMap[line.line[^1]].railType == RailData.railTypes.normal)
             {
-                case true:
-                    currentRail.setDirection(direction, RailData.directionType.Incoming); break;
-                case false:
-                    currentRail.setDirection(direction, RailData.directionType.Outgoing); break;
+                tileAtLineEnd = (tilePos == line.line[^1] || tilePos == line.line[^2]);
             }
-            //Debug.Log(currentRail.getConnection());
-            tileName = $"rail_{currentRail.getConnection()}";
-        }
-        Tile selectedTile = null;
-
-        if (tileName != null)
-        {
-            foreach (Tile tile in tiles)
+            else
             {
-                if (tile.name == tileName)
+                tileAtLineEnd = (tilePos == line.line[^2] || tilePos == line.line[^3] || tilePos == line.line[^4]);
+            }
+
+            if (gridScript.railDataMap.ContainsKey(tilePos) && (gridScript.railDataMap[tilePos].directionIn == Vector2.zero || gridScript.railDataMap[tilePos].directionOut == Vector2.zero) && tileAtLineEnd)
+            {
+                currentRail = gridScript.railDataMap[tilePos];
+
+                switch (incoming)
                 {
-                    selectedTile = tile;
-                    break;
+                    case true:
+                        currentRail.setDirection(direction, RailData.directionType.Incoming); break;
+                    case false:
+                        currentRail.setDirection(direction, RailData.directionType.Outgoing); break;
+                }
+                //Debug.Log(currentRail.getConnection());
+                tileName = $"rail_{currentRail.getConnection()}";
+            }
+            Tile selectedTile = null;
+
+            if (tileName != null)
+            {
+                foreach (Tile tile in tiles)
+                {
+                    if (tile.name == tileName)
+                    {
+                        selectedTile = tile;
+                        break;
+                    }
                 }
             }
+            else selectedTile = tiles[0];
+
+
+
+            RailData data = gridScript.railDataMap[tilePos];
+            if (gridScript.railDataMap[tilePos].railType == RailData.railTypes.normal && tileAtLineEnd) GameManager.spawnTile(tilePos, selectedTile, data);
         }
-        else selectedTile = tiles[0];
-
-        
-
-        RailData data = gridScript.railDataMap[tilePos];
-        if (gridScript.railDataMap[tilePos].railType == RailData.railTypes.normal && tileAtLineEnd ) GameManager.spawnTile(tilePos, selectedTile, data);
     }
 }
