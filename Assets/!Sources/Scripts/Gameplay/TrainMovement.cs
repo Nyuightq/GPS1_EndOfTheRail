@@ -6,20 +6,30 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
+
 public class TrainMovement : MonoBehaviour
 {
+    
+    [SerializeField] private float moveSpeed = 0.02f;
+
     public GameObject gridManager;
-    [SerializeField] float moveSpeed;
-    RailGridScript gridScript;
-    bool moving = false;
+    public GameObject dayCycleManager;
+
+    private RailGridScript gridScript;
+    private DayCycleScript dayCycleScript;
+
+    private bool moving = false;
+
     //private bool reversed = false;
-    Vector2 direction;
-    Vector3Int tilePos;
-    Vector3Int targetTile;
+    private Vector2 direction;
+    private Vector3Int tilePos;
+    private Vector3Int targetTile;
     private RailData prevRail = null;
     void Start()
     {
         gridScript = gridManager.GetComponent<RailGridScript>();
+        dayCycleScript = dayCycleManager.GetComponent<DayCycleScript>();
+
         tilePos = Vector3Int.FloorToInt(transform.position);
 
         transform.position = gridScript.snapToGrid(transform.position);
@@ -29,13 +39,6 @@ public class TrainMovement : MonoBehaviour
     {
         return new Vector3Int(Mathf.RoundToInt(v.x), Mathf.RoundToInt(v.y), 0);
     }
-
-    private bool AreOpposite(Vector2 a, Vector2 b, float tol = 0.01f)
-    {
-        // returns true if a ≈ -b
-        return Mathf.Abs(a.x + b.x) < tol && Mathf.Abs(a.y + b.y) < tol;
-    }
-
     void Update()
     {
         if(!moving)
@@ -48,56 +51,39 @@ public class TrainMovement : MonoBehaviour
                 Vector2 prevRailDir = Vector2.zero, currentRailDir = Vector2.zero;
                 Vector2 chosenDir;
 
-                //Debug.Log(reversed);
-
-                if (prevRail != null)
+                if (currentRail.railType != RailData.railTypes.end)
                 {
-                    //if (reversed)
-                    //{
-                    //    prevRailDir = prevRail.directionOut;
-                    //    currentRailDir = currentRail.directionOut;
-                    //}
-                    //else
-                    //{
-                    //    prevRailDir = prevRail.directionOut;
-                    //    currentRailDir = currentRail.directionIn;
-                    //}
+                    if (prevRail != null)
+                    {
 
-                    //if (reversed && currentRail.directionOut != prevRail.directionOut) reversed = false;
-
-                    //if (AreOpposite(prevRailDir, currentRailDir))
-                    //{
-                    //    // We confirmed prevRail points into this tile, so continue forwards (use outgoing)
-                    //    chosenDir = currentRail.directionOut;
-                    //    reversed = false;
-                    //}
-                    //else
-                    //{
-                    //    // either prevRail missing or doesn't point in -> fallback to incoming (or choose outgoing if that's your intended behavior)
-                    //    chosenDir = currentRail.directionIn;
-                    //    reversed = true;
-                    //}
-                    chosenDir = currentRail.directionOut;
-                }
-                else
-                {
-                    chosenDir = currentRail.directionOut;
-                }
+                        chosenDir = currentRail.directionOut;
+                    }
+                    else
+                    {
+                        chosenDir = currentRail.directionOut;
+                    }
 
                     // convert chosenDir to integer tile offset and set target
-                targetTile = tilePos + Vec2ToInt(chosenDir);
-                prevRail = currentRail;
-                moving = true;
+                    targetTile = tilePos + Vec2ToInt(chosenDir);
+                    prevRail = currentRail;
+                    moving = true;
+                }
             }
         }
         else
         {
             if (gridScript.railAtPos(targetTile))
             {
-                transform.position = Vector3.Lerp(transform.position, gridScript.snapToGrid(targetTile), 0.1f);
+                Vector3 targetTilePos = gridScript.snapToGrid(targetTile);
+                //transform.position = Vector3.Lerp(transform.position, targetTilePos, 0.1f);
+                float x = Util.Approach(transform.position.x, targetTilePos.x, moveSpeed);
+                float y = Util.Approach(transform.position.y, targetTilePos.y, moveSpeed);
+                transform.position = new Vector2(x, y);
             }
+
             if (Vector3.Distance(transform.position, gridScript.snapToGrid(targetTile)) < 0.001f)
             {
+                if(moving)dayCycleScript.addTilesMoved(1);
                 transform.position = gridScript.snapToGrid(targetTile); // snap cleanly
                 tilePos = Vector3Int.FloorToInt(gridManager.GetComponent<Grid>().WorldToCell(targetTile));
                 moving = false;

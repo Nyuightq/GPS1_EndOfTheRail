@@ -17,14 +17,17 @@ public class RailData
     public railTypes railType = railTypes.normal;
     public Vector2 directionIn;
     public Vector2 directionOut;
+
+    private Vector3Int pos;
     public Tile tile;
 
     public RailLine line;
 
     public HashSet<Vector3Int> railEnd = new HashSet<Vector3Int>();
 
-    public RailData(railTypes railType = railTypes.normal)
+    public RailData(Vector3Int pos, railTypes railType = railTypes.normal)
     {
+        this.pos = pos;
         this.railType = railType;
     }
 
@@ -39,6 +42,30 @@ public class RailData
             case directionType.Outgoing:
                 directionOut = dir; break;
         }
+
+        updateVisual();
+    }
+
+    private void updateVisual()
+    {
+        // Don’t update visuals if this is a special rail
+        if (railType != railTypes.normal) return;
+
+        string tileName = $"rail_{getConnection()}";
+        Tile selectedTile = null;
+
+        foreach (Tile t in ConnectRails.tileSet)
+        {
+            if (t.name == tileName)
+            {
+                selectedTile = t;
+                break;
+            }
+        }
+
+        if (selectedTile == null) selectedTile = ConnectRails.tileSet[0];
+
+        GameManager.spawnTile(pos, selectedTile, this);
     }
 
     public int getConnection()
@@ -61,13 +88,14 @@ public class RailGridScript : MonoBehaviour
 {
 
     private Grid grid;
+    [SerializeField] private GameObject dayCycleManager;
+
     [SerializeField] private Tilemap railTileMap;
     [SerializeField] private Tile defaultRail;
     [SerializeField] private Tile startPointSprite;
     [SerializeField] private Tile endPointSprite;
 
     [SerializeField] private GameObject train;
-
 
     public Vector3Int startPoint;
     public Vector3Int endPoint;
@@ -77,7 +105,6 @@ public class RailGridScript : MonoBehaviour
     void Awake()
     {
         grid = GetComponent<Grid>();
-        
     }
 
     private void OnEnable()
@@ -113,8 +140,8 @@ public class RailGridScript : MonoBehaviour
                     Vector3 worldPos = snapToGrid(pos);
                     GameObject trainIns = Instantiate(train,worldPos,Quaternion.identity);
                     TrainMovement tm = trainIns.GetComponent<TrainMovement>();
-
                     tm.gridManager = gameObject;
+                    tm.dayCycleManager = dayCycleManager;
                     break;
                 }
             }
@@ -141,8 +168,9 @@ public class RailGridScript : MonoBehaviour
                 {
                     if (railDataMap[lineList[0]].railType == RailData.railTypes.start && railDataMap[lineList[^1]].railType == RailData.railTypes.end)
                     {
-                        railDataMap[lineList[0]].directionOut = new Vector2(lineList[1].x - lineList[0].x, lineList[1].y - lineList[0].y);
-                        railDataMap[lineList[^2]].directionOut = new Vector2(lineList[^1].x - lineList[^2].x, lineList[^1].y - lineList[^2].y);
+                        railDataMap[lineList[0]].setDirection(new Vector2(lineList[1].x - lineList[0].x, lineList[1].y - lineList[0].y), RailData.directionType.Outgoing);
+                        railDataMap[lineList[1]].setDirection(new Vector2(lineList[0].x - lineList[1].x, lineList[0].y - lineList[1].y), RailData.directionType.Incoming);
+                        railDataMap[lineList[^2]].setDirection(new Vector2(lineList[^1].x - lineList[^2].x, lineList[^1].y - lineList[^2].y), RailData.directionType.Outgoing);
                         return true;
                     }
                 }
@@ -150,7 +178,7 @@ public class RailGridScript : MonoBehaviour
         }
         return false;
     }
-
+    
     public Vector3 snapToGrid(Vector3 worldPos)
     {
         Vector3Int cellPos = grid.WorldToCell(worldPos);
@@ -182,14 +210,6 @@ public class RailGridScript : MonoBehaviour
     {
         railTileMap.SetTile(tilePos, null);
         if(railDataMap.ContainsKey(tilePos)) railDataMap.Remove(tilePos);
-    }
-
-    private bool isRailEnd(Vector3Int tilePos)
-    {
-        RailData rail = railDataMap[tilePos];
-        Vector3Int connectedTileIngoing = tilePos + Vector3Int.FloorToInt(new Vector3(rail.directionIn.x,rail.directionIn.y,0));
-        Vector3Int connectedTileOutgoing = tilePos + Vector3Int.FloorToInt(new Vector3(rail.directionOut.x, rail.directionOut.y, 0));
-        return !(railAtPos(connectedTileOutgoing) && railAtPos(connectedTileIngoing));
     }
 
     public Vector3Int findPoint(Dictionary<Vector3Int,RailData> railDataMap, RailData.railTypes railType)
@@ -265,11 +285,11 @@ public class RailGridScript : MonoBehaviour
 
                     if (tile == startPointSprite)
                     {
-                        railDataMap[tilePos] = new RailData(RailData.railTypes.start);
+                        railDataMap[tilePos] = new RailData(tilePos,RailData.railTypes.start);
                     }
                     else if(tile == endPointSprite)
                     {
-                        railDataMap[tilePos] = new RailData(RailData.railTypes.end);
+                        railDataMap[tilePos] = new RailData(tilePos,RailData.railTypes.end);
                     }
                 }
             }

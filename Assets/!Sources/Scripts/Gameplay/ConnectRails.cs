@@ -13,8 +13,8 @@ using static UnityEditor.ShaderGraph.Internal.Texture2DShaderProperty;
 
 public class ConnectRails : MonoBehaviour
 {
-    [SerializeField] GameObject gridManager;
-    [SerializeField] Tile[] tiles;
+    [SerializeField] private GameObject gridManager;
+    [SerializeField] private Tile[] tiles;
     [SerializeField] private InputActionReference mouseHoldReference;
     //[SerializeField] private float mouseDirThreshold = 0.3f;
     private Vector2 mouse;
@@ -24,8 +24,15 @@ public class ConnectRails : MonoBehaviour
     private Vector3Int currentTile;
     private RailGridScript gridScript;
     private Vector3Int cursorGridPos;
+
+    public static Tile[] tileSet;
     //private Vector2 direction;
-    
+
+    private void Awake()
+    {
+        tileSet = tiles;
+    }
+
     private void OnEnable()
     {
         mouseHoldReference.action.started += setStartingPoint;
@@ -103,7 +110,7 @@ public class ConnectRails : MonoBehaviour
         if (gridScript.railDataMap[tilePos].railType == RailData.railTypes.normal)
         {
             RailData currentRail;
-            string tileName = null;
+            //string tileName = null;
             RailLine line = gridScript.railDataMap[tilePos].line;
 
             bool tileAtLineEnd; //checks for the last,second last && third last(if validated) in the rail line
@@ -128,28 +135,7 @@ public class ConnectRails : MonoBehaviour
                     case false:
                         currentRail.setDirection(direction, RailData.directionType.Outgoing); break;
                 }
-                //Debug.Log(currentRail.getConnection());
-                tileName = $"rail_{currentRail.getConnection()}";
             }
-            Tile selectedTile = null;
-
-            if (tileName != null)
-            {
-                foreach (Tile tile in tiles)
-                {
-                    if (tile.name == tileName)
-                    {
-                        selectedTile = tile;
-                        break;
-                    }
-                }
-            }
-            else selectedTile = tiles[0];
-
-
-
-            RailData data = gridScript.railDataMap[tilePos];
-            if (gridScript.railDataMap[tilePos].railType == RailData.railTypes.normal && tileAtLineEnd) GameManager.spawnTile(tilePos, selectedTile, data);
         }
     }
 }

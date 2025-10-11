@@ -11,58 +11,41 @@ using UnityEngine.Tilemaps;
 
 public class BuildRails : MonoBehaviour
 {
-    [SerializeField] GameObject gridManager;
+    [Header("tileMaps/Grid Manager")]
+    [SerializeField] private GameObject gridManager;
+    [SerializeField] private Tile defaultTile;
+    [SerializeField] private Tilemap eventTilemap; //NEW
+    [Header("rail preview")]
     [SerializeField] private Sprite railPreview;
     [SerializeField] private float previewTransparency;
     [SerializeField] private LayerMask railLayer;
-    [SerializeField] private Tile defaultTile;
+    
     [SerializeField] private InputActionReference mouseHoldReference;
-
-    [SerializeField] private Tilemap eventTilemap; //NEW
 
     private Grid grid;
     private RailGridScript gridScript;
     private Vector2 mouse;
     private SpriteRenderer previewRenderer;
 
-    RailLine railLine;
+    private RailLine railLine;
     private bool canBuild = false;
     private bool isHolding = false;
-
-
-    //private void OnEnable()
-    //{
-    //    mouseHoldReference.action.performed += OnMouseHoldPerformed;
-    //    mouseHoldReference.action.canceled += OnMouseHoldCanceled;
-    //}
-
-    //private void OnDisable()
-    //{
-    //    mouseHoldReference.action.performed -= OnMouseHoldPerformed;
-    //    mouseHoldReference.action.canceled -= OnMouseHoldCanceled;
-    //}
 
     private void OnMouseHoldPerformed(InputAction.CallbackContext ctx)
     {
         isHolding = true;
     }
-
     private void OnMouseHoldCanceled(InputAction.CallbackContext ctx)
     {
         isHolding = false;
     }
-
-    void Start()
+    private void Awake()
     {
+        grid = gridManager.GetComponent<Grid>();
         gridScript = gridManager.GetComponent<RailGridScript>();
         previewRenderer = gameObject.AddComponent<SpriteRenderer>();
         previewRenderer.sortingLayerName = "Ui";
         previewRenderer.sprite = railPreview;
-    }
-
-    private void Awake()
-    {
-        grid = gridManager.GetComponent<Grid>();
     }
 
     void Update()
@@ -108,7 +91,7 @@ public class BuildRails : MonoBehaviour
             else if (railLine != null && railLine.line != null && railLine.line.Count > 0)
             {
                 Vector3Int lastTile = railLine.line[^1];
-                if (gridScript.onConnection(lastTile, tilePos))
+                if (gridScript.onConnection(lastTile, tilePos) && gridScript.railDataMap[lastTile].railType != RailData.railTypes.end)
                 {
                     validConnection = true;
                 }
@@ -121,12 +104,12 @@ public class BuildRails : MonoBehaviour
         if (isHolding && canBuild)
         {
             Debug.Log("WOO THERES A TILE THAT SPAWNED!!!");
-            if (gridScript.onConnection(gridScript.startPoint, tilePos))
+            if (gridScript.onConnection(gridScript.startPoint, tilePos) && emptyStart)
             {
                 railLine = new RailLine();
                 railLine.line.Add(gridScript.startPoint);
             }
-            RailData data = new RailData();
+            RailData data = new RailData(tilePos);
             GameManager.spawnTile(tilePos, defaultTile, data);
             gridScript.railDataMap[tilePos].setLine(railLine);
             railLine.line.Add(tilePos);
@@ -149,8 +132,7 @@ public class BuildRails : MonoBehaviour
                     railLine.line.Remove(railLine.line[^2]);
                     railLine.line.Remove(railLine.line[^1]);
                 }
-            }
-            
+            } 
         }
     }
 
