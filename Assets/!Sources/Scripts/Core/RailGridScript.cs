@@ -186,11 +186,13 @@ public class RailGridScript : MonoBehaviour
         return grid.GetCellCenterWorld(cellPos);
     }
 
+    //checks if there is a rail at position
     public bool railAtPos(Vector3Int tilePos)
     {
         return railDataMap.ContainsKey(tilePos);
     }
 
+    //gets the rail data at the position
     public RailData GetRailAtPos(Vector3Int tilePos)
     {
         if (railDataMap.TryGetValue(tilePos, out RailData data))
@@ -213,6 +215,7 @@ public class RailGridScript : MonoBehaviour
         if(railDataMap.ContainsKey(tilePos)) railDataMap.Remove(tilePos);
     }
 
+    //used to find the coordinates of unique tiles (start,end)
     public Vector3Int findPoint(Dictionary<Vector3Int,RailData> railDataMap, RailData.railTypes railType)
     {
         if(railDataMap.Count == 0) Debug.Log("nothing in yet");
@@ -221,56 +224,53 @@ public class RailGridScript : MonoBehaviour
         {
             if(rail.Value.railType == railType)
             {
-                Debug.Log(rail.Key);
+                //Debug.Log(rail.Key);
                 return rail.Key;
             }
             else
             {
-                Debug.Log("cant find shit");
+               // Debug.Log("cant find shit");
             }
         }
         return new Vector3Int(500,500,500);
     }
 
+    //returns true if the tile has any connections
     public bool hasConnection(Vector3Int tilePos)
     {
-        Vector3Int[] directions = new Vector3Int[]
+        List<Vector3Int> adjacentList = getAdjacentTiles(tilePos);
+        foreach (Vector3Int adjacent in adjacentList)
         {
-            new Vector3Int(1,0,0),
-            new Vector3Int(-1,0,0),
-            new Vector3Int(0,1,0),
-            new Vector3Int(0,-1,0)
-        };
-
-        foreach (Vector3Int direction in directions)
-        {
-            if (railAtPos(tilePos+direction))
-            {
-                return true;
-            }
+            if (railAtPos(adjacent)) return true;
         }
         return false;
     }
+
+    //finds if tilePos is adjacent/connected to tileSource
     public bool onConnection(Vector3Int tileSource, Vector3Int tilePos)
     {
-        Vector3Int[] directions = new Vector3Int[]
+        List<Vector3Int> adjacentList = getAdjacentTiles(tileSource);
+        foreach(Vector3Int adjacent in adjacentList)
         {
-            new Vector3Int(1,0,0),
-            new Vector3Int(-1,0,0),
-            new Vector3Int(0,1,0),
-            new Vector3Int(0,-1,0)
-        };
-
-        foreach(Vector3Int direction in directions)
-        {
-            if(tilePos == tileSource+direction)
-            {
-                return true;
-            }
+            if(adjacent == tilePos) return true;
         }
+
         return false;
     }
 
+    //returns a list of the adjacent tiles to the tilepos
+    public List<Vector3Int> getAdjacentTiles(Vector3Int tilepos)
+    {
+        return new List<Vector3Int>
+        {
+            tilepos + new Vector3Int(1,0,0),
+            tilepos + new Vector3Int(-1,0,0),
+            tilepos + new Vector3Int(0,1,0),
+            tilepos + new Vector3Int(0,-1,0)
+        };
+    }
+
+    //register the special tiles (start,end,rest) into the dataMap at the start of the game
     private void registerRails()
     {
         BoundsInt bounds = railTileMap.cellBounds;

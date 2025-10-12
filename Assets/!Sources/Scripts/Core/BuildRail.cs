@@ -104,7 +104,7 @@ public class BuildRails : MonoBehaviour
         //building
         if (isHolding && canBuild)
         {
-            Debug.Log("WOO THERES A TILE THAT SPAWNED!!!");
+            //Debug.Log("WOO THERES A TILE THAT SPAWNED!!!");
             if (gridScript.onConnection(gridScript.startPoint, tilePos) && emptyStart)
             {
                 railLine = new RailLine();
@@ -113,8 +113,34 @@ public class BuildRails : MonoBehaviour
             RailData data = new RailData(tilePos);
             GameManager.spawnTile(tilePos, defaultTile, data);
             gridScript.railDataMap[tilePos].setLine(railLine);
+            Debug.Log($"Tile {tilePos} assigned to line {railLine.GetHashCode()}");
             railLine.line.Add(tilePos);
-            if(gridScript.onConnection(gridScript.endPoint, tilePos))railLine.line.Add(gridScript.endPoint);
+
+            foreach(Vector3Int adjacent in gridScript.getAdjacentTiles(tilePos))
+            {
+                if(gridScript.railAtPos(adjacent))
+                {
+                    RailData adjacentData = gridScript.railDataMap[adjacent];
+                    if (adjacentData.line == railLine && adjacent == railLine.line[^2])
+                    {
+                        Vector2 dirToAdjacent = new Vector2(adjacent.x-tilePos.x,adjacent.y-tilePos.y);
+                        Vector2 dirFromAdjacent = new Vector2(tilePos.x - adjacent.x, tilePos.y - adjacent.y);
+
+                        gridScript.railDataMap[adjacent].setDirection(dirFromAdjacent, RailData.directionType.Outgoing);
+                        gridScript.railDataMap[tilePos].setDirection(dirToAdjacent, RailData.directionType.Incoming);
+                        break;
+                    }
+                }
+            }
+
+            if (gridScript.onConnection(gridScript.endPoint, tilePos))
+            {
+                railLine.line.Add(gridScript.endPoint);
+                Vector3Int prevRail = railLine.line[^2];
+                Vector3Int currentRail = railLine.line[^1];
+                Vector2 newDir = new Vector2(currentRail.x-prevRail.x,currentRail.y-prevRail.y);
+                gridScript.railDataMap[railLine.line[^2]].setDirection(newDir,RailData.directionType.Outgoing);
+            }
 
             foreach(var Rail in gridScript.railDataMap)
             {
@@ -125,7 +151,7 @@ public class BuildRails : MonoBehaviour
                 }
             }
 
-            foreach(Vector3Int Line in railLine.line) Debug.Log(Line);
+            //foreach(Vector3Int Line in railLine.line) Debug.Log(Line);
         }
 
         if (Input.GetMouseButtonDown(1))//&& onRail && gridScript.railDataMap[tilePos].railType == RailData.railTypes.normal)
@@ -139,8 +165,11 @@ public class BuildRails : MonoBehaviour
                 }
                 else
                 {
-                    GameManager.DestroyTile(railLine.line[^2]);
-                    railLine.line.Remove(railLine.line[^2]);
+                    if (gridScript.railDataMap[railLine.line[^2]].railType == RailData.railTypes.normal)
+                    {
+                        GameManager.DestroyTile(railLine.line[^2]);
+                        railLine.line.Remove(railLine.line[^2]);
+                    }
                     railLine.line.Remove(railLine.line[^1]);
                 }
             } 
