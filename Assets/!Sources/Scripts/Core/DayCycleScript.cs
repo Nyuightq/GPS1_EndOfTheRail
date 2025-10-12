@@ -3,47 +3,73 @@
 // Author: User
 // Description: -
 // --------------------------------------------------------------
-using Unity.VisualScripting;
+// --------------------------------------------------------------
+// Creation Date: 2025-10-12 01:49
+// Author: User
+// Description: Handles tile-based day/night transitions + UI overlay
+// --------------------------------------------------------------
 using UnityEngine;
+using UnityEngine.UI;
 
 public class DayCycleScript : MonoBehaviour
 {
-    [Header("debug field, just for looking")]
+    [Header("Debug fields (for viewing only)")]
     [SerializeField] private int tilesMoved = 0;
     [SerializeField] private int day = 0;
-    [SerializeField] timeOfDay currentTime = timeOfDay.day; //please help me rename it, im horrible at names
-    [Header("other")]
-    [SerializeField] private int dayLength;
-    [SerializeField] private int nightLength;
-    [SerializeField] private int dayLengthMod; //this is for when you get items that affect the day length
-    
-    
-    enum timeOfDay{day, night};
-    
-    public void setTilesMoved(int val){ tilesMoved = val; }
-    public void addTilesMoved(int val){ tilesMoved += val; }
+    [SerializeField] private TimeState currentTime = TimeState.Day;
+
+    [Header("Cycle Settings")]
+    [SerializeField] private int dayLength = 20;
+    [SerializeField] private int nightLength = 10;
+    [SerializeField] private int dayLengthMod = 0;
+
+    [Header("UI Settings")]
+    [SerializeField] private GameObject nightPanel; // ← assign your UI panel here
+
+    private enum TimeState { Day, Night }
+
+    public void setTilesMoved(int val) { tilesMoved = val; }
+    public void addTilesMoved(int val) { tilesMoved += val; } 
     public int getTilesMoved() { return tilesMoved; }
+
+    private void Start()
+    {
+        // Ensure the night panel starts disabled
+        if (nightPanel != null)
+            nightPanel.SetActive(false);
+    }
 
     private void Update()
     {
-        switch(currentTime)
+        switch (currentTime)
         {
-            case timeOfDay.day:
-                if (tilesMoved >= dayLength+dayLengthMod)
+            case TimeState.Day:
+                if (tilesMoved >= dayLength + dayLengthMod)
                 {
-                    currentTime = timeOfDay.night;
+                    currentTime = TimeState.Night;
                     tilesMoved = 0;
+
+                    if (nightPanel != null)
+                        nightPanel.SetActive(true);
+
+                    Debug.Log("🌙 Night has begun!");
                 }
                 break;
-            case timeOfDay.night:
+
+            case TimeState.Night:
                 if (tilesMoved >= nightLength)
                 {
-                    currentTime = timeOfDay.day;
+                    currentTime = TimeState.Day;
                     tilesMoved = 0;
                     day += 1;
+
+                    if (nightPanel != null)
+                        nightPanel.SetActive(false);
+
+                    Debug.Log("☀️ Day has begun!");
                 }
                 break;
         }
     }
-
 }
+

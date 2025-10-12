@@ -18822,6 +18822,7 @@ GameObject:
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
+  - component: {fileID: 519420033}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -18947,6 +18948,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &519420033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6470af03f705074459d7fbcdb00a5b8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 5
 --- !u!1 &564265089 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2075898144806698868, guid: a735768d6f135c6499b2e30d0b2731e3, type: 3}
@@ -19978,7 +19992,7 @@ Tilemap:
   - m_RefCount: 41
     m_Data: {fileID: 11400000, guid: 751e1901cd0c7b04aa226c7208774768, type: 2}
   - m_RefCount: 1
-    m_Data: {fileID: 11400000, guid: 74362ee74450bce449c042ba7c7083a0, type: 2}
+    m_Data: {fileID: 11400000, guid: d944694facad1b04da862f403e6d9fcb, type: 2}
   - m_RefCount: 1
     m_Data: {fileID: 11400000, guid: 8af1ee9b2164f3e468237cdb65090158, type: 2}
   m_TileSpriteArray:
@@ -19991,7 +20005,7 @@ Tilemap:
   - m_RefCount: 41
     m_Data: {fileID: 21300000, guid: df0f1d9f33bce564385df73a6b84f034, type: 3}
   - m_RefCount: 1
-    m_Data: {fileID: 21300000, guid: 8bf21247eee2c2c4d815cc9d1c708aea, type: 3}
+    m_Data: {fileID: 21300000, guid: b9a4cdacde79d3d4d947f1691c465547, type: 3}
   - m_RefCount: 1
     m_Data: {fileID: 21300000, guid: e03a0e83fc4781d48a4e4b5f33a9c883, type: 3}
   - m_RefCount: 1
