@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c0906de83e94cc44a4f919dc3479ac1, type: 3}
-  m_Name: CombatTile
+  m_Script: {fileID: 11500000, guid: d8be59372bdfad84c9245539ec14be2d, type: 3}
+  m_Name: New Encounter Tile
   m_EditorClassIdentifier: 
   m_Sprite: {fileID: 2891247693787962197, guid: 900583c8bd1ce73479e85fb59960f43c, type: 3}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Color: {r: 0.990566, g: 0, b: 0.82481813, a: 1}
   m_Transform:
     e00: 1
     e01: 0
@@ -31,7 +31,7 @@ MonoBehaviour:
     e31: 0
     e32: 0
     e33: 1
-  m_InstancedGameObject: {fileID: 2477839202617122279, guid: df36f381657b0f8498608000dd6a0c64, type: 3}
+  m_InstancedGameObject: {fileID: 0}
   m_Flags: 1
   m_ColliderType: 1
   tileVisual: {fileID: 11400000}

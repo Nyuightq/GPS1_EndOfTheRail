@@ -96,7 +96,18 @@ public class TrainMovement : MonoBehaviour
 
             if (Vector3.Distance(transform.position, gridScript.snapToGrid(targetTile)) < 0.001f)
             {
-                if(moving)dayCycleScript.addTilesMoved(1);
+                if (moving)
+                {
+                    dayCycleScript.addTilesMoved(1);
+
+                    // Notify the CrystalDeteriorates component
+                    CrystalDeteriorates deteriorator = GetComponent<CrystalDeteriorates>();
+                    if (deteriorator != null)
+                    {
+                        deteriorator.OnTileMoved();
+                    }
+                }
+
                 transform.position = gridScript.snapToGrid(targetTile); // snap cleanly
                 tilePos = Vector3Int.FloorToInt(gridManager.GetComponent<Grid>().WorldToCell(targetTile));
                 moving = false;
@@ -110,7 +121,7 @@ public class TrainMovement : MonoBehaviour
                         Debug.Log("Phase - Plan");
                         GameStateManager.SetPhase(Phase.Plan);
                         /// NEED
-                        gridScript.railDataMap[tilePos] = new RailData(tilePos, RailData.railTypes.normal);
+                        //gridScript.railDataMap[tilePos] = new RailData(tilePos, RailData.railTypes.normal);
                         /// NEED
                         GetComponent<TrainMovement>().enabled = false;
                     }

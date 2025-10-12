@@ -290,27 +290,62 @@ public class RailGridScript : MonoBehaviour
 
         for (int x = bounds.xMin; x < bounds.xMax; x++)
         {
-            for(int y = bounds.yMin; y < bounds.yMax; y++)
+            for (int y = bounds.yMin; y < bounds.yMax; y++)
             {
                 Vector3Int tilePos = new Vector3Int(x, y, 0);
-                if(railTileMap.HasTile(tilePos))
+                if (railTileMap.HasTile(tilePos))
                 {
                     TileBase tile = railTileMap.GetTile(tilePos);
 
                     if (tile == startPointSprite)
                     {
-                        railDataMap[tilePos] = new RailData(tilePos,RailData.railTypes.start);
+                        railDataMap[tilePos] = new RailData(tilePos, RailData.railTypes.start);
                     }
-                    else if(tile == endPointSprite)
+                    else if (tile == endPointSprite)
                     {
-                        railDataMap[tilePos] = new RailData(tilePos,RailData.railTypes.end);
+                        railDataMap[tilePos] = new RailData(tilePos, RailData.railTypes.end);
                     }
-                    else if(tile == restPointSprite)
+                    else if (tile == restPointSprite)
                     {
-                        railDataMap[tilePos] = new RailData(tilePos,RailData.railTypes.rest);
+                        railDataMap[tilePos] = new RailData(tilePos, RailData.railTypes.rest);
                     }
                 }
             }
         }
     }
+    
+    public void SpawnCombatTile(CombatTile combatTileSO)
+    {
+        List<Vector3Int> eligibleTiles = new List<Vector3Int>();
+
+        // Collect all "normal" rails only
+        foreach (var kvp in railDataMap)
+        {
+            RailData data = kvp.Value;
+            if (data.railType == RailData.railTypes.normal)
+            {
+                eligibleTiles.Add(kvp.Key);
+            }
+        }
+
+        if (eligibleTiles.Count == 0)
+        {
+            Debug.LogWarning("No eligible rails to spawn combat tile!");
+            return;
+        }
+
+        // Pick a random rail
+        Vector3Int randomPos = eligibleTiles[Random.Range(0, eligibleTiles.Count)];
+
+        // Optional: visually change the tile or mark it
+        Tile combatVisual = ScriptableObject.Instantiate(combatTileSO).tileVisual;
+        if (combatVisual != null)
+        {
+            railTileMap.SetTile(randomPos, combatVisual);
+        }
+
+        // Store this for later if you want to revert after night
+        Debug.Log($"Combat tile spawned at {randomPos}");
+    }
+
 }
