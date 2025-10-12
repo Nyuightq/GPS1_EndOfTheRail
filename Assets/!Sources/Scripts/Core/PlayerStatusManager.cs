@@ -7,16 +7,24 @@ using UnityEngine;
 
 public class PlayerStatusManager : MonoBehaviour
 {
-    private int _hp;
-    private int _maxHp;
-    private int _scraps;
+    [SerializeField] private int _hp = 0;
+    [SerializeField] private int _maxHp = 0;
+    [SerializeField] private int _scraps = 0;
     // public Inventory inventory;
 
-    public int Hp { get; set; }
+    public int Hp => _hp;
     public int MaxHp => _maxHp;
     public int Scraps => _scraps;
 
+    public void UpdateCurrentHp(int hp)
+    {
+        _hp = hp;
+    }
 
+    public void Start()
+    {
+        _hp = _maxHp;
+    }
     public bool ConsumeScraps(int value)
     {
         if (_scraps >= value)

@@ -27,7 +27,7 @@ public class GameStateManager : MonoBehaviour
 
     // private CycleManager cycleManeger;
 
-    private PlayerStatusManager playerStatus;
+    public PlayerStatusManager playerStatus;
     private Phase _phase = Phase.Plan;
     private bool _pause = false;
     // private int _scraps;

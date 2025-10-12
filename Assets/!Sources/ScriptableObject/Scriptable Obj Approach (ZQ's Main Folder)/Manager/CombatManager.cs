@@ -43,6 +43,7 @@ public class CombatManager : MonoBehaviour
         // Generate player
         GameObject playerObj = Instantiate(playerPrefab, playerSpawnPoint.position, Quaternion.identity, playerSpawnPoint);
         CombatPlayerEntity playerEntity = playerObj.GetComponent<CombatPlayerEntity>();
+        playerEntity.InitialHealth(GameStateManager.Instance.playerStatus.Hp, GameStateManager.Instance.playerStatus.MaxHp);
 
         // Generate enemies
         List<CombatEnemyEntity> enemies = new List<CombatEnemyEntity>();
@@ -60,8 +61,9 @@ public class CombatManager : MonoBehaviour
         Debug.Log("[CombatManager] Combat setup completed!");
     }
 
-    public void EndCombat(bool playerWon)
+    public void EndCombat(bool playerWon, int remainHp)
     {
+        GameStateManager.Instance.playerStatus.UpdateCurrentHp(remainHp);
         if (combatUIPanel != null)
             combatUIPanel.SetActive(false);
 

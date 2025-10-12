@@ -32,7 +32,7 @@ public class CombatEntity : MonoBehaviour
     public event TakeDamageEvent OnTakeDamage;
 
     private bool hasDied = false; // ensures event fires once
-    private UI_CombatEntity combatEntityUI;
+    protected UI_CombatEntity combatEntityUI;
     // Getters
     public int CurrentHp => _hp;
     public int MaxHp => _maxHp;
@@ -73,13 +73,18 @@ public class CombatEntity : MonoBehaviour
         _hp -= dmg;
         Debug.Log(entityName + " takes " + dmg + " damage. HP: " + _hp);
         OnTakeDamage?.Invoke(this, dmg);
-        combatEntityUI?.UpdateHealthBar(_hp*1.0f, _maxHp*1.0f);
+        combatEntityUI?.UpdateHealthBar(_hp * 1.0f, _maxHp * 1.0f);
         combatEntityUI?.ShowDamageText(dmg);
         if (IsDead == true && hasDied == false)
         {
             hasDied = true;
             OnDeath?.Invoke(this); // Trigger event once to CombatManager
         }
+    }
+    
+    public void updateUI()
+    {
+        combatEntityUI?.UpdateHealthBar(_hp*1.0f, _maxHp*1.0f);
     }
 
     // Return true when target is getting killed in this hit.

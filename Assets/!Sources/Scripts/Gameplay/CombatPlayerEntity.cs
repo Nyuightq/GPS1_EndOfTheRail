@@ -19,6 +19,14 @@ public class CombatPlayerEntity : CombatEntity
 
     }
 
+    public void InitialHealth(int currentHp, int maxHp)
+    {
+        _hp = currentHp;
+        _maxHp = maxHp;
+        // Update UI
+        combatEntityUI?.UpdateHealthBar(_hp*1.0f, _maxHp*1.0f);
+    }
+
     public override void Attack(CombatEntity target)
     {
         base.Attack(target);

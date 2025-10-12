@@ -17,7 +17,7 @@ public class CombatSystem : MonoBehaviour
 
     private bool isBattling = false;
    
-    public delegate void GameEvent(bool value);
+    public delegate void GameEvent(bool value, int remainHp);
     public event GameEvent onBattleEnd;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -129,6 +129,7 @@ public class CombatSystem : MonoBehaviour
     {
         Debug.Log("[CombatManager] Battle End. PlayerWon: " + playerWon);
         isBattling = false;
+        int remainHp = player.CurrentHp;
 
         if (playerWon)
         {
@@ -147,12 +148,13 @@ public class CombatSystem : MonoBehaviour
         }
         enemies.Clear();
 
-        onBattleEnd?.Invoke(playerWon);
+        onBattleEnd?.Invoke(playerWon, remainHp);
     }
 
     
     public void Test_BattleForceCancel()
     {
+        int remainHp = player.CurrentHp;
         if (player != null)
         {
             Destroy(player.gameObject);
@@ -165,7 +167,7 @@ public class CombatSystem : MonoBehaviour
         }
         enemies.Clear();
 
-        onBattleEnd?.Invoke(true);
+        onBattleEnd?.Invoke(true, remainHp);
     }
     
     
