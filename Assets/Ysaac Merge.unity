@@ -449,6 +449,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tilesMoved: 0
+  day: 0
+  currentTime: 0
+  dayLength: 5
+  nightLength: 5
+  dayLengthMod: 0
 --- !u!4 &363824372
 Transform:
   m_ObjectHideFlags: 0
@@ -1347,6 +1352,26 @@ Tilemap:
   m_GameObject: {fileID: 621970894}
   m_Enabled: 1
   m_Tiles:
+  - first: {x: -3, y: -4, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 6
+      m_TileSpriteIndex: 5
+      m_TileMatrixIndex: 4
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
+  - first: {x: 7, y: -2, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 6
+      m_TileSpriteIndex: 5
+      m_TileMatrixIndex: 4
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
   - first: {x: -10, y: 1, z: 0}
     second:
       serializedVersion: 2
@@ -1367,6 +1392,16 @@ Tilemap:
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
+  - first: {x: -4, y: 8, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 6
+      m_TileSpriteIndex: 5
+      m_TileMatrixIndex: 4
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
   m_AnimatedTiles: {}
   m_TileAssetArray:
   - m_RefCount: 1
@@ -1381,8 +1416,8 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
+  - m_RefCount: 3
+    m_Data: {fileID: 11400000, guid: 8af1ee9b2164f3e468237cdb65090158, type: 2}
   m_TileSpriteArray:
   - m_RefCount: 0
     m_Data: {fileID: 0}
@@ -1394,8 +1429,8 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
+  - m_RefCount: 3
+    m_Data: {fileID: 21300000, guid: e03a0e83fc4781d48a4e4b5f33a9c883, type: 3}
   - m_RefCount: 1
     m_Data: {fileID: 21300000, guid: cb35d34daeb576c4abeb6034e49dc0cc, type: 3}
   - m_RefCount: 1
@@ -1473,7 +1508,7 @@ Tilemap:
       e31: 0
       e32: 4.5915e-41
       e33: 0
-  - m_RefCount: 2
+  - m_RefCount: 5
     m_Data:
       e00: 1
       e01: 0
@@ -1492,7 +1527,7 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 2
+  - m_RefCount: 5
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   - m_RefCount: 0
     m_Data: {r: -4.9826697e-29, g: -4.9826697e-29, b: -4.9826697e-29, a: -4.9826697e-29}
@@ -1818,14 +1853,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridManager: {fileID: 1978963955}
+  defaultTile: {fileID: 11400000, guid: 29e7a9e41aea4b04995ff859ba91f1a7, type: 2}
+  eventTilemap: {fileID: 475663774}
   railPreview: {fileID: -756829269, guid: 18d91a242b0275946a0ab82bd4744fd7, type: 3}
   previewTransparency: 0.5
   railLayer:
     serializedVersion: 2
     m_Bits: 8
-  defaultTile: {fileID: 11400000, guid: 29e7a9e41aea4b04995ff859ba91f1a7, type: 2}
   mouseHoldReference: {fileID: -8267893273561798208, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-  eventTilemap: {fileID: 475663774}
 --- !u!114 &880395504
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3048,6 +3083,7 @@ MonoBehaviour:
   defaultRail: {fileID: 11400000, guid: 29e7a9e41aea4b04995ff859ba91f1a7, type: 2}
   startPointSprite: {fileID: 11400000, guid: 168c36d42842b4846b15004b46e51664, type: 2}
   endPointSprite: {fileID: 11400000, guid: d547f48115b19754fb29d846b563ed95, type: 2}
+  restPointSprite: {fileID: 11400000, guid: 8af1ee9b2164f3e468237cdb65090158, type: 2}
   train: {fileID: 6589955524157421207, guid: c37e54ec1fb11ae47a9182e5ac19653c, type: 3}
   startPoint: {x: 0, y: 0, z: 0}
   endPoint: {x: 0, y: 0, z: 0}

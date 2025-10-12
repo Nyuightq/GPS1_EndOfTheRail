@@ -3,6 +3,7 @@
 // Author: User
 // Description: -
 // --------------------------------------------------------------
+using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -91,7 +92,7 @@ public class BuildRails : MonoBehaviour
             else if (railLine != null && railLine.line != null && railLine.line.Count > 0)
             {
                 Vector3Int lastTile = railLine.line[^1];
-                if (gridScript.onConnection(lastTile, tilePos) && gridScript.railDataMap[lastTile].railType != RailData.railTypes.end)
+                if (gridScript.onConnection(lastTile, tilePos) && (gridScript.railDataMap[lastTile].railType != RailData.railTypes.end || gridScript.railDataMap[lastTile].railType != RailData.railTypes.rest))
                 {
                     validConnection = true;
                 }
@@ -100,7 +101,7 @@ public class BuildRails : MonoBehaviour
 
         canBuild = (!onRail && !isNonTraversable && validConnection);
 
-
+        //building
         if (isHolding && canBuild)
         {
             Debug.Log("WOO THERES A TILE THAT SPAWNED!!!");
@@ -113,7 +114,17 @@ public class BuildRails : MonoBehaviour
             GameManager.spawnTile(tilePos, defaultTile, data);
             gridScript.railDataMap[tilePos].setLine(railLine);
             railLine.line.Add(tilePos);
-            if(gridScript.onConnection(gridScript.endPoint, tilePos)) railLine.line.Add(gridScript.endPoint);
+            if(gridScript.onConnection(gridScript.endPoint, tilePos))railLine.line.Add(gridScript.endPoint);
+
+            foreach(var Rail in gridScript.railDataMap)
+            {
+                if(Rail.Value.railType == RailData.railTypes.rest && gridScript.onConnection(Rail.Key, tilePos))
+                {
+                    railLine.line.Add(Rail.Key);
+                    break;
+                }
+            }
+
             foreach(Vector3Int Line in railLine.line) Debug.Log(Line);
         }
 

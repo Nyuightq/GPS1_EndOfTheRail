@@ -11,7 +11,7 @@ using UnityEngine.Tilemaps;
 
 public class RailData
 {
-    public enum railTypes {normal, start, end}
+    public enum railTypes {normal, start, end, rest}
     public enum directionType { Incoming, Outgoing }
 
     public railTypes railType = railTypes.normal;
@@ -94,6 +94,7 @@ public class RailGridScript : MonoBehaviour
     [SerializeField] private Tile defaultRail;
     [SerializeField] private Tile startPointSprite;
     [SerializeField] private Tile endPointSprite;
+    [SerializeField] private Tile restPointSprite;
 
     [SerializeField] private GameObject train;
 
@@ -166,7 +167,7 @@ public class RailGridScript : MonoBehaviour
                 List<Vector3Int> lineList = railDataMap[tile].line.line;
                 if (lineList != null)
                 {
-                    if (railDataMap[lineList[0]].railType == RailData.railTypes.start && railDataMap[lineList[^1]].railType == RailData.railTypes.end)
+                    if (railDataMap[lineList[0]].railType == RailData.railTypes.start && (railDataMap[lineList[^1]].railType == RailData.railTypes.end || railDataMap[lineList[^1]].railType == RailData.railTypes.rest))
                     {
                         railDataMap[lineList[0]].setDirection(new Vector2(lineList[1].x - lineList[0].x, lineList[1].y - lineList[0].y), RailData.directionType.Outgoing);
                         railDataMap[lineList[1]].setDirection(new Vector2(lineList[0].x - lineList[1].x, lineList[0].y - lineList[1].y), RailData.directionType.Incoming);
@@ -290,6 +291,10 @@ public class RailGridScript : MonoBehaviour
                     else if(tile == endPointSprite)
                     {
                         railDataMap[tilePos] = new RailData(tilePos,RailData.railTypes.end);
+                    }
+                    else if(tile == restPointSprite)
+                    {
+                        railDataMap[tilePos] = new RailData(tilePos,RailData.railTypes.rest);
                     }
                 }
             }
