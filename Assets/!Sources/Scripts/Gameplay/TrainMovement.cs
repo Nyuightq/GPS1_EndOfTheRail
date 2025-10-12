@@ -100,6 +100,22 @@ public class TrainMovement : MonoBehaviour
                 transform.position = gridScript.snapToGrid(targetTile); // snap cleanly
                 tilePos = Vector3Int.FloorToInt(gridManager.GetComponent<Grid>().WorldToCell(targetTile));
                 moving = false;
+
+                // NEW: Check if collided to Rest point, then trigger Plan state.
+                if (gridScript.railAtPos(tilePos))
+                {
+                    RailData currentRail = gridScript.railDataMap[tilePos];
+                    if (currentRail.railType == RailData.railTypes.rest)
+                    {
+                        Debug.Log("Phase - Plan");
+                        GameStateManager.SetPhase(Phase.Plan);
+                        /// NEED
+                        gridScript.railDataMap[tilePos] = new RailData(tilePos, RailData.railTypes.normal);
+                        /// NEED
+                        GetComponent<TrainMovement>().enabled = false;
+                    }
+                }
+                // NEW: Check if collided to Rest point, then trigger Plan state.
             }
         }
     }   

@@ -17,6 +17,7 @@ public class RailData
     public railTypes railType = railTypes.normal;
     public Vector2 directionIn;
     public Vector2 directionOut;
+    private bool passThrought;
 
     private Vector3Int pos;
     public Tile tile;
@@ -100,6 +101,7 @@ public class RailGridScript : MonoBehaviour
 
     public Vector3Int startPoint;
     public Vector3Int endPoint;
+    private GameObject _trainRef;
 
     public Dictionary<Vector3Int,RailData> railDataMap = new Dictionary<Vector3Int,RailData>();
 
@@ -132,20 +134,29 @@ public class RailGridScript : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space) && validatePath(startPoint))
         {
-            foreach(var rail in railDataMap)
+            if (_trainRef == null) // Initial first train
             {
-                Vector3Int pos = rail.Key;
-                RailData data = rail.Value;
-                if(data.railType == RailData.railTypes.start)
+                foreach (var rail in railDataMap)
                 {
-                    Vector3 worldPos = snapToGrid(pos);
-                    GameObject trainIns = Instantiate(train,worldPos,Quaternion.identity);
-                    TrainMovement tm = trainIns.GetComponent<TrainMovement>();
-                    tm.gridManager = gameObject;
-                    tm.dayCycleManager = dayCycleManager;
-                    break;
+                    Vector3Int pos = rail.Key;
+                    RailData data = rail.Value;
+                    if (data.railType == RailData.railTypes.start)
+                    {
+                        Vector3 worldPos = snapToGrid(pos);
+                        _trainRef = Instantiate(train, worldPos, Quaternion.identity);
+                        TrainMovement tm = _trainRef.GetComponent<TrainMovement>();
+                        tm.gridManager = gameObject;
+                        tm.dayCycleManager = dayCycleManager;
+                        break;
+                    }
                 }
             }
+            else
+            {
+                _trainRef.GetComponent<TrainMovement>().enabled = true;
+            }
+
+            GameStateManager.SetPhase(Phase.Travel);
         }
     }
 
@@ -165,10 +176,12 @@ public class RailGridScript : MonoBehaviour
             if (railAtPos(tile))
             {
                 List<Vector3Int> lineList = railDataMap[tile].line.line;
+                Debug.Log("Last rail type: " + railDataMap[lineList[^1]].railType);
                 if (lineList != null)
                 {
                     if (railDataMap[lineList[0]].railType == RailData.railTypes.start && (railDataMap[lineList[^1]].railType == RailData.railTypes.end || railDataMap[lineList[^1]].railType == RailData.railTypes.rest))
                     {
+                        Debug.Log("Go");
                         railDataMap[lineList[0]].setDirection(new Vector2(lineList[1].x - lineList[0].x, lineList[1].y - lineList[0].y), RailData.directionType.Outgoing);
                         railDataMap[lineList[1]].setDirection(new Vector2(lineList[0].x - lineList[1].x, lineList[0].y - lineList[1].y), RailData.directionType.Incoming);
                         railDataMap[lineList[^2]].setDirection(new Vector2(lineList[^1].x - lineList[^2].x, lineList[^1].y - lineList[^2].y), RailData.directionType.Outgoing);
