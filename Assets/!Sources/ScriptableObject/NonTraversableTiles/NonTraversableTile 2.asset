@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 811563fb803ecdf4e8b2c3dbce293235, type: 3}
-  m_Name: NonTraversableTile
+  m_Name: NonTraversableTile 2
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 21300000, guid: 69c4c453fedc4724caeea21ab6063114, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 2e9bdfe1df659fd4db18fba26fdada0c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
