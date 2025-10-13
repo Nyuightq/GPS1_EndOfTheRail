@@ -1,15 +1,12 @@
 // --------------------------------------------------------------
-// Creation Date: 2025-10-12 01:49
-// Author: User
-// Description: -
-// --------------------------------------------------------------
-// --------------------------------------------------------------
-// Creation Date: 2025-10-12 01:49
-// Author: User
-// Description: Handles tile-based day/night transitions + UI overlay
+// Creation Date: 2025-10-12
+// Author: Liew Zhi Qian
+// Description: Handles day/night transitions, UI overlay, and night encounters
 // --------------------------------------------------------------
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Tilemaps;
+using System.Collections.Generic;
 
 public class DayCycleScript : MonoBehaviour
 {
@@ -24,7 +21,12 @@ public class DayCycleScript : MonoBehaviour
     [SerializeField] private int dayLengthMod = 0;
 
     [Header("UI Settings")]
-    [SerializeField] private GameObject nightPanel; // ← assign your UI panel here
+    [SerializeField] private GameObject nightPanel;
+
+    [Header("Event Settings")]
+    [SerializeField] private Tilemap eventTilemap;          // ← Assign EventTilemap
+    [SerializeField] private EncounterTile encounterTileSO; // ← Assign EncounterTile ScriptableObject
+    [SerializeField, Range(0f, 1f)] private float globalSpawnChance = 0.3f;
 
     private enum TimeState { Day, Night }
 
@@ -34,7 +36,6 @@ public class DayCycleScript : MonoBehaviour
 
     private void Start()
     {
-        // Ensure the night panel starts disabled
         if (nightPanel != null)
             nightPanel.SetActive(false);
     }
@@ -53,6 +54,7 @@ public class DayCycleScript : MonoBehaviour
                         nightPanel.SetActive(true);
 
                     Debug.Log("🌙 Night has begun!");
+                    SpawnNightEncounters(); // 
                 }
                 break;
 
@@ -66,10 +68,72 @@ public class DayCycleScript : MonoBehaviour
                     if (nightPanel != null)
                         nightPanel.SetActive(false);
 
+                    ClearNightEncounters(); // 
                     Debug.Log("☀️ Day has begun!");
                 }
                 break;
         }
     }
-}
 
+    // Spawns EncounterTiles on empty normal rails at night
+    // -------------------------------------------------------
+    private void SpawnNightEncounters()
+    {
+        if (eventTilemap == null || encounterTileSO == null)
+        {
+            Debug.LogWarning("Event Tilemap or EncounterTile not assigned!");
+            return;
+        }
+
+        RailGridScript grid = FindObjectOfType<RailGridScript>();
+        if (grid == null || grid.railDataMap == null)
+        {
+            Debug.LogWarning("No RailGridScript or rails found.");
+            return;
+        }
+
+        foreach (var kvp in grid.railDataMap)
+        {
+            Vector3Int pos = kvp.Key;
+            RailData data = kvp.Value;
+
+            // Only on normal rails and skip occupied event tiles (like Rest, End, Combat)
+            if (data.railType == RailData.railTypes.normal)
+            {
+                TileBase currentTile = eventTilemap.GetTile(pos);
+                if (currentTile is EventTile) // skip pre-placed EventTiles
+                    continue;
+
+                float roll = Random.value;
+                float finalChance = encounterTileSO.spawnChance * globalSpawnChance;
+
+                if (roll <= finalChance)
+                {
+                    eventTilemap.SetTile(pos, encounterTileSO.tileVisual);
+                    Debug.Log($"⚔️ Encounter Tile spawned at {pos}");
+                }
+            }
+        }
+    }
+
+    // Clears only EncounterTiles when day returns
+    private void ClearNightEncounters()
+    {
+        if (eventTilemap == null || encounterTileSO == null) return;
+
+        BoundsInt bounds = eventTilemap.cellBounds;
+        int cleared = 0;
+
+        foreach (var pos in bounds.allPositionsWithin)
+        {
+            TileBase tile = eventTilemap.GetTile(pos);
+            if (tile == encounterTileSO.tileVisual)
+            {
+                eventTilemap.SetTile(pos, null);
+                cleared++;
+            }
+        }
+
+        Debug.Log($"🧹 Cleared {cleared} EncounterTiles from EventTilemap.");
+    }
+}

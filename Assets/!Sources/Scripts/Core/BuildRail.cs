@@ -20,7 +20,7 @@ public class BuildRails : MonoBehaviour
     [SerializeField] private Sprite railPreview;
     [SerializeField] private float previewTransparency;
     [SerializeField] private LayerMask railLayer;
-    
+
     [SerializeField] private InputActionReference mouseHoldReference;
 
     private Grid grid;
@@ -114,23 +114,23 @@ public class BuildRails : MonoBehaviour
             GameManager.spawnTile(tilePos, defaultTile, data);
             gridScript.railDataMap[tilePos].setLine(railLine);
             railLine.line.Add(tilePos);
-            if(gridScript.onConnection(gridScript.endPoint, tilePos))railLine.line.Add(gridScript.endPoint);
+            if (gridScript.onConnection(gridScript.endPoint, tilePos)) railLine.line.Add(gridScript.endPoint);
 
-            foreach(var Rail in gridScript.railDataMap)
+            foreach (var Rail in gridScript.railDataMap)
             {
-                if(Rail.Value.railType == RailData.railTypes.rest && gridScript.onConnection(Rail.Key, tilePos))
+                if (Rail.Value.railType == RailData.railTypes.rest && gridScript.onConnection(Rail.Key, tilePos))
                 {
                     railLine.line.Add(Rail.Key);
                     break;
                 }
             }
 
-            foreach(Vector3Int Line in railLine.line) Debug.Log(Line);
+            foreach (Vector3Int Line in railLine.line) Debug.Log(Line);
         }
 
         if (Input.GetMouseButtonDown(1))//&& onRail && gridScript.railDataMap[tilePos].railType == RailData.railTypes.normal)
         {
-            if(railLine != null && railLine.line.Count > 1)
+            if (railLine != null && railLine.line.Count > 1)
             {
                 if (gridScript.railDataMap[railLine.line[^1]].railType == RailData.railTypes.normal)
                 {
@@ -143,8 +143,7 @@ public class BuildRails : MonoBehaviour
                     railLine.line.Remove(railLine.line[^2]);
                     railLine.line.Remove(railLine.line[^1]);
                 }
-            } 
+            }
         }
     }
-
 }
