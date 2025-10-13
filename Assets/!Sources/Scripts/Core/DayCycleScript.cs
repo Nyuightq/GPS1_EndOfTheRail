@@ -53,7 +53,7 @@ public class DayCycleScript : MonoBehaviour
                     if (nightPanel != null)
                         nightPanel.SetActive(true);
 
-                    Debug.Log("🌙 Night has begun!");
+                    Debug.Log("Night has begun!");
                     SpawnNightEncounters(); // 
                 }
                 break;
@@ -69,7 +69,7 @@ public class DayCycleScript : MonoBehaviour
                         nightPanel.SetActive(false);
 
                     ClearNightEncounters(); // 
-                    Debug.Log("☀️ Day has begun!");
+                    Debug.Log("Day has begun!");
                 }
                 break;
         }
@@ -110,7 +110,7 @@ public class DayCycleScript : MonoBehaviour
                 if (roll <= finalChance)
                 {
                     eventTilemap.SetTile(pos, encounterTileSO.tileVisual);
-                    Debug.Log($"⚔️ Encounter Tile spawned at {pos}");
+                    Debug.Log($"Encounter Tile spawned at {pos}");
                 }
             }
         }

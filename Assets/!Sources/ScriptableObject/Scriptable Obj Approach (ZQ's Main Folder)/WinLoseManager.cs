@@ -126,7 +126,7 @@ private void CheckWinCondition()
         if (trainMovement != null)
             trainMovement.enabled = false;
 
-        Debug.Log("🏁 Player Won! Reached End Point Safely!");
+        Debug.Log("Player Won! Reached End Point Safely!");
         GameStateManager.SetPhase(Phase.Win);
 
         // Pause the game
