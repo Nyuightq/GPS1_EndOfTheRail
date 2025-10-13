@@ -11,15 +11,14 @@ using UnityEngine.Tilemaps;
 
 public class RailData
 {
-    public enum railTypes {normal, start, end, rest}
+    public enum railTypes {normal, start, end, rest, disabled}
     public enum directionType { Incoming, Outgoing }
 
     public railTypes railType = railTypes.normal;
     public Vector2 directionIn;
     public Vector2 directionOut;
-    private bool passThrought;
-
     private Vector3Int pos;
+    public Vector3Int Pos => pos;
     public Tile tile;
 
     public RailLine line;
@@ -124,7 +123,7 @@ public class RailGridScript : MonoBehaviour
 
     void Start()
     {
-        registerRails();
+        railDataMap = registerRails();
         startPoint = findPoint(railDataMap,RailData.railTypes.start);
         endPoint = findPoint(railDataMap,RailData.railTypes.end);
 
@@ -154,10 +153,57 @@ public class RailGridScript : MonoBehaviour
             else
             {
                 _trainRef.GetComponent<TrainMovement>().enabled = true;
+
+                
             }
 
             GameStateManager.SetPhase(Phase.Travel);
         }
+    }
+
+    public void refreshRoute()
+    {
+        Dictionary<Vector3Int, RailData> new_RailDataMap = new Dictionary<Vector3Int, RailData>();
+        new_RailDataMap = registerRails();
+        // List<Vector3Int> linelist = railDataMap;
+        
+        Vector3Int c_endPoint = findEndPoint(startPoint);
+        if (c_endPoint == startPoint) Debug.Log("Fuckyou");
+
+        new_RailDataMap[startPoint].railType = RailData.railTypes.disabled;
+        new_RailDataMap[c_endPoint].railType = RailData.railTypes.start;
+
+        startPoint = c_endPoint;
+        
+        railDataMap = new_RailDataMap;
+    }
+    public Vector3Int findEndPoint(Vector3Int startPoint)
+    {
+        Vector3Int[] directions = new Vector3Int[]
+        {
+            new Vector3Int(1,0,0),
+            new Vector3Int(-1,0,0),
+            new Vector3Int(0,1,0),
+            new Vector3Int(0,-1,0)
+        };
+
+        foreach (Vector3Int direction in directions)
+        {
+            Vector3Int tile = startPoint + direction;
+            if (railAtPos(tile))
+            {
+                List<Vector3Int> lineList = railDataMap[tile].line.line;
+                if (lineList != null)
+                {
+                    if (railDataMap[lineList[0]].railType == RailData.railTypes.start && (railDataMap[lineList[^1]].railType == RailData.railTypes.end || railDataMap[lineList[^1]].railType == RailData.railTypes.rest))
+                    {
+                        return railDataMap[lineList[^1]].Pos;
+                    }
+                }
+
+            }
+        }
+        return startPoint;
     }
 
     public bool validatePath(Vector3Int startPoint)
@@ -176,7 +222,15 @@ public class RailGridScript : MonoBehaviour
             if (railAtPos(tile))
             {
                 List<Vector3Int> lineList = railDataMap[tile].line.line;
-                Debug.Log("Last rail type: " + railDataMap[lineList[^1]].railType);
+                Debug.Log("Last rail type: "
+                + railDataMap[lineList[^1]].directionIn + " "
+                + railDataMap[lineList[^1]].directionOut + " "
+                + railDataMap[lineList[^1]].line + " Next is [^2]"
+                + railDataMap[lineList[^2]].directionIn + " "
+                + railDataMap[lineList[^2]].directionOut + " "
+                + railDataMap[lineList[^2]].line + " "
+                + railDataMap[lineList[^2]]
+                );
                 if (lineList != null)
                 {
                     if (railDataMap[lineList[0]].railType == RailData.railTypes.start && (railDataMap[lineList[^1]].railType == RailData.railTypes.end || railDataMap[lineList[^1]].railType == RailData.railTypes.rest))
@@ -188,6 +242,7 @@ public class RailGridScript : MonoBehaviour
                         return true;
                     }
                 }
+
             }
         }
         return false;
@@ -284,33 +339,36 @@ public class RailGridScript : MonoBehaviour
         return false;
     }
 
-    private void registerRails()
+    private Dictionary<Vector3Int,RailData> registerRails()
     {
+        Dictionary<Vector3Int,RailData> compiling_railDataMap = new Dictionary<Vector3Int, RailData>();
         BoundsInt bounds = railTileMap.cellBounds;
 
         for (int x = bounds.xMin; x < bounds.xMax; x++)
         {
-            for(int y = bounds.yMin; y < bounds.yMax; y++)
+            for (int y = bounds.yMin; y < bounds.yMax; y++)
             {
                 Vector3Int tilePos = new Vector3Int(x, y, 0);
-                if(railTileMap.HasTile(tilePos))
+                if (railTileMap.HasTile(tilePos))
                 {
                     TileBase tile = railTileMap.GetTile(tilePos);
 
                     if (tile == startPointSprite)
                     {
-                        railDataMap[tilePos] = new RailData(tilePos,RailData.railTypes.start);
+                        compiling_railDataMap[tilePos] = new RailData(tilePos, RailData.railTypes.start);
                     }
-                    else if(tile == endPointSprite)
+                    else if (tile == endPointSprite)
                     {
-                        railDataMap[tilePos] = new RailData(tilePos,RailData.railTypes.end);
+                        compiling_railDataMap[tilePos] = new RailData(tilePos, RailData.railTypes.end);
                     }
-                    else if(tile == restPointSprite)
+                    else if (tile == restPointSprite)
                     {
-                        railDataMap[tilePos] = new RailData(tilePos,RailData.railTypes.rest);
+                        compiling_railDataMap[tilePos] = new RailData(tilePos, RailData.railTypes.rest);
                     }
                 }
             }
         }
+
+        return compiling_railDataMap;
     }
 }
