@@ -121,8 +121,9 @@ public class TrainMovement : MonoBehaviour
                         Debug.Log("Phase - Plan");
                         GameStateManager.SetPhase(Phase.Plan);
                         /// NEED
-                        //gridScript.railDataMap[tilePos] = new RailData(tilePos, RailData.railTypes.normal);
+                        /// gridScript.railDataMap[tilePos] = new RailData(tilePos, RailData.railTypes.normal);
                         /// NEED
+                        gridScript.refreshRoute();
                         GetComponent<TrainMovement>().enabled = false;
                     }
                 }
