@@ -115,10 +115,7 @@ public class BuildRails : MonoBehaviour
         }
 
         canBuild = (!onRail && !isNonTraversable && validConnection);
-        if (canBuild & !onRail)
-        {
-            Debug.Log($"✅ Valid build candidate: {tilePos}");
-        }
+
         //building
         if (isHolding && canBuild)
         {
@@ -135,15 +132,6 @@ public class BuildRails : MonoBehaviour
 
             Debug.Log($"Tile {tilePos} assigned to line {railLine.GetHashCode()}");
             railLine.line.Add(tilePos);
-
-            foreach (var Rail in gridScript.railDataMap)
-            {
-                if (Rail.Value.railType == RailData.railTypes.rest && gridScript.onConnection(Rail.Key, tilePos))
-                {
-                    railLine.line.Add(Rail.Key);;
-                    break;
-                }
-            }
 
             foreach (Vector3Int adjacent in gridScript.getAdjacentTiles(tilePos))
             {
@@ -162,8 +150,25 @@ public class BuildRails : MonoBehaviour
                 }
             }
 
-            
+            //register rest point tile
+            foreach (var Rail in gridScript.railDataMap)
+            {
+                if (Rail.Value.railType == RailData.railTypes.rest && gridScript.onConnection(Rail.Key, tilePos))
+                {
+                    railLine.line.Add(Rail.Key);
+                    Vector3Int restTile = railLine.line[^1];
+                    Vector3Int prevTile = railLine.line[^2];
 
+                    Vector2 dirToRest = new Vector2(restTile.x - prevTile.x, restTile.y - prevTile.y);
+                    Vector2 dirFromRest = -new Vector2(restTile.x - prevTile.x, restTile.y - prevTile.y);
+
+                    gridScript.railDataMap[restTile].setDirection(dirFromRest, RailData.directionType.Incoming);
+                    gridScript.railDataMap[prevTile].setDirection(dirToRest, RailData.directionType.Outgoing);
+                    break;
+                }
+            }
+
+            //register end tile
             if (gridScript.onConnection(gridScript.endPoint, tilePos))
             {
                 railLine.line.Add(gridScript.endPoint);
