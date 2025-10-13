@@ -205,6 +205,36 @@ public class RailGridScript : MonoBehaviour
         return startPoint;
     }
 
+    public void travelCheck()
+    {
+        if (validatePath(startPoint))
+        {
+            if (_trainRef == null) // Initial first train
+            {
+                foreach (var rail in railDataMap)
+                {
+                    Vector3Int pos = rail.Key;
+                    RailData data = rail.Value;
+                    if (data.railType == RailData.railTypes.start)
+                    {
+                        Vector3 worldPos = snapToGrid(pos);
+                        _trainRef = Instantiate(train, worldPos, Quaternion.identity);
+                        TrainMovement tm = _trainRef.GetComponent<TrainMovement>();
+                        tm.gridManager = gameObject;
+                        tm.dayCycleManager = dayCycleManager;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                _trainRef.GetComponent<TrainMovement>().enabled = true;
+            }
+
+            GameStateManager.SetPhase(Phase.Travel);
+        }
+    }
+
     public bool validatePath(Vector3Int startPoint)
     {
         Vector3Int[] directions = new Vector3Int[]

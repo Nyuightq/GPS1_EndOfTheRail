@@ -41,6 +41,7 @@ public class GameStateManager : MonoBehaviour
     // private CameraManager _cameraManager;
     // private UIManager _uiManager;
     [SerializeField] private GameObject _railBuilderManager;
+    [SerializeField] private GameObject _planPhasePanel;
 
     private void Awake()
     {
@@ -97,10 +98,12 @@ public class GameStateManager : MonoBehaviour
             // Enable Planning phase related UI
             // Enable Rail building and hover UI
             _railBuilderManager.SetActive(true);
+            _planPhasePanel.SetActive(true);
         }
         else if (_phase == Phase.Travel)
         {
             _railBuilderManager.SetActive(false);
+            _planPhasePanel.SetActive(false);
             // Disable camera Move
             // Disable Planning phase related UI
             // Disable Rail building and hover UI
