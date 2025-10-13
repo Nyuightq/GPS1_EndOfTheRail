@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd8a298b010b8984dadd2c7af07d7059, type: 3}
-  m_Name: TestCrystalTakeDamage
+  m_Script: {fileID: 11500000, guid: d8be59372bdfad84c9245539ec14be2d, type: 3}
+  m_Name: Encounter Tile
   m_EditorClassIdentifier: 
   m_Sprite: {fileID: 2891247693787962197, guid: 900583c8bd1ce73479e85fb59960f43c, type: 3}
-  m_Color: {r: 0, g: 0.10499692, b: 1, a: 1}
+  m_Color: {r: 0.990566, g: 0, b: 0.82481813, a: 1}
   m_Transform:
     e00: 1
     e01: 0
@@ -34,4 +34,5 @@ MonoBehaviour:
   m_InstancedGameObject: {fileID: 0}
   m_Flags: 1
   m_ColliderType: 1
-  damageAmount: 100
+  tileVisual: {fileID: 11400000}
+  spawnChance: 0.25

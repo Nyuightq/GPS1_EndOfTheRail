@@ -18,7 +18,10 @@ public enum Phase
 {
     Plan,
     Travel,
-    Combat
+    Combat,
+
+    Win,
+    Lose
 }
 
 public class GameStateManager : MonoBehaviour
@@ -107,6 +110,24 @@ public class GameStateManager : MonoBehaviour
 
 
         if (_phase == Phase.Combat)
+        {
+            // Disable configuration interactive system
+        }
+        else
+        {
+            // Enable configuration interactive system
+        }
+
+        if (_phase == Phase.Win)
+        {
+            // Disable configuration interactive system
+        }
+        else
+        {
+            // Enable configuration interactive system
+        }
+        
+                if (_phase == Phase.Lose)
         {
             // Disable configuration interactive system
         }
