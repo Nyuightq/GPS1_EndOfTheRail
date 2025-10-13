@@ -10,7 +10,7 @@ using UnityEngine;
 public class TrainMovement : MonoBehaviour
 {
     [Header("regular movement")]
-    [SerializeField] private float moveSpeed = 0.02f;
+    [SerializeField] private float moveSpeed = 2.0f;
     [Header("lerp movement option")]
     [SerializeField] private bool lerpMovement = false;
     [SerializeField] private float lerpAmount = 0.1f;
@@ -88,8 +88,8 @@ public class TrainMovement : MonoBehaviour
                 }
                 else
                 {
-                    float x = Util.Approach(transform.position.x, targetTilePos.x, moveSpeed);
-                    float y = Util.Approach(transform.position.y, targetTilePos.y, moveSpeed);
+                    float x = Util.Approach(transform.position.x, targetTilePos.x, moveSpeed * Time.deltaTime);
+                    float y = Util.Approach(transform.position.y, targetTilePos.y, moveSpeed * Time.deltaTime);
                     transform.position = new Vector2(x, y);
                 }
             }
