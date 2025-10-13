@@ -67,7 +67,7 @@ public class ConnectRails : MonoBehaviour
 
         if (currentTile != prevTile && gridScript.railAtPos(currentTile) && gridScript.railDataMap[currentTile].directionIn == Vector2.zero)
         {
-            Debug.Log("look");
+            //Debug.Log("look");
 
             Vector2 direction = new Vector2(currentTile.x - prevTile.x, currentTile.y - prevTile.y);
             changeRail(prevTile, direction, false);

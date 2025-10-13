@@ -54,7 +54,7 @@ public class TrainMovement : MonoBehaviour
                 Vector2 prevRailDir = Vector2.zero, currentRailDir = Vector2.zero;
                 Vector2 chosenDir;
 
-                if (currentRail.railType != RailData.railTypes.end  && currentRail.railType != RailData.railTypes.rest)
+                if (currentRail.railType != RailData.railTypes.end && currentRail.railType != RailData.railTypes.rest)
                 {
                     if (prevRail != null)
                     {
