@@ -43,7 +43,7 @@ public class OnButtonClick : MonoBehaviour
 
     public void OnStartButton()
     {
-        SceneManager.LoadScene("GameplayScene");
+        SceneManager.LoadScene("CutScene01");
     }
     
     public void OnOptionsButton()
