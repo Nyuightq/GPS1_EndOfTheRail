@@ -29183,6 +29183,18 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2512334478067095315, guid: fe6b25b414272cd40bcead92c9d4e5ed, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6504558006802690411, guid: fe6b25b414272cd40bcead92c9d4e5ed, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1978963956}
+    - target: {fileID: 6504558006802690411, guid: fe6b25b414272cd40bcead92c9d4e5ed, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: travelCheck
+      objectReference: {fileID: 0}
     - target: {fileID: 7031631100772428351, guid: fe6b25b414272cd40bcead92c9d4e5ed, type: 3}
       propertyPath: m_LocalScale.x
       value: 2
