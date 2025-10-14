@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70071df3d3fb49f499dc29adaab5f8cf, type: 3}
   m_Name: TrasactionTile
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 2891247693787962197, guid: 900583c8bd1ce73479e85fb59960f43c, type: 3}
-  m_Color: {r: 0, g: 0.972549, b: 0.12297564, a: 1}
+  m_Sprite: {fileID: 21300000, guid: cbfcaa0cd106a0643a1fe71fc8284dfe, type: 3}
+  m_Color: {r: 0.9924528, g: 0.9924528, b: 0.9924528, a: 1}
   m_Transform:
     e00: 1
     e01: 0

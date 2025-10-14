@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53554d2598176ae41b85b52b53a03e46, type: 3}
   m_Name: ChurchTile
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 2891247693787962197, guid: 900583c8bd1ce73479e85fb59960f43c, type: 3}
-  m_Color: {r: 0, g: 0.8771584, b: 1, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 9ac105569bfa5b94c968dce67a2115df, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
     e01: 0
