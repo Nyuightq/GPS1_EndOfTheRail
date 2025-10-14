@@ -99,11 +99,13 @@ public class GameStateManager : MonoBehaviour
             // Enable Rail building and hover UI
             _railBuilderManager.SetActive(true);
             _planPhasePanel.SetActive(true);
+            CameraMovementTemp.ToggleCameraFollowMode(false);
         }
         else if (_phase == Phase.Travel)
         {
             _railBuilderManager.SetActive(false);
             _planPhasePanel.SetActive(false);
+            CameraMovementTemp.ToggleCameraFollowMode(true);
             // Disable camera Move
             // Disable Planning phase related UI
             // Disable Rail building and hover UI
