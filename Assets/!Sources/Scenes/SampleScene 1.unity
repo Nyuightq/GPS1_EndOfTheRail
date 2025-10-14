@@ -29179,6 +29179,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 473910171478371308, guid: fe6b25b414272cd40bcead92c9d4e5ed, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7031631100772428351, guid: fe6b25b414272cd40bcead92c9d4e5ed, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7031631100772428351, guid: fe6b25b414272cd40bcead92c9d4e5ed, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 7096268493977147597, guid: fe6b25b414272cd40bcead92c9d4e5ed, type: 3}
       propertyPath: m_Name
       value: Canvas
@@ -29268,7 +29280,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 513020824660682945, guid: fe6b25b414272cd40bcead92c9d4e5ed, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fe6b25b414272cd40bcead92c9d4e5ed, type: 3}
@@ -29302,3 +29315,4 @@ SceneRoots:
   - {fileID: 444064496}
   - {fileID: 2066187032}
   - {fileID: 1092441549}
+  - {fileID: 1928116089}
