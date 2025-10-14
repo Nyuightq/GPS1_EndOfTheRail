@@ -16,6 +16,7 @@ public class CombatSystem : MonoBehaviour
     private float battleSpeed = 1.0f;
 
     private bool isBattling = false;
+    private UI_CombatTooltipDetail tooltip;
    
     public delegate void GameEvent(bool value, int remainHp);
     public event GameEvent onBattleEnd;
@@ -28,6 +29,8 @@ public class CombatSystem : MonoBehaviour
 
     public void InitializeBattle(CombatPlayerEntity playerEntity, List<CombatEnemyEntity> enemyEntities)
     {
+        if (tooltip == null) tooltip = UI_CombatTooltipDetail.Instance;
+        
         player = playerEntity;
         enemies = enemyEntities;
 
@@ -149,6 +152,7 @@ public class CombatSystem : MonoBehaviour
         enemies.Clear();
 
         onBattleEnd?.Invoke(playerWon, remainHp);
+        tooltip.Hide();
     }
 
     
