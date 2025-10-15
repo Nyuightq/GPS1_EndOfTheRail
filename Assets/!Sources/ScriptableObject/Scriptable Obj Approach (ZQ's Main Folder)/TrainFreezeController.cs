@@ -23,6 +23,7 @@ public class TrainFreezeController : MonoBehaviour
         TransactionManager.OnTransactionClosed += ResumeTrain;
         ChurchManager.OnChurchClosed += ResumeTrain;
         CombatManager.OnCombatClosed += ResumeTrain; 
+        StoryManager.OnStoryClosed += ResumeTrain; 
     }
 
     private void OnDisable()
@@ -31,6 +32,7 @@ public class TrainFreezeController : MonoBehaviour
         TransactionManager.OnTransactionClosed -= ResumeTrain;
         ChurchManager.OnChurchClosed -= ResumeTrain;
         CombatManager.OnCombatClosed -= ResumeTrain; 
+        StoryManager.OnStoryClosed -= ResumeTrain; 
     }
 
     public void FreezeTrain()
