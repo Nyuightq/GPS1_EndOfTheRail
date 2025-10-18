@@ -15,7 +15,7 @@ public class BuildRails : MonoBehaviour
     [Header("tileMaps/Grid Manager")]
     [SerializeField] private GameObject gridManager;
     [SerializeField] private Tile defaultTile;
-    [SerializeField] private Tilemap eventTilemap; //NEW
+    [SerializeField] private Tilemap eventTilemap;
     [Header("rail preview")]
     [SerializeField] private Sprite railPreview;
     [SerializeField] private float previewTransparency;
@@ -31,6 +31,7 @@ public class BuildRails : MonoBehaviour
     private RailLine railLine;
     private bool canBuild = false;
     private bool isHolding = false;
+    private Vector3Int? _lastBuiltRail = null;
 
     private void OnMouseHoldPerformed(InputAction.CallbackContext ctx)
     {
@@ -39,6 +40,15 @@ public class BuildRails : MonoBehaviour
     private void OnMouseHoldCanceled(InputAction.CallbackContext ctx)
     {
         isHolding = false;
+    }
+
+    #region Unity Life Cycle
+    private void OnEnable()
+    {
+        // The rail building related data is reset due to Phase state is change and make the BuildRail being disabled and enable
+        // Might still have some problem happens if keep it here.
+        _lastBuiltRail = null;
+        railLine = null;
     }
     private void Awake()
     {
@@ -51,153 +61,305 @@ public class BuildRails : MonoBehaviour
 
     void Update()
     {
+        if (gridScript == null) return;
+
+        // =====================
+        // Variables Declaration 
+        // =====================
+        Vector3Int tilePos = ReadMousePointingSnapPoint();
+        bool onRail = gridScript.railAtPos(tilePos);
+        if (_lastBuiltRail != null)
+        {
+            railLine = gridScript.railDataMap[(Vector3Int) _lastBuiltRail].line;
+        }
+        
+        TileBase eventTile = eventTilemap.GetTile(tilePos);
+        bool isNonTraversable = eventTile is NonTraversableTile;
+
+        if (Input.GetMouseButton(0)) isHolding = true; else isHolding = false;
+
+        bool emptyStart = !gridScript.hasConnection(gridScript.startPoint);
+        bool validConnection = IsValidConnection(tilePos);
+        canBuild = !onRail && !isNonTraversable && validConnection;
+        // =====================
+        // Variables Declaration 
+        // =====================
+        RenderPreviewRail(onRail, isNonTraversable);
+
+        // =====================
+        // Handle Building Input and check is buildable
+        // =====================
+        if (isHolding && canBuild)
+        {
+            if (gridScript.onConnection(gridScript.startPoint, tilePos) && emptyStart)
+            {
+                railLine = new RailLine();
+                railLine.line.Add(gridScript.startPoint);
+            }
+            if (emptyStart) Debug.Log("Empty Start");
+            RailData data = new RailData(tilePos);
+
+            GameManager.spawnTile(tilePos, defaultTile, data);
+            gridScript.railDataMap[tilePos].setLine(railLine);
+            railLine.line.Add(tilePos);
+
+            Debug.Log($"Tile {tilePos} assigned to line {railLine.GetHashCode()}");
+
+            if (emptyStart)
+            {
+                HandleStartTileConnection(tilePos);
+            }
+            else
+            {
+                HandlePreviousTileConnection(tilePos);
+            }
+            _lastBuiltRail = tilePos;
+
+            Debug.Log($"Tile {tilePos} assigned to line {gridScript.railDataMap[tilePos].directionIn}, {gridScript.railDataMap[tilePos].directionOut}");
+
+            //register rest point tile
+            HandleRestTileConnection(tilePos);
+            HandleEndTileConnection(tilePos);
+        }
+
+        HandleDeleteInput(tilePos);
+    }
+    #endregion
+
+    #region Mouse Preview & Build State
+    private Vector3Int ReadMousePointingSnapPoint()
+    {
         mouse = Mouse.current.position.ReadValue();
 
         Vector3 worldMouse = Camera.main.ScreenToWorldPoint(mouse);
         worldMouse.z = 0;
 
         Vector3 snapPoint = gridScript.snapToGrid(worldMouse);
-        previewRenderer.transform.position = snapPoint;
+        previewRenderer.transform.position = snapPoint; // Update preview renderer position
 
-        Vector3Int tilePos = Vector3Int.FloorToInt(snapPoint);
+        return Vector3Int.FloorToInt(snapPoint);
+    }
 
-        bool onRail = gridScript.railAtPos(tilePos);
-
-
-        TileBase eventTile = eventTilemap.GetTile(tilePos); //NEW
-        bool isNonTraversable = eventTile is NonTraversableTile;//NEW
-
-        if (!onRail && !isNonTraversable && canBuild/*NEW*/) previewRenderer.color = Color.cyan; else previewRenderer.color = Color.red;
+    private void RenderPreviewRail(bool isOnRail, bool isNonTraversable)
+    {
+        if (!isOnRail && !isNonTraversable && canBuild)
+        {
+            previewRenderer.color = Color.cyan;
+        }
+        else
+        {
+            previewRenderer.color = Color.red;
+        }
 
         Color c = previewRenderer.color;
         c.a = previewTransparency;
         previewRenderer.color = c;
-
-        if (Input.GetMouseButton(0)) isHolding = true; else isHolding = false;
-
-        if (gridScript.railAtPos(tilePos)) railLine = gridScript.railDataMap[tilePos].line;
-
+    }
+    #endregion
+    // ==================
+    #region Rail Building
+    private bool IsValidConnection(Vector3Int tilePos)
+    {
         bool emptyStart = !gridScript.hasConnection(gridScript.startPoint);
-        bool validConnection = false;
 
-        // Safety checks for nulls
-        if (gridScript != null)
+        // Check if starting from start point
+        if (gridScript.onConnection(gridScript.startPoint, tilePos) && emptyStart)
         {
-            // Check if starting from start point
-            if (gridScript.onConnection(gridScript.startPoint, tilePos) && emptyStart)
-            {
-                validConnection = true;
-            }
-            // Check if continuing an existing line safely
-            else if (railLine != null && railLine.line != null && railLine.line.Count > 0)
-            {
-                
-                Vector3Int lastTile = railLine.line[^1];
-                RailData lastData = gridScript.railDataMap[lastTile];
+            return true;
+        }
 
-                bool canExtend = lastData.railType != RailData.railTypes.end;
+        if (railLine == null) return false;
+        // Check if continuing an existing line safely
+        if (railLine?.line != null && railLine?.line.Count > 0)
+        {
+            Vector3Int lastTile = (Vector3Int)_lastBuiltRail;
+            RailData lastData = gridScript.railDataMap[lastTile];
 
-                Debug.Log(gridScript.railDataMap[lastTile].railType);
-                if (gridScript.onConnection(lastTile, tilePos) && canExtend)
-                {
-                    validConnection = true;
-                    //Debug.Log("valid");
-                }
-                else if (canExtend)
-                {
-                    // Only check if tilePos is directly next to the last tile
-                    if (gridScript.onConnection(lastTile, tilePos))
-                    {
-                        validConnection = true;
-                    }
-                }
+            bool isExtendable = lastData.railType != RailData.railTypes.end && lastData.railType != RailData.railTypes.rest;
+
+            if (gridScript.onConnection(lastTile, tilePos) && isExtendable)
+            {
+                return true;
             }
         }
 
-        canBuild = (!onRail && !isNonTraversable && validConnection);
+        return false;
+    }
 
-        //building
-        if (isHolding && canBuild)
+    private void HandleStartTileConnection(Vector3Int tilePos)
+    {
+        bool emptyStart = !gridScript.hasConnection(gridScript.startPoint);
+        if (gridScript.onConnection(gridScript.startPoint, tilePos))
         {
-            //Debug.Log("WOO THERES A TILE THAT SPAWNED!!!");
-            if (gridScript.onConnection(gridScript.startPoint, tilePos) && emptyStart)
-            {
-                railLine = new RailLine();
-                railLine.line.Add(gridScript.startPoint);
-            }
-            RailData data = new RailData(tilePos);
+            Vector2 dirFromStart = new Vector2(tilePos.x - gridScript.startPoint.x, tilePos.y - gridScript.startPoint.y);
+            Vector2 dirToStart = new Vector2(gridScript.startPoint.x - tilePos.x, gridScript.startPoint.y - tilePos.y);
 
-            GameManager.spawnTile(tilePos, defaultTile, data);
-            gridScript.railDataMap[tilePos].setLine(railLine);
-
-            Debug.Log($"Tile {tilePos} assigned to line {railLine.GetHashCode()}");
-            railLine.line.Add(tilePos);
-
-            foreach (Vector3Int adjacent in gridScript.getAdjacentTiles(tilePos))
-            {
-                if(gridScript.railAtPos(adjacent))
-                {
-                    RailData adjacentData = gridScript.railDataMap[adjacent];
-                    if (adjacentData.line == railLine && adjacent == railLine.line[^2])
-                    {
-                        Vector2 dirToAdjacent = new Vector2(adjacent.x-tilePos.x,adjacent.y-tilePos.y);
-                        Vector2 dirFromAdjacent = new Vector2(tilePos.x - adjacent.x, tilePos.y - adjacent.y);
-
-                        gridScript.railDataMap[adjacent].setDirection(dirFromAdjacent, RailData.directionType.Outgoing);
-                        gridScript.railDataMap[tilePos].setDirection(dirToAdjacent, RailData.directionType.Incoming);
-                        break;
-                    }
-                }
-            }
-
-            //register rest point tile
-            foreach (var Rail in gridScript.railDataMap)
-            {
-                if (Rail.Value.railType == RailData.railTypes.rest && gridScript.onConnection(Rail.Key, tilePos))
-                {
-                    railLine.line.Add(Rail.Key);
-                    Vector3Int restTile = railLine.line[^1];
-                    Vector3Int prevTile = railLine.line[^2];
-
-                    Vector2 dirToRest = new Vector2(restTile.x - prevTile.x, restTile.y - prevTile.y);
-                    Vector2 dirFromRest = -new Vector2(restTile.x - prevTile.x, restTile.y - prevTile.y);
-
-                    gridScript.railDataMap[restTile].setDirection(dirFromRest, RailData.directionType.Incoming);
-                    gridScript.railDataMap[prevTile].setDirection(dirToRest, RailData.directionType.Outgoing);
-                    break;
-                }
-            }
-
-            //register end tile
-            if (gridScript.onConnection(gridScript.endPoint, tilePos))
-            {
-                railLine.line.Add(gridScript.endPoint);
-                Vector3Int prevRail = railLine.line[^2];
-                Vector3Int currentRail = railLine.line[^1];
-                Vector2 newDir = new Vector2(currentRail.x-prevRail.x,currentRail.y-prevRail.y);
-                gridScript.railDataMap[railLine.line[^2]].setDirection(newDir,RailData.directionType.Outgoing);
-            }
+            gridScript.railDataMap[gridScript.startPoint].setDirection(dirFromStart, RailData.directionType.Outgoing);
+            gridScript.railDataMap[tilePos].setDirection(dirToStart, RailData.directionType.Incoming);
         }
-
-        if (Input.GetMouseButtonDown(1))//&& onRail && gridScript.railDataMap[tilePos].railType == RailData.railTypes.normal)
+    }
+    
+    private void HandlePreviousTileConnection(Vector3Int tilePos)
+    {
+        foreach (Vector3Int adjacent in gridScript.getAdjacentTiles(tilePos))
         {
-            if (railLine != null && railLine.line.Count > 1)
+            if (gridScript.railAtPos(adjacent))
             {
-                if (gridScript.railDataMap[railLine.line[^1]].railType == RailData.railTypes.normal)
+                RailData adjacentData = gridScript.railDataMap[adjacent];
+                if (adjacentData.line == railLine && adjacent == _lastBuiltRail)
                 {
-                    GameManager.DestroyTile(railLine.line[^1]);
-                    railLine.line.Remove(railLine.line[^1]);
-                }
-                else
-                {
-                    if (gridScript.railDataMap[railLine.line[^2]].railType == RailData.railTypes.normal)
-                    {
-                        GameManager.DestroyTile(railLine.line[^2]);
-                        railLine.line.Remove(railLine.line[^2]);
-                    }
-                    railLine.line.Remove(railLine.line[^1]);
+                    Vector2 dirToAdjacent = new Vector2(adjacent.x - tilePos.x, adjacent.y - tilePos.y);
+                    Vector2 dirFromAdjacent = new Vector2(tilePos.x - adjacent.x, tilePos.y - adjacent.y);
+
+                    gridScript.railDataMap[adjacent].setDirection(dirFromAdjacent, RailData.directionType.Outgoing);
+                    gridScript.railDataMap[tilePos].setDirection(dirToAdjacent, RailData.directionType.Incoming);
+                    return;
                 }
             }
         }
+    }
+
+    private void HandleRestTileConnection(Vector3Int tilePos)
+    {
+        foreach (var Rail in gridScript.railDataMap)
+        {
+            if (Rail.Value.railType == RailData.railTypes.rest && gridScript.onConnection(Rail.Key, tilePos))
+            {
+                railLine.line.Add(Rail.Key);
+                Vector3Int restTile = railLine.line[^1];
+                Vector3Int prevTile = railLine.line[^2];
+
+                Vector2 dirToRest = new Vector2(restTile.x - prevTile.x, restTile.y - prevTile.y);
+                Vector2 dirFromRest = -new Vector2(restTile.x - prevTile.x, restTile.y - prevTile.y);
+
+                gridScript.railDataMap[restTile].setDirection(dirFromRest, RailData.directionType.Incoming);
+                gridScript.railDataMap[prevTile].setDirection(dirToRest, RailData.directionType.Outgoing);
+                return;
+            }
+        }
+    }
+
+    private void HandleEndTileConnection(Vector3Int tilePos)
+    {
+        if (gridScript.onConnection(gridScript.endPoint, tilePos))
+        {
+            railLine.line.Add(gridScript.endPoint);
+            Vector3Int prevRail = railLine.line[^2];
+            Vector3Int currentRail = railLine.line[^1];
+            Vector2 newDir = new Vector2(currentRail.x - prevRail.x, currentRail.y - prevRail.y);
+            gridScript.railDataMap[railLine.line[^2]].setDirection(newDir, RailData.directionType.Outgoing);
+        }
+    }
+    #endregion
+    // ==================
+    #region Rail Deletetion
+    /// <summary>
+    /// Handles deletion of the last placed rail when right-clicking.
+    /// </summary>
+    private void HandleDeleteInput(Vector3Int tilePos)
+    {
+        if (!Input.GetMouseButton(1)) return;
+        DeleteCertainRail(tilePos);
+    }
+
+    private void DeleteCertainRail(Vector3Int tilePos)
+    {
+        Vector3Int lastTile = tilePos;
+
+        if (!gridScript.railDataMap.ContainsKey(lastTile)) return;
+
+        RailData lastData = gridScript.railDataMap[lastTile];
+        RailLine currentLine = lastData.line;
+
+        if (currentLine == null || currentLine.line.Count == 0) return;
+
+        // record IncomingDirection（ComingFromDirection）
+        Vector3Int? previousRail = GetSingleConnectedRail(lastTile, true);
+        Vector3Int? nextRail = GetSingleConnectedRail(lastTile, false);
+        Debug.Log("Origin " + lastTile + " PreviousRail: " + previousRail + " NextRail: " + nextRail);
+
+        // delete last Rail Tile
+        GameManager.DestroyTile(lastTile);
+        currentLine.line.Remove(lastTile);
+
+        // Loop until nextRail is clear
+        while (nextRail != null)
+        {
+            Vector3Int nextRailVector3Int = (Vector3Int)nextRail;
+            RailData checkingRail = gridScript.railDataMap[nextRailVector3Int];
+            bool isNextRailSpecial = checkingRail.railType == RailData.railTypes.rest || checkingRail.railType == RailData.railTypes.end;
+
+            if (isNextRailSpecial)
+            {
+                nextRail = null;
+                currentLine.line.Remove(nextRailVector3Int);
+            }
+            else
+            {
+                nextRail = GetSingleConnectedRail(nextRailVector3Int, false);
+                GameManager.DestroyTile(nextRailVector3Int);
+                currentLine.line.Remove(nextRailVector3Int);
+            }
+        }
+
+        Debug.Log($"Deleted tile: {lastTile}");
+
+        // Use ComingFromDirection to find previous tile connected to deleted tile
+        if (previousRail.HasValue)
+        {
+            _lastBuiltRail = previousRail;
+            Debug.Log($"_lastBuiltRail set to previous connected tile: {_lastBuiltRail}");
+        }
+        else
+        {
+            _lastBuiltRail = null;
+        }
+
+        // Remove the relation of lastBuiltRail connected with rest/end tile
+        if (currentLine.line.Count > 0)
+        {
+            Vector3Int tailTile = currentLine.line[^1];
+
+            if (gridScript.railDataMap.ContainsKey(tailTile))
+            {
+                RailData tailData = gridScript.railDataMap[tailTile];
+                if (tailData.railType == RailData.railTypes.rest || tailData.railType == RailData.railTypes.end)
+                {
+                    Debug.Log($"Removed trailing {tailData.railType} tile at {tailTile}");
+                    currentLine.line.Remove(tailTile);
+                }
+            }
+        }
+    }
+    #endregion
+
+    /// <summary>
+    /// Returns the connected rail position based on the tile's IncomingDirection.
+    /// </summary>
+    private Vector3Int? GetSingleConnectedRail(Vector3Int currentTile, bool isDirectionIn = true)
+    {
+        if (!gridScript.railDataMap.ContainsKey(currentTile)) return null;
+
+        RailData data = gridScript.railDataMap[currentTile];
+        Vector2? targetDir = isDirectionIn ?
+            data.directionIn :
+            data.directionOut;
+
+        if (!targetDir.HasValue) return null;
+
+        Vector2 dir = targetDir.Value;
+        Vector3Int nextTargetTilePos = new Vector3Int(
+            currentTile.x + (int)dir.x,
+            currentTile.y + (int)dir.y,
+            currentTile.z
+        );
+
+        if (gridScript.railDataMap.ContainsKey(nextTargetTilePos))
+        {
+            if (currentTile == nextTargetTilePos) return null;
+            return nextTargetTilePos;
+        }
+
+        return null;
     }
 }
