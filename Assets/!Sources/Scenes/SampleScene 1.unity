@@ -27941,7 +27941,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 5.8854165
+  orthographic size: 5.625
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -29041,7 +29041,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1092441548
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29058,7 +29058,8 @@ MonoBehaviour:
   inventoryHeight: 4
   inventoryCell: {fileID: 4300450558859377986, guid: e00446c319aa05b42b284c6bc5658876, type: 3}
   inventoryCanvas: {fileID: 1083313735}
-  margin: 0
+  cellSize: 16
+  margin: {x: 10, y: 10}
 --- !u!4 &1092441549
 Transform:
   m_ObjectHideFlags: 0
@@ -30961,7 +30962,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1837988831019596584
 MonoBehaviour:
   m_ObjectHideFlags: 0
