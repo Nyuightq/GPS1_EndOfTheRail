@@ -7,13 +7,9 @@ public class OnButtonClick : MonoBehaviour
     [SerializeField] private Animator sideSliderAnimator;
 
     [SerializeField] private GameObject optionMenuText;
-    [SerializeField] private GameObject shadersText;
     [SerializeField] private GameObject shaderToggle;
-    [SerializeField] private GameObject fontsText;
-    [SerializeField] private GameObject normalFontsToggle;
-    [SerializeField] private GameObject pixelFontsToggle;
-    [SerializeField] private GameObject volumeText;
     [SerializeField] private GameObject volumeToggle;
+    [SerializeField] private GameObject volumeIcon;
 
     [SerializeField] private GameObject creditsText;
     [SerializeField] private GameObject creditsNames;
@@ -29,13 +25,9 @@ public class OnButtonClick : MonoBehaviour
         creditsClicked = false;
 
         optionMenuText.SetActive(false);
-        shadersText.SetActive(false);
         shaderToggle.SetActive(false);
-        fontsText.SetActive(false);
-        normalFontsToggle.SetActive(false);
-        pixelFontsToggle.SetActive(false);
-        volumeText.SetActive(false);
         volumeToggle.SetActive(false);
+        volumeIcon.SetActive(false);
 
         creditsText.SetActive(false);
         creditsNames.SetActive(false);
@@ -83,13 +75,9 @@ public class OnButtonClick : MonoBehaviour
             creditsClicked = false;
 
             optionMenuText.SetActive(true);
-            shadersText.SetActive(true);
             shaderToggle.SetActive(true);
-            fontsText.SetActive(true);
-            normalFontsToggle.SetActive(true);
-            pixelFontsToggle.SetActive(true);
-            volumeText.SetActive(true);
             volumeToggle.SetActive(true);
+            volumeIcon.SetActive(true);
 
             creditsText.SetActive(false);
             creditsNames.SetActive(false);
@@ -135,13 +123,9 @@ public class OnButtonClick : MonoBehaviour
             creditsClicked = true;
 
             optionMenuText.SetActive(false);
-            shadersText.SetActive(false);
             shaderToggle.SetActive(false);
-            fontsText.SetActive(false);
-            normalFontsToggle.SetActive(false);
-            pixelFontsToggle.SetActive(false);
-            volumeText.SetActive(false);
             volumeToggle.SetActive(false);
+            volumeIcon.SetActive(false);
 
             creditsText.SetActive(true);
             creditsNames.SetActive(true);
@@ -155,13 +139,9 @@ public class OnButtonClick : MonoBehaviour
         yield return new WaitForSeconds(0.35f);
 
         optionMenuText.SetActive(true);
-        shadersText.SetActive(true);
         shaderToggle.SetActive(true);
-        fontsText.SetActive(true);
-        normalFontsToggle.SetActive(true);
-        pixelFontsToggle.SetActive(true);
-        volumeText.SetActive(true);
         volumeToggle.SetActive(true);
+        volumeIcon.SetActive(true);
 
         Debug.Log("Options content displayed!");
     }
@@ -171,13 +151,9 @@ public class OnButtonClick : MonoBehaviour
         yield return new WaitForSeconds(0.0f);
 
         optionMenuText.SetActive(false);
-        shadersText.SetActive(false);
         shaderToggle.SetActive(false);
-        fontsText.SetActive(false);
-        normalFontsToggle.SetActive(false);
-        pixelFontsToggle.SetActive(false);
-        volumeText.SetActive(false);
         volumeToggle.SetActive(false);
+        volumeIcon.SetActive(false);
 
         Debug.Log("Options content closed!");
     }

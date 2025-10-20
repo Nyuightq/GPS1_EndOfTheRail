@@ -151,9 +151,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2031993867}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 12, y: -486}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 12, y: 81}
   m_SizeDelta: {x: 1325.05, y: 156.41}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &161611844
@@ -180,8 +180,8 @@ MonoBehaviour:
     - PURIFICATION CRYSTALS! The higher ups were impressed, and tasked you on a mission
     to close the portal.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 954d63e4f9edbc64080eb9edc606f0d9, type: 2}
-  m_sharedMaterial: {fileID: -7755813871730351057, guid: 954d63e4f9edbc64080eb9edc606f0d9, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: f9e8f24a60a0e7e4a8d5dfbc9d6872bc, type: 2}
+  m_sharedMaterial: {fileID: 7855811193445537851, guid: f9e8f24a60a0e7e4a8d5dfbc9d6872bc, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -246,7 +246,7 @@ MonoBehaviour:
   m_margin: {x: -121.52222, y: 0, z: -85.72583, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &161611845
@@ -289,10 +289,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2031993867}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 3, y: -486}
-  m_SizeDelta: {x: 1405.9746, y: 156.4095}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 3, y: 81}
+  m_SizeDelta: {x: 1405.9746, y: 156.40948}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &532315169
 MonoBehaviour:
@@ -319,8 +319,8 @@ MonoBehaviour:
 
 '
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 954d63e4f9edbc64080eb9edc606f0d9, type: 2}
-  m_sharedMaterial: {fileID: -7755813871730351057, guid: 954d63e4f9edbc64080eb9edc606f0d9, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: f9e8f24a60a0e7e4a8d5dfbc9d6872bc, type: 2}
+  m_sharedMaterial: {fileID: 7855811193445537851, guid: f9e8f24a60a0e7e4a8d5dfbc9d6872bc, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -385,7 +385,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &532315170
@@ -741,10 +741,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2031993867}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 3, y: -486}
-  m_SizeDelta: {x: 1405.9746, y: 156.4095}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 3, y: 81}
+  m_SizeDelta: {x: 1405.9746, y: 156.40948}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1140838738
 MonoBehaviour:
@@ -770,8 +770,8 @@ MonoBehaviour:
     Hordes of unholy monsters swarmed around the lands, terrorizing the towns and
     villages.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 954d63e4f9edbc64080eb9edc606f0d9, type: 2}
-  m_sharedMaterial: {fileID: -7755813871730351057, guid: 954d63e4f9edbc64080eb9edc606f0d9, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: f9e8f24a60a0e7e4a8d5dfbc9d6872bc, type: 2}
+  m_sharedMaterial: {fileID: 7855811193445537851, guid: f9e8f24a60a0e7e4a8d5dfbc9d6872bc, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1016,10 +1016,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2031993867}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 3, y: -486}
-  m_SizeDelta: {x: 1405.9746, y: 156.4095}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: -110, y: 81}
+  m_SizeDelta: {x: 1405.9746, y: 156.40948}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1358567544
 MonoBehaviour:
@@ -1045,8 +1045,8 @@ MonoBehaviour:
     their crafts - weaving together the marvels of magic and technology. Thus, the
     Aetherforge Academy was born.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 954d63e4f9edbc64080eb9edc606f0d9, type: 2}
-  m_sharedMaterial: {fileID: -7755813871730351057, guid: 954d63e4f9edbc64080eb9edc606f0d9, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: f9e8f24a60a0e7e4a8d5dfbc9d6872bc, type: 2}
+  m_sharedMaterial: {fileID: 7855811193445537851, guid: f9e8f24a60a0e7e4a8d5dfbc9d6872bc, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1108,10 +1108,10 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: -206.02313, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &1358567545
