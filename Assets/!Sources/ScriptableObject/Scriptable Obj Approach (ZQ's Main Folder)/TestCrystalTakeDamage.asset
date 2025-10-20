@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd8a298b010b8984dadd2c7af07d7059, type: 3}
   m_Name: TestCrystalTakeDamage
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 2891247693787962197, guid: 900583c8bd1ce73479e85fb59960f43c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 900583c8bd1ce73479e85fb59960f43c, type: 3}
   m_Color: {r: 0, g: 0.10499692, b: 1, a: 1}
   m_Transform:
     e00: 1

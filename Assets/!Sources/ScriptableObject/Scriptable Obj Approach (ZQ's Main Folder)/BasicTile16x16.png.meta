@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 900583c8bd1ce73479e85fb59960f43c
+guid: dda630f83c878e6478facf3752a40271
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2891247693787962197
-    second: BasicTile_0
+      213: 341956467535825320
+    second: BasicTile16x16_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
