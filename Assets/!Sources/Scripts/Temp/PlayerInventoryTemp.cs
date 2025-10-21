@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerInventory : MonoBehaviour
+public class PlayerInventoryTemp : MonoBehaviour
 {
     public int componentCount { get; private set; }
     public int scrapCount { get; private set; }

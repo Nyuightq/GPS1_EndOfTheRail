@@ -25,7 +25,7 @@ public class TransactionManager : MonoBehaviour
     [SerializeField] private int item2Cost = 5;
     [SerializeField] private int item3Cost = 7;
 
-    private PlayerInventory currentPlayer;
+    private PlayerInventoryTemp currentPlayer;
 
     private void Awake()
     {
@@ -43,7 +43,7 @@ public class TransactionManager : MonoBehaviour
 
     public void OpenTransactionUI(GameObject player)
     {
-        currentPlayer = player.GetComponent<PlayerInventory>();
+        currentPlayer = player.GetComponent<PlayerInventoryTemp>();
         if (currentPlayer == null) return;
 
         if (uiPanel != null)

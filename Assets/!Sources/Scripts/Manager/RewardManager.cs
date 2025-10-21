@@ -19,7 +19,7 @@ public class RewardManager : MonoBehaviour
         // NEW EVENT
     public static event System.Action OnRewardClosed;
 
-    private PlayerInventory currentPlayer;
+    private PlayerInventoryTemp currentPlayer;
 
     private void Awake()
     {
@@ -36,7 +36,7 @@ public class RewardManager : MonoBehaviour
 
     public void OpenRewardUI(GameObject player)
     {
-        currentPlayer = player.GetComponent<PlayerInventory>();
+        currentPlayer = player.GetComponent<PlayerInventoryTemp>();
         if (currentPlayer == null) return;
 
         if (uiPanel != null)
