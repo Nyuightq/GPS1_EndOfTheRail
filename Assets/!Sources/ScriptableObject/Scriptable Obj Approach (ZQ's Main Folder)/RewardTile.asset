@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c26e50698b8797488f454973ced3ac3, type: 3}
   m_Name: RewardTile
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 2891247693787962197, guid: 900583c8bd1ce73479e85fb59960f43c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 900583c8bd1ce73479e85fb59960f43c, type: 3}
   m_Color: {r: 1, g: 0.95914936, b: 0, a: 1}
   m_Transform:
     e00: 1

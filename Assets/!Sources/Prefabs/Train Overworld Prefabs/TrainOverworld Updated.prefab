@@ -108,7 +108,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 4
-  lerpMovement: 0
+  lerpMovement: 1
   lerpAmount: 0.1
   gridManager: {fileID: 5765065582379823760}
   dayCycleManager: {fileID: 0}

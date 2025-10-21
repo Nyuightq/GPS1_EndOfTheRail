@@ -95,4 +95,15 @@ public class CombatEntity : MonoBehaviour
         int variance = UnityEngine.Random.Range(-_attackDamageVariance, _attackDamageVariance + 1);
         target.TakeDamage(Math.Max(1, _attackDamage + variance));
     }
+
+    public void SetStats(int newHp, int newDamage, int newSpeed)
+    {
+        _maxHp = newHp;
+        _hp = Mathf.Min(_hp, _maxHp);
+        _attackDamage = newDamage;
+        _attackSpeed = newSpeed;
+
+        Debug.Log($"{entityName} stats updated: HP={_maxHp}, DMG={_attackDamage}, SPD={_attackSpeed}");
+    }
+
 }
