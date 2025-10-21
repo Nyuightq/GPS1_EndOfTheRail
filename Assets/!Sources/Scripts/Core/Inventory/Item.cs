@@ -43,13 +43,13 @@ public class Item : MonoBehaviour
     private void Update()
     {
         Vector2 topLeft = new Vector2(rectTransform.position.x - shapeWidth / 2, rectTransform.position.y + shapeHeight / 2);
-        for(int x = 0; x< shapeWidth/cellSize;x++)
-        {
-            for(int y=0;  y< shapeHeight/cellSize;y++)
-            {
+        //for(int x = 0; x< shapeWidth/cellSize;x++)
+        //{
+        //    for(int y=0;  y< shapeHeight/cellSize;y++)
+        //    {
 
-            }
-        }
+        //    }
+        //}
 
     }
 }

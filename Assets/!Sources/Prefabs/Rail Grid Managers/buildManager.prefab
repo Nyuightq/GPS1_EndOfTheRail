@@ -1,0 +1,95 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6745722188079022264
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5332533035589947180}
+  - component: {fileID: 5370428205922676759}
+  - component: {fileID: 3223308510361612823}
+  - component: {fileID: 6905883776482943377}
+  m_Layer: 0
+  m_Name: buildManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5332533035589947180
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6745722188079022264}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.8403056, y: 0.17908022, z: 0.06137445}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5370428205922676759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6745722188079022264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 877e6bb0fe6113b44b09f11664cef806, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gridManager: {fileID: 0}
+  defaultTile: {fileID: 11400000, guid: 29e7a9e41aea4b04995ff859ba91f1a7, type: 2}
+  eventTilemap: {fileID: 0}
+  railPreview: {fileID: -756829269, guid: 18d91a242b0275946a0ab82bd4744fd7, type: 3}
+  previewTransparency: 0.5
+  railLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  mouseHoldReference: {fileID: -8267893273561798208, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+--- !u!114 &3223308510361612823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6745722188079022264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bb517ec86cdb9c4eb34e0f1b319529d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gridManager: {fileID: 0}
+  tiles:
+  - {fileID: 11400000, guid: 29e7a9e41aea4b04995ff859ba91f1a7, type: 2}
+  - {fileID: 11400000, guid: f5422a31e70bd884a9473a3b91890496, type: 2}
+  - {fileID: 11400000, guid: 22d3f5b22d1fb8048a36df991ebb32dc, type: 2}
+  - {fileID: 11400000, guid: 50f0fa5430160fc4b9df35d80a1e7b44, type: 2}
+  - {fileID: 11400000, guid: ef0b632f2f0f96b4b9e2ced5d34140e8, type: 2}
+  - {fileID: 11400000, guid: 7e251abd3eb71cc46be8d9da26b4666a, type: 2}
+  - {fileID: 11400000, guid: c989c552d7c4b794996d19f9e3b8da0e, type: 2}
+  - {fileID: 11400000, guid: 9bc4aec4c2ece78409b31ab862f55cd0, type: 2}
+  - {fileID: 11400000, guid: c9723f53eba0cd548be83b752b320e0b, type: 2}
+  - {fileID: 11400000, guid: 3aae087ec2cc7994a9be45e438398ea7, type: 2}
+  mouseHoldReference: {fileID: -8267893273561798208, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+--- !u!114 &6905883776482943377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6745722188079022264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b1e038324638cd4ca3aa997462c8567, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventTilemap: {fileID: 0}
