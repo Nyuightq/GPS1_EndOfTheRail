@@ -7,24 +7,25 @@ using UnityEngine;
 
 public class CombatPlayerEntity : CombatEntity
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private PlayerStatusManager playerStatus;
+    public void Start()
     {
-
+        playerStatus = GameStateManager.Instance.playerStatus;
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
+    
     public void InitialHealth(int currentHp, int maxHp)
     {
         _hp = currentHp;
         _maxHp = maxHp;
         // Update UI
-        combatEntityUI?.UpdateHealthBar(_hp*1.0f, _maxHp*1.0f);
+        combatEntityUI?.UpdateHealthBar(_hp * 1.0f, _maxHp * 1.0f);
+    }
+    
+    
+    public override void TakeDamage(int dmg)
+    {
+        base.TakeDamage(dmg);
+        playerStatus.UpdateCurrentHp(_hp);
     }
 
     public override void Attack(CombatEntity target)

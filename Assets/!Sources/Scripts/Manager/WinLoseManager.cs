@@ -13,7 +13,6 @@ public class WinLoseManager : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private PlayerStatusManager playerStatus;
-    [SerializeField] private CrystalHP crystalHP;
     [SerializeField] private TrainMovement trainMovement;
     [SerializeField] private RailGridScript gridManager;
 
@@ -47,8 +46,6 @@ private IEnumerator Start()
         trainMovement = FindObjectOfType<TrainMovement>();
     if (playerStatus == null)
         playerStatus = FindObjectOfType<PlayerStatusManager>();
-    if (crystalHP == null)
-        crystalHP = FindObjectOfType<CrystalHP>();
     if (gridManager == null)
         gridManager = FindObjectOfType<RailGridScript>();
 
@@ -67,12 +64,10 @@ private void Update()
         trainMovement = FindObjectOfType<TrainMovement>();
     if (playerStatus == null)
         playerStatus = FindObjectOfType<PlayerStatusManager>();
-    if (crystalHP == null)
-        crystalHP = FindObjectOfType<CrystalHP>();
     if (gridManager == null)
         gridManager = FindObjectOfType<RailGridScript>();
 
-    if (trainMovement == null || playerStatus == null || crystalHP == null || gridManager == null)
+    if (trainMovement == null || playerStatus == null || gridManager == null)
         return;
 
     CheckHealthCondition();
@@ -82,14 +77,14 @@ private void Update()
 
     private void CheckHealthCondition()
     {
-        if (playerStatus == null || crystalHP == null) return;
+        if (playerStatus == null) return;
 
         if (playerStatus.Hp <= 0)
         {
             Debug.Log("Player Lost! Reason: Player HP reached 0.");
             TriggerLose("Player HP reached 0");
         }
-        else if (crystalHP.currentHP <= 0)
+        else if (playerStatus.CrystalHp <= 0)
         {
             Debug.Log("Player Lost! Reason: Crystal HP reached 0.");
             TriggerLose("Crystal HP reached 0");
@@ -112,7 +107,7 @@ private void CheckWinCondition()
     RailData currentRail = gridManager.GetRailAtPos(currentTile);
     if (currentRail != null && currentRail.railType == RailData.railTypes.end)
     {
-        if (playerStatus != null && crystalHP != null && playerStatus.Hp > 0 && crystalHP.currentHP > 0)
+        if (playerStatus != null && playerStatus.Hp > 0 && playerStatus.CrystalHp > 0)
             TriggerWin();
     }
 }

@@ -58,9 +58,9 @@ public class ChurchManager : MonoBehaviour
         // Yes = heal and close
         yesButton.onClick.AddListener(() =>
         {
-            CrystalHP crystal = FindObjectOfType<CrystalHP>();
-            if (crystal != null)
-                crystal.Heal(healAmount);
+            PlayerStatusManager playerStatus = GameStateManager.Instance.playerStatus;
+            if (playerStatus != null)
+                playerStatus.HealCrystal(healAmount);
 
             Debug.Log("Crystal healed by " + healAmount);
             CloseChurchUI();

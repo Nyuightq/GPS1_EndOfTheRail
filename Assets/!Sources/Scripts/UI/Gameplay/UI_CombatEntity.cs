@@ -55,13 +55,13 @@ public class UI_CombatEntity : MonoBehaviour
     {
         RectTransform rect = go.GetComponent<RectTransform>();
         TextMeshProUGUI tmp = go.GetComponent<TextMeshProUGUI>();
-        float duration = 1.0f;
+        float duration = 0.75f;
         float time = 0f;
 
         Vector3 startPos = rect.localPosition;
 
-        float horizontalOffset = Random.Range(-60f, 60f);
-        float peakHeight = Random.Range(60f, 90f);
+        float horizontalOffset = Random.Range(-24f, 24f);
+        float peakHeight = Random.Range(8f, 24f);
         Vector3 endPos = startPos + new Vector3(horizontalOffset, 0f, 0f);
 
         Color startColor = tmp.color;

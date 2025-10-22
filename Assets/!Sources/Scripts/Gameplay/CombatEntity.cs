@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class CombatEntity : MonoBehaviour
 {
-    public static float COMBAT_BASIC_INTERVAL = 6.0f; // 6 sec/per attack in speed 1
+    public static float COMBAT_BASIC_INTERVAL = 2.6f; // 2.6 sec/per attack in speed 1
     public static int COMBAT_MAX_SPEED = 10;
     // Basic Properties define
     public string entityName;
@@ -17,7 +17,7 @@ public class CombatEntity : MonoBehaviour
     [SerializeField] protected int _hp;
     [SerializeField] protected int _evasion;
     [SerializeField] protected int _defense;
-    [SerializeField] protected int _attackSpeed; // 1 speed = 0.6sec
+    [SerializeField] protected int _attackSpeed; // 1 speed = 0.26sec
     [SerializeField] protected int _attackDamage;
     [SerializeField] protected int _attackDamageVariance;
     // Extra Properties
@@ -68,7 +68,7 @@ public class CombatEntity : MonoBehaviour
         combatEntityUI?.UpdateAttackIntervalBar(_attackTimer *1.0f, _attackTakenTime *1.0f);
     }
 
-    public void TakeDamage(int dmg)
+    public virtual void TakeDamage(int dmg)
     {
         _hp -= dmg;
         Debug.Log(entityName + " takes " + dmg + " damage. HP: " + _hp);

@@ -9,17 +9,18 @@ using UnityEngine;
 public class CrystalDeteriorates : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private CrystalHP crystal;          // Assign in Inspector
     [SerializeField] private DayCycleScript dayCycle;    // Optional: if you want to sync with DayCycle
     [Header("Deterioration Settings")]
     [SerializeField] private int tilesPerHPLoss = 10;    // How many tiles must be moved before losing HP
 
     private TrainMovement trainMovement;
+    private PlayerStatusManager playerStatus;
     private int tilesMovedSinceLastHP = 0;
 
     private void Awake()
     {
         trainMovement = GetComponent<TrainMovement>();
+        playerStatus = GameStateManager.Instance.playerStatus;
         if (trainMovement == null)
         {
             Debug.LogError("CrystalDeteriorates: No TrainMovement component found!");
@@ -35,9 +36,9 @@ public class CrystalDeteriorates : MonoBehaviour
 
         if (tilesMovedSinceLastHP >= tilesPerHPLoss)
         {
-            if (crystal != null)
+            if (playerStatus != null)
             {
-                crystal.TakeDamage(1);
+                playerStatus.CrystalTakeDamage(1);
                 Debug.Log("[CrystalDeteriorates] Crystal loses 1 HP due to travel.");
             }
             else

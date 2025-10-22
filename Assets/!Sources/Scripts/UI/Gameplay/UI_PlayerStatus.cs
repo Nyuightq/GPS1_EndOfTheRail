@@ -36,6 +36,7 @@ public class UI_PlayerStatus : MonoBehaviour
         
         playerStatus.OnHpChanged += UpdateHpUI;
         playerStatus.OnScrapsChanged += UpdateScrapsUI;
+        playerStatus.OnCrystalHpChanged += UpdateCrystalHpUI;
     }
 
     private void OnDisable()
@@ -48,6 +49,7 @@ public class UI_PlayerStatus : MonoBehaviour
         
         playerStatus.OnHpChanged -= UpdateHpUI;
         playerStatus.OnScrapsChanged -= UpdateScrapsUI;
+        playerStatus.OnCrystalHpChanged -= UpdateCrystalHpUI;
     }
 
     private void UpdateScrapsUI(int currentScraps)
