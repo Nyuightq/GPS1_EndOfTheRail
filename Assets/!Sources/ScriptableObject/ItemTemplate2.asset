@@ -10,26 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 068edb241815e8b48bae3bd0df376ff4, type: 3}
-  m_Name: ItemTemplate
+  m_Name: ItemTemplate2
   m_EditorClassIdentifier: 
-  itemSprite: {fileID: 21300000, guid: 5d9a2aca4156da8409fefc39a63528f5, type: 3}
-  itemName: Crystal Of Purity
+  itemSprite: {fileID: 21300000, guid: 5d704657946588440a655df0600d1ddc, type: 3}
+  itemName: Fack you
   itemWidth: 3
   itemHeight: 3
   itemShape:
   - filled: 0
   - filled: 1
-  - filled: 0
   - filled: 1
   - filled: 1
-  - filled: 1
-  - filled: 0
-  - filled: 1
-  - filled: 0
   - filled: 1
   - filled: 1
   - filled: 0
   - filled: 0
-  - filled: 1
-  - filled: 1
   - filled: 0

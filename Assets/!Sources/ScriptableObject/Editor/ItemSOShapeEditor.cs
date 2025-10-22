@@ -1,4 +1,4 @@
-// --------------------------------------------------------------
+﻿// --------------------------------------------------------------
 // Creation Date: 2025-10-20 02:07
 // Author: User
 // Description: -
@@ -47,7 +47,6 @@ public class ItemSOEditor : Editor
             }
         }
 
-        // Apply changes
         if (GUI.changed)
         {
             EditorUtility.SetDirty(item);
