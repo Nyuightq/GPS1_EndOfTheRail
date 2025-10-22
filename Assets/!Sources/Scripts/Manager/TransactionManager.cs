@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System.Collections;
 
 public class TransactionManager : MonoBehaviour
 {
@@ -14,11 +15,11 @@ public class TransactionManager : MonoBehaviour
     [SerializeField] private Button item1Button;
     [SerializeField] private Button item2Button;
     [SerializeField] private Button item3Button;
-    [SerializeField] private Button declineButton; // NEW: Decline / Cancel button
+    [SerializeField] private Button declineButton;
 
     [Header("TMP References")]
     [SerializeField] private TMP_Text scrapText;
-    [SerializeField] private TMP_Text feedbackText; // shows purchase result
+    [SerializeField] private TMP_Text feedbackText;
 
     [Header("Item Costs")]
     [SerializeField] private int item1Cost = 3;
@@ -26,6 +27,10 @@ public class TransactionManager : MonoBehaviour
     [SerializeField] private int item3Cost = 7;
 
     private PlayerInventoryTemp currentPlayer;
+
+    // --- NEW: State controls ---
+    public bool IsTransactionUIActive { get; private set; } = false;
+    public bool IsCooldownActive { get; private set; } = false;
 
     private void Awake()
     {
@@ -43,12 +48,19 @@ public class TransactionManager : MonoBehaviour
 
     public void OpenTransactionUI(GameObject player)
     {
+        if (IsTransactionUIActive || IsCooldownActive)
+        {
+            Debug.Log("[TransactionManager] Ignored OpenTransactionUI request (UI busy or cooldown active)");
+            return;
+        }
+
         currentPlayer = player.GetComponent<PlayerInventoryTemp>();
         if (currentPlayer == null) return;
 
         if (uiPanel != null)
         {
             uiPanel.SetActive(true);
+            IsTransactionUIActive = true;
 
             // Clear old listeners
             item1Button.onClick.RemoveAllListeners();
@@ -61,31 +73,45 @@ public class TransactionManager : MonoBehaviour
             item2Button.onClick.AddListener(() => TryPurchase(item2Cost, "Item 2"));
             item3Button.onClick.AddListener(() => TryPurchase(item3Cost, "Item 3"));
 
-            // Add decline logic
+            // Decline logic
             declineButton.onClick.AddListener(() =>
             {
                 feedbackText.text = "Transaction declined.";
                 Debug.Log("Player declined the transaction.");
-                CloseTransactionUI(); // Closes UI and resumes train
+                CloseTransactionUI();
             });
 
             UpdateUI();
         }
+
+        Debug.Log("[TransactionManager] Transaction UI opened");
     }
 
-public void CloseTransactionUI()
-{
-    if (uiPanel != null)
-        uiPanel.SetActive(false);
+    public void CloseTransactionUI()
+    {
+        if (!IsTransactionUIActive)
+            return;
 
-    currentPlayer = null;
+        if (uiPanel != null)
+            uiPanel.SetActive(false);
 
-    // Notify listeners (e.g. TrainFreezeController)
-    OnTransactionClosed?.Invoke();
+        currentPlayer = null;
+        IsTransactionUIActive = false;
 
-    Debug.Log("Transaction UI closed. Event fired.");
-}
+        Debug.Log("Transaction UI closed. Event fired.");
+        OnTransactionClosed?.Invoke();
 
+        // Begin cooldown before another tile can trigger
+        StartCoroutine(CloseCooldown());
+    }
+
+    private IEnumerator CloseCooldown()
+    {
+        IsCooldownActive = true;
+        yield return new WaitForSeconds(0.5f);
+        IsCooldownActive = false;
+        Debug.Log("[TransactionManager] Cooldown finished, ready for next trigger.");
+    }
 
     private void TryPurchase(int cost, string itemName)
     {
@@ -99,8 +125,7 @@ public void CloseTransactionUI()
 
             UpdateUI();
 
-            // Close UI and resume train after successful purchase
-            CloseTransactionUI();
+            CloseTransactionUI(); // successful purchase closes UI
         }
         else
         {

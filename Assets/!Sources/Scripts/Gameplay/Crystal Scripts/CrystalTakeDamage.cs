@@ -9,7 +9,7 @@ public class CrystalTakeDamage : EventTile
     public override void OnPlayerEnter(GameObject player)
     {
         // Find the crystal in the scene
-        CrystalHP crystal = FindObjectOfType<CrystalHP>();
+        CrystalHP crystal = FindFirstObjectByType<CrystalHP>();
         if (crystal != null)
         {
             crystal.TakeDamage(damageAmount);

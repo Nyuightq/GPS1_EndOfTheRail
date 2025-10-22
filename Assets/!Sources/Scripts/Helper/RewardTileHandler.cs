@@ -49,7 +49,7 @@ public class RewardTileHandler : MonoBehaviour
                 if (tile != null && tile.GetType() == typeof(RewardTile))
                 {
                     map.SetTile(pos, null);
-                    Debug.Log($"✅ [RewardTileHandler] RewardTile deleted at {pos}");
+                    Debug.Log($"[RewardTileHandler] RewardTile deleted at {pos}");
                 }
             }
         }

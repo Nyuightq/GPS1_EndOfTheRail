@@ -30,7 +30,7 @@ public class IncreaseDifficulty : MonoBehaviour
     {
         if (dayCycleScript == null)
         {
-            dayCycleScript = FindObjectOfType<DayCycleScript>();
+            dayCycleScript = FindFirstObjectByType<DayCycleScript>();
         }
     }
 

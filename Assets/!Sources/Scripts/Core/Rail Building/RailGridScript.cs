@@ -400,7 +400,7 @@ public class RailGridScript : MonoBehaviour
 
         return compiling_railDataMap;
     }
-    
+
     public void SpawnCombatTile(CombatTile combatTileSO)
     {
         List<Vector3Int> eligibleTiles = new List<Vector3Int>();
@@ -434,5 +434,16 @@ public class RailGridScript : MonoBehaviour
         // Store this for later if you want to revert after night
         Debug.Log($"Combat tile spawned at {randomPos}");
     }
+    
+    //Helper for Rest Point Manager
+    public bool IsPlayerOnRestTile(Vector3 playerPosition)
+    {
+        Vector3Int cellPos = railTileMap.WorldToCell(playerPosition);
+        if (railDataMap.TryGetValue(cellPos, out RailData data))
+            return data.railType == RailData.railTypes.rest;
+
+        return false;
+    }
+
 
 }

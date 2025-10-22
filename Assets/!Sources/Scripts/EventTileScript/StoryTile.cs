@@ -12,18 +12,23 @@ public class StoryTile : EventTile
 {
     [Header("Story Content")]
     [TextArea(3, 6)] 
-    public string storyText;        // Unique story text
-    public Sprite storyImage;       // Optional story image
+    public string storyText;
+    public Sprite storyImage;
 
     private static Tilemap eventTilemap;
-
-    // Debounce tracking to prevent double-triggering
     private static GameObject lastPlayer;
     private static StoryTile lastTriggeredTile;
 
     public override void OnPlayerEnter(GameObject player)
     {
-        // Ignore duplicate triggers for same tile & same player
+        // Global debounce: skip if StoryManager is already active
+        if (StoryManager.Instance != null && StoryManager.Instance.IsStoryActive)
+        {
+            Debug.Log($"[StoryTile] StoryManager busy, ignoring tile {name}");
+            return;
+        }
+
+        // Skip duplicate triggers for same tile and player
         if (lastPlayer == player && lastTriggeredTile == this)
         {
             Debug.Log($"[StoryTile] Duplicate trigger ignored for: {name}");
@@ -35,7 +40,6 @@ public class StoryTile : EventTile
 
         Debug.Log($"Player entered Story Tile: {name}");
 
-        // Cache EventTilemap reference if needed
         if (eventTilemap == null)
         {
             GameObject tilemapObj = GameObject.Find("EventTilemap");
@@ -43,7 +47,6 @@ public class StoryTile : EventTile
                 eventTilemap = tilemapObj.GetComponent<Tilemap>();
         }
 
-        // Snap player (train) to tile center
         if (eventTilemap != null)
         {
             Vector3Int tilePos = eventTilemap.WorldToCell(player.transform.position);
@@ -52,18 +55,15 @@ public class StoryTile : EventTile
             Debug.Log($"[StoryTile] Snapped train to center at {tilePos}");
         }
 
-        // Freeze the train
-        TrainFreezeController freezeController = player.GetComponent<TrainFreezeController>();
+        var freezeController = player.GetComponent<TrainFreezeController>();
         if (freezeController != null)
             freezeController.FreezeTrain();
 
-        // Show story UI
         StoryManager.Instance.OpenStoryUI(this, player);
     }
 
     public override void OnPlayerExit(GameObject player)
     {
-        // Reset debounce when player exits
         if (lastPlayer == player)
         {
             lastPlayer = null;

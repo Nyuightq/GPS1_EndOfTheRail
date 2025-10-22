@@ -16,7 +16,7 @@ public class DebugDamageTile : EventTile
         Debug.Log($"Player stepped on DebugDamageTile! Dealing {damageAmount} HP.");
 
         // Find the player's status manager in the scene
-        PlayerStatusManager playerStatus = FindObjectOfType<PlayerStatusManager>();
+        PlayerStatusManager playerStatus = FindFirstObjectByType<PlayerStatusManager>();
         if (playerStatus != null)
         {
             int newHp = Mathf.Max(0, playerStatus.Hp - damageAmount);
