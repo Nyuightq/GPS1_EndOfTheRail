@@ -6,6 +6,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.EventSystems;
+using System.Collections;
 
 public class StoryManager : MonoBehaviour
 {
@@ -31,6 +33,8 @@ public class StoryManager : MonoBehaviour
             return;
         }
         Instance = this;
+        // Optional: Persist across scenes if needed
+        // DontDestroyOnLoad(gameObject);
     }
 
     private void Start()
@@ -42,6 +46,7 @@ public class StoryManager : MonoBehaviour
             continueButton.onClick.AddListener(CloseStoryUI);
     }
 
+    //Opens the story UI and displays the StoryTile content.
     public void OpenStoryUI(StoryTile tile, GameObject player)
     {
         currentPlayer = player;
@@ -49,23 +54,36 @@ public class StoryManager : MonoBehaviour
 
         if (storyPanel == null || storyTextUI == null)
         {
-            Debug.LogWarning("Story UI references missing!");
+            Debug.LogWarning("[StoryManager] Story UI references missing!");
             return;
         }
 
-        // Display text
+        // Set story text and image
         storyTextUI.text = tile.storyText;
-
-        // Display image (if any)
         if (storyImageUI != null)
         {
             storyImageUI.sprite = tile.storyImage;
             storyImageUI.gameObject.SetActive(tile.storyImage != null);
         }
 
-        storyPanel.SetActive(true);
+        StartCoroutine(ShowUIWithInputDelay());
     }
 
+    private IEnumerator ShowUIWithInputDelay()
+    {
+        // Show panel
+        storyPanel.SetActive(true);
+
+        // Temporarily disable input for one frame to avoid click overlap
+        continueButton.interactable = false;
+        EventSystem.current.SetSelectedGameObject(null);
+        yield return null;
+        continueButton.interactable = true;
+
+        Debug.Log("[StoryManager] Story UI shown with one-frame input delay");
+    }
+
+    //Closes the story UI and resumes the train.
     public void CloseStoryUI()
     {
         if (storyPanel != null)
@@ -74,7 +92,7 @@ public class StoryManager : MonoBehaviour
         currentPlayer = null;
         currentStoryTile = null;
 
-        // Fire event to resume train
+        // Fire event for TrainFreezeController to resume
         OnStoryClosed?.Invoke();
 
         Debug.Log("Story UI closed. Event fired to resume train.");

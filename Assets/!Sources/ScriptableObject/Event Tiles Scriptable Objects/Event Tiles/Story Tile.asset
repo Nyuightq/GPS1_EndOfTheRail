@@ -34,5 +34,10 @@ MonoBehaviour:
   m_InstancedGameObject: {fileID: 0}
   m_Flags: 1
   m_ColliderType: 1
-  storyText: Part 1
+  storyText: 'On your way to your designated route,what you have witnessed will remain
+    in your memory forever. The destroyed decorations, a burnt doll on the sidewalk,
+    a moment of joy turned into terror. You could do nothing but continue the path
+    you planned out, and the more reason to seal that portal for good.
+
+'
   storyImage: {fileID: 0}
