@@ -9,6 +9,7 @@ public class TrainMovement : MonoBehaviour
     [Header("lerp movement option")]
     [SerializeField] private bool lerpMovement = false;
     [SerializeField] private float lerpAmount = 0.1f;
+ public RestPointManager restPointManager;
 
     public GameObject gridManager;
     public GameObject dayCycleManager;
@@ -36,6 +37,13 @@ public class TrainMovement : MonoBehaviour
     private void Awake()
     {
         baseSpeed = moveSpeed;
+
+        restPointManager = FindObjectOfType<RestPointManager>();
+        if (restPointManager == null)
+            Debug.LogError("No RestPointManager found before train spawn!");
+        else
+            Debug.Log("Found RestPointManager: " + restPointManager.name);
+
     }
 
     public void ApplySpeedModifier(float reduction)
@@ -108,6 +116,16 @@ public class TrainMovement : MonoBehaviour
 
     void Update()
     {
+
+            if (restPointManager == null)
+            {
+                restPointManager = FindObjectOfType<RestPointManager>();
+                if (restPointManager == null)
+                {
+                    Debug.LogError("RestPointManager is NULL! Please assign it in the inspector.");
+                    return;
+                }
+            }
         if (!moving)
         {
             if (gridScript.railAtPos(tilePos))
@@ -215,17 +233,34 @@ public class TrainMovement : MonoBehaviour
                 moving = false;
 
                 // Check if collided to Rest point
-                if (gridScript.railAtPos(tilePos))
+                if (gridScript.IsRestTile(tilePos))
                 {
-                    RailData currentRail = gridScript.railDataMap[tilePos];
-                    if (currentRail.railType == RailData.railTypes.rest)
+                    Debug.Log("Reached Rest Point - Entering Plan Phase");
+                    
+                    // ADD THESE DEBUG LINES:
+                    if (restPointManager == null)
                     {
-                        Debug.Log("Phase - Plan");
-                        GameStateManager.SetPhase(Phase.Plan);
-                        gridScript.refreshRoute();
-                        GetComponent<TrainMovement>().enabled = false;
+                        Debug.LogError("RestPointManager is NULL! Please assign it in the inspector.");
+                    }
+                    else
+                    {
+                        Debug.Log("Calling restPointManager.OnRestPointEntered()");
+                        restPointManager.OnRestPointEntered(this);
+                    }
+                    
+                    GameStateManager.SetPhase(Phase.Plan);
+                    gridScript.refreshRoute();
+                    enabled = false;
+                }
+                
+                if (moving && restPointManager != null && prevRail != null)
+                {
+                    if (prevRail.railType == RailData.railTypes.rest)
+                    {
+                        restPointManager.OnRestPointExited();
                     }
                 }
+
             }
         }
     }

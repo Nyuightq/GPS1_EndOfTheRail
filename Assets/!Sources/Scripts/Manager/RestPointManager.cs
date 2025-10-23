@@ -5,103 +5,162 @@
 // --------------------------------------------------------------
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class RestPointManager : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private GameObject restPanel;          // First panel (shows "Rest" button)
-    [SerializeField] private GameObject healConfirmPanel;   // Second panel (confirm heal)
-    [SerializeField] private Button restButton;             // Button to open heal confirmation
-    [SerializeField] private Button healButton;             // Button to perform heal
-    [SerializeField] private Button cancelButton;           // Button to cancel heal
-    [SerializeField] private PlayerStatusManager playerStatus;
-    [SerializeField] private RailGridScript railGrid;       // Reference to the grid to detect rest point tiles
-
-    [Header("Healing Settings")]
-    [SerializeField] private int healCost = 5;              // Scraps required for full heal
-    [SerializeField] private int healAmount = 999;          // Amount of HP restored (set to large for full heal)
-
-    private bool isPlayerOnRestTile = false;
-    private GameObject player;
+    [SerializeField] private PlayerStatusManager playerStatusManager;
+    
+    [Header("UI References")]
+    [SerializeField] private Button healPromptButton;
+    [SerializeField] private GameObject confirmPanel;
+    [SerializeField] private TextMeshProUGUI descriptionText;
+    [SerializeField] private Button acceptButton;
+    [SerializeField] private Button cancelButton;
+    
+    [Header("Heal Settings")]
+    [SerializeField] private int healAmount = 20;
+    [SerializeField] private int scrapCost = 10;
+    
+    private bool isOnRestPoint = false;
+    private TrainMovement trainMovement;
 
     private void Start()
     {
-        // Ensure panels are hidden at start
-        restPanel.SetActive(false);
-        healConfirmPanel.SetActive(false);
-
-        if (restButton != null)
-            restButton.onClick.AddListener(OpenHealConfirmPanel);
-
-        if (healButton != null)
-            healButton.onClick.AddListener(AttemptHeal);
-
+        // Subscribe to button clicks
+        if (healPromptButton != null)
+            healPromptButton.onClick.AddListener(OnPromptButtonClicked);
+        
+        if (acceptButton != null)
+            acceptButton.onClick.AddListener(OnAcceptButtonClicked);
+        
         if (cancelButton != null)
-            cancelButton.onClick.AddListener(CloseHealConfirmPanel);
-
-        // Find player automatically if not set
-        if (playerStatus == null)
-            playerStatus = FindFirstObjectByType<PlayerStatusManager>();
-
-        if (railGrid == null)
-            railGrid = FindFirstObjectByType<RailGridScript>();
-
-        player = GameObject.FindGameObjectWithTag("Player");
+            cancelButton.onClick.AddListener(OnCancelButtonClicked);
+        
+        HideAll();
     }
 
-    private void Update()
+    private void OnDestroy()
     {
-        if (player == null || railGrid == null)
+        // Unsubscribe from button clicks
+        if (healPromptButton != null)
+            healPromptButton.onClick.RemoveListener(OnPromptButtonClicked);
+        
+        if (acceptButton != null)
+            acceptButton.onClick.RemoveListener(OnAcceptButtonClicked);
+        
+        if (cancelButton != null)
+            cancelButton.onClick.RemoveListener(OnCancelButtonClicked);
+    }
+
+    public void OnRestPointEntered(TrainMovement train)
+    {
+        isOnRestPoint = true;
+        trainMovement = train;
+        
+        if (healPromptButton != null)
+            healPromptButton.gameObject.SetActive(true);
+        
+        Debug.Log("Entered Rest Point - Heal Button Available");
+    }
+
+    public void OnRestPointExited()
+    {
+        isOnRestPoint = false;
+        trainMovement = null;
+        HideAll();
+        
+        Debug.Log("Exited Rest Point");
+    }
+
+    private void OnPromptButtonClicked()
+    {
+        if (!isOnRestPoint || playerStatusManager == null)
             return;
 
-        // Check if the player is currently standing on a rest tile
-        bool onRestTile = railGrid.IsPlayerOnRestTile(player.transform.position);
-
-        if (onRestTile && !isPlayerOnRestTile)
+        // Check if already at max HP
+        if (playerStatusManager.Hp >= playerStatusManager.MaxHp)
         {
-            // Player just entered a rest tile
-            isPlayerOnRestTile = true;
-            ShowRestPanel(true);
+            ShowConfirmPanel("Already at full health!", false);
+            return;
         }
-        else if (!onRestTile && isPlayerOnRestTile)
-        {
-            // Player just left the rest tile
-            isPlayerOnRestTile = false;
-            ShowRestPanel(false);
-            healConfirmPanel.SetActive(false);
-        }
+
+        // Check if player has enough scraps
+        bool hasEnoughScraps = playerStatusManager.Scraps >= scrapCost;
+        
+        string description = hasEnoughScraps 
+            ? $"Heal {healAmount} HP for {scrapCost} scraps?\nCurrent HP: {playerStatusManager.Hp}/{playerStatusManager.MaxHp}\nCurrent Scraps: {playerStatusManager.Scraps}"
+            : $"Not enough scraps!\nNeed: {scrapCost}\nHave: {playerStatusManager.Scraps}";
+
+        ShowConfirmPanel(description, hasEnoughScraps);
     }
 
-    private void ShowRestPanel(bool show)
+    private void OnAcceptButtonClicked()
     {
-        restPanel.SetActive(show);
-    }
-
-    private void OpenHealConfirmPanel()
-    {
-        healConfirmPanel.SetActive(true);
-    }
-
-    private void CloseHealConfirmPanel()
-    {
-        healConfirmPanel.SetActive(false);
-    }
-
-    private void AttemptHeal()
-    {
-        if (playerStatus == null)
+        if (playerStatusManager == null)
             return;
 
-        if (playerStatus.ConsumeScraps(healCost))
+        // Try to consume scraps
+        if (!playerStatusManager.ConsumeScraps(scrapCost))
         {
-            playerStatus.HealCurrentHp(healAmount);
-            Debug.Log($"[RestPointManager] Player healed by {healAmount} HP for {healCost} scraps.");
-        }
-        else
-        {
-            Debug.LogWarning("[RestPointManager] Not enough scraps to heal!");
+            Debug.LogWarning("Not enough scraps to heal!");
+            HideConfirmPanel();
+            return;
         }
 
-        healConfirmPanel.SetActive(false);
+        // Heal the player
+        playerStatusManager.HealCurrentHp(healAmount);
+        
+        Debug.Log($"Healed {healAmount} HP for {scrapCost} scraps");
+        
+        HideConfirmPanel();
+    }
+
+    private void OnCancelButtonClicked()
+    {
+        HideConfirmPanel();
+    }
+
+    private void ShowConfirmPanel(string description, bool canAfford)
+    {
+        if (confirmPanel != null)
+            confirmPanel.SetActive(true);
+        
+        if (descriptionText != null)
+            descriptionText.text = description;
+        
+        if (acceptButton != null)
+            acceptButton.interactable = canAfford;
+        
+        // Hide prompt button when panel is open
+        if (healPromptButton != null)
+            healPromptButton.gameObject.SetActive(false);
+    }
+
+    private void HideConfirmPanel()
+    {
+        if (confirmPanel != null)
+            confirmPanel.SetActive(false);
+        
+        // Show prompt button again
+        if (isOnRestPoint && healPromptButton != null)
+            healPromptButton.gameObject.SetActive(true);
+    }
+
+    private void HideAll()
+    {
+        if (healPromptButton != null)
+            healPromptButton.gameObject.SetActive(false);
+        
+        if (confirmPanel != null)
+            confirmPanel.SetActive(false);
+    }
+
+    // Optional: Public method to set heal parameters dynamically
+    public void SetHealParameters(int amount, int cost)
+    {
+        healAmount = amount;
+        scrapCost = cost;
     }
 }
