@@ -5,10 +5,10 @@ using UnityEngine;
 public class TrainMovement : MonoBehaviour
 {
     [Header("regular movement")]
-    [SerializeField] private float moveSpeed = 2.0f;
+    [SerializeField] private float moveSpeed = 3.0f; //it was 2.0f
     [Header("lerp movement option")]
     [SerializeField] private bool lerpMovement = false;
-    [SerializeField] private float lerpAmount = 0.1f;
+    [SerializeField] private float lerpAmount = 4.0f; //it was 0.1f
 
     public GameObject gridManager;
     public GameObject dayCycleManager;
@@ -108,6 +108,12 @@ public class TrainMovement : MonoBehaviour
 
     void Update()
     {
+        // Stop all updates when the game is paused
+        if (Mathf.Approximately(Time.timeScale, 0f) && moving)
+        {
+            return;
+        }
+
         if (!moving)
         {
             if (gridScript.railAtPos(tilePos))
@@ -141,15 +147,21 @@ public class TrainMovement : MonoBehaviour
 
                 if (lerpMovement)
                 {
-                    transform.position = Vector3.Lerp(transform.position, targetTilePos, lerpAmount);
+                    //transform.position = Vector3.Lerp(transform.position, targetTilePos, lerpAmount);
+                    //transform.position = Vector3.Lerp(transform.position, targetTilePos, lerpAmount * OnSpeedToggle.SpeedMultiplier);
+                    transform.position = Vector3.Lerp(transform.position, targetTilePos, lerpAmount * Time.deltaTime * 50f * OnSpeedToggle.SpeedMultiplier);
+
                     float x = Util.Approach(transform.position.x, targetTilePos.x, 0.001f);
                     float y = Util.Approach(transform.position.y, targetTilePos.y, 0.001f);
                     transform.position = new Vector2(x, y);
                 }
                 else
                 {
-                    float x = Util.Approach(transform.position.x, targetTilePos.x, moveSpeed * Time.deltaTime);
-                    float y = Util.Approach(transform.position.y, targetTilePos.y, moveSpeed * Time.deltaTime);
+                    //float x = Util.Approach(transform.position.x, targetTilePos.x, moveSpeed * Time.deltaTime);
+                    //float y = Util.Approach(transform.position.y, targetTilePos.y, moveSpeed * Time.deltaTime);
+                    float x = Util.Approach(transform.position.x, targetTilePos.x, moveSpeed * Time.deltaTime * OnSpeedToggle.SpeedMultiplier);
+                    float y = Util.Approach(transform.position.y, targetTilePos.y, moveSpeed * Time.deltaTime * OnSpeedToggle.SpeedMultiplier);
+
                     transform.position = new Vector2(x, y);
                 }
             }

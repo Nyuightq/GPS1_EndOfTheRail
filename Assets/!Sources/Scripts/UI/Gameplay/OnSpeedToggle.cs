@@ -8,11 +8,14 @@ public class OnSpeedToggle : MonoBehaviour
     [SerializeField] private string secondText = "X2";
 
     private bool isToggled = false;
-    private bool isPaused = false;
 
+    // Global speed multiplier accessible to all other scripts
+    public static float SpeedMultiplier = 1f;
     public void OnSpeedButton()
     {
         isToggled = !isToggled;
+        //speedButtonText.text = isToggled ? secondText : firstText;
+        SpeedMultiplier = isToggled ? 4f : 1f; // <– core logic
         speedButtonText.text = isToggled ? secondText : firstText;
     }
 }

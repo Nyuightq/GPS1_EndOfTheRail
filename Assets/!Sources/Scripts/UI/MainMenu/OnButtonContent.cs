@@ -9,13 +9,17 @@ public class OnButtonContent : MonoBehaviour
 
     public void Start()
     {
-        toggleShaderOn = true;
+        //toggleShaderOn = true;
+        CRTShaderVolume.SetActive(ApplySavedCRT.Instance.toggleShaderOn);
     }
 
     public void onShaderToggle()
     {
-        toggleShaderOn = !toggleShaderOn;
+        //toggleShaderOn = !toggleShaderOn;
 
-        CRTShaderVolume.SetActive(toggleShaderOn);
+        //CRTShaderVolume.SetActive(toggleShaderOn);
+
+        ApplySavedCRT.Instance.toggleShaderOn = !ApplySavedCRT.Instance.toggleShaderOn;
+        CRTShaderVolume.SetActive(ApplySavedCRT.Instance.toggleShaderOn);
     }
 }

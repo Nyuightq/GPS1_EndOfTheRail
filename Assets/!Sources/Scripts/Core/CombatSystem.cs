@@ -63,7 +63,7 @@ public class CombatSystem : MonoBehaviour
 
         // Support custom battleSpeed without affecting Time.timescale that affect UI layer.
         // If overall game is affected by Time.deltaTime, then battleSpeed keep in 1.0f;
-        float delta = Time.deltaTime * battleSpeed;
+        float delta = Time.deltaTime * battleSpeed * OnSpeedToggle.SpeedMultiplier;
 
         if (player != null && !player.IsDead)
             player.UpdateCombat(delta);
