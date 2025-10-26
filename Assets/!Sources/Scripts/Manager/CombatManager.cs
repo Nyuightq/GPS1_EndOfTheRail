@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class CombatManager : MonoBehaviour
 {
@@ -47,9 +48,13 @@ public class CombatManager : MonoBehaviour
 
         // Generate enemies
         List<CombatEnemyEntity> enemies = new List<CombatEnemyEntity>();
-        for (int i = 0; i < 1; i++)
+        int enemyCount = UnityEngine.Random.Range(2, 5); 
+        Vector3[] spawnPositions = GetEnemySpawnPositionsCircle(enemyCount, 24f);
+
+        for (int i = 0; i < enemyCount; i++)
         {
             GameObject enemyObj = Instantiate(enemyPrefab, enemySpawnParent);
+            enemyObj.transform.localPosition = spawnPositions[i];
             CombatEnemyEntity enemyEntity = enemyObj.GetComponent<CombatEnemyEntity>();
             enemies.Add(enemyEntity);
         }
@@ -59,6 +64,27 @@ public class CombatManager : MonoBehaviour
         combatSystem.onBattleEnd += EndCombat;
 
         Debug.Log("[CombatManager] Combat setup completed!");
+    }
+
+    // Used in StartCombat, auto initialize position for enemies.
+    private Vector3[] GetEnemySpawnPositionsCircle(int count, float radius)
+    {
+        Vector3[] positions = new Vector3[count];
+
+        float startAngle = 70f;
+
+        for (int i = 0; i < count; i++)
+        {
+            float angle = startAngle + (350f / count) * i;
+            float rad = angle * Mathf.Deg2Rad;
+
+            float x = Mathf.Cos(rad) * radius;
+            float y = Mathf.Sin(rad) * radius;
+
+            positions[i] = new Vector3(x, y, 0f);
+        }
+
+        return positions;
     }
 
     public void EndCombat(bool playerWon, int remainHp)
@@ -76,6 +102,7 @@ public class CombatManager : MonoBehaviour
 
     public void EndCombat()
     {
+        combatSystem.onBattleEnd -= EndCombat;
         combatSystem.Test_BattleForceCancel();
 
         if (combatUIPanel != null)

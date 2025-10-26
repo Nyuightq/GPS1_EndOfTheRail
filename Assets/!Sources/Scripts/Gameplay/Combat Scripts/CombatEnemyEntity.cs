@@ -7,19 +7,8 @@ using UnityEngine;
 
 public class CombatEnemyEntity : CombatEntity
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    // void Start()
-    // {
-
-    // }
-
-    // Update is called once per frame
-    // void Update()
-    // {
-
-    // }
     public void Initialize(EnemyData data)
-{
+    {
         entityName = data.enemyName;
         _maxHp = data.maxHp;
         _hp = data.maxHp;

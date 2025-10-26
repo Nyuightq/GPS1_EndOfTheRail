@@ -40,7 +40,7 @@ public class InventoryGridScript : MonoBehaviour
 
     private InvCellData[,] inventoryGrid;
 
-    void Awake()
+    void Start()
     {
         inventoryRect = inventoryCanvas.GetComponent<RectTransform>();
         inventoryGrid = new InvCellData[inventoryWidth, inventoryHeight];

@@ -26,6 +26,12 @@ public class CombatPlayerEntity : CombatEntity
     {
         base.TakeDamage(dmg);
         playerStatus.UpdateCurrentHp(_hp);
+
+        if (IsDead)
+        {
+            Debug.Log("🚂 Train destroyed — Player loses battle!");
+            //CombatManager.Instance?.OnPlayerDefeated();
+        }
     }
 
     public override void Attack(CombatEntity target)

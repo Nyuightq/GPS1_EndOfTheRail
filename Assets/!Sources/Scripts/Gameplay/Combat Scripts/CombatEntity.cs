@@ -41,7 +41,7 @@ public class CombatEntity : MonoBehaviour
     public int Evasion => _evasion;
     public int Defense => _defense;
     public float RemainingAttackTimer => _attackTimer;
-    public float AttackInterval => _attackTakenTime;
+    public float AttackTakenTime => _attackTakenTime;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
