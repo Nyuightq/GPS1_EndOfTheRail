@@ -3,6 +3,7 @@
 // Author: User
 // Description: -
 // --------------------------------------------------------------
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
@@ -21,8 +22,8 @@ public class InvCellData
 
 public class InventoryGridScript : MonoBehaviour
 {
-    [SerializeField] private int inventoryWidth;
-    [SerializeField] private int inventoryHeight;
+    [SerializeField] public int inventoryWidth;
+    [SerializeField] public int inventoryHeight;
 
     [SerializeField] private GameObject inventoryCell;
     [SerializeField] private Canvas inventoryCanvas;
@@ -34,6 +35,10 @@ public class InventoryGridScript : MonoBehaviour
 
     [SerializeField] GameObject itemSpawn;
 
+
+    //public Dictionary<GameObject, InvCellData> equippedItems = new Dictionary<GameObject, InvCellData>();
+
+    public List<GameObject> equippedItems = new List<GameObject>();
 
     private float canvasWidth;
     private float canvasHeight;
@@ -106,11 +111,13 @@ public class InventoryGridScript : MonoBehaviour
                 cellRect.pivot = new Vector2(0.5f, 0.5f);
 
                 // Position each cell from left to right, up to bottom using the top right of the screen as a pivot
-                Vector2 gridSize = new Vector2(inventoryWidth * cellSize, inventoryHeight * cellSize);
+                //Vector2 gridSize = new Vector2(inventoryWidth * cellSize, inventoryHeight * cellSize);
 
-                Vector2 canvasTopRight = new Vector2(canvasWidth*0.5f - gridSize.x - margin.x, canvasHeight*0.5f - cellSize - margin.y);
+                //Vector2 canvasTopRight = new Vector2(canvasWidth*0.5f - gridSize.x - margin.x, canvasHeight*0.5f - cellSize - margin.y);
 
-                Vector2 cellPos = canvasTopRight + new Vector2(x * cellSize + cellSize/2, -y * cellSize + cellSize/2);
+                Vector2 canvasTopLeft = getTopLeft();
+
+                Vector2 cellPos = canvasTopLeft + new Vector2(x * cellSize + cellSize/2, -y * cellSize + cellSize/2);
                 cellRect.anchoredPosition = cellPos;
 
                 cellRect.SetAsFirstSibling();
@@ -118,27 +125,37 @@ public class InventoryGridScript : MonoBehaviour
         }
     }
 
+    
+
     //returns the actual position in local space that the cell position takes up
     public Vector2 getLocalPosGrid(Vector2 cellPos)
     {
-        Vector2 gridSize = new Vector2(inventoryWidth * cellSize, inventoryHeight * cellSize);
-        Vector2 canvasTopRight = new Vector2(canvasWidth * 0.5f - gridSize.x - margin.x, canvasHeight * 0.5f - margin.y);
+        //Vector2 gridSize = new Vector2(inventoryWidth * cellSize, inventoryHeight * cellSize);
+        Vector2 canvasTopLeft = getTopLeft();
 
-        float posX = canvasTopRight.x + (cellPos.x * cellSize) + (cellSize * 0.5f);
-        float posY = canvasTopRight.y - (cellPos.y * cellSize) - (cellSize * 0.5f);
+        float posX = canvasTopLeft.x + (cellPos.x * cellSize) + (cellSize * 0.5f);
+        float posY = canvasTopLeft.y - (cellPos.y * cellSize) + (cellSize * 0.5f);
         return new Vector2(posX, posY);
     }
 
     public Vector2Int getCellAtPos(Vector2 pos)
     {
-        Vector2 gridSize = new Vector2(inventoryWidth * cellSize, inventoryHeight * cellSize);
-        Vector2 canvasTopRight = new Vector2(canvasWidth * 0.5f - gridSize.x - margin.x, canvasHeight * 0.5f - margin.y);
+        //Vector2 gridSize = new Vector2(inventoryWidth * cellSize, inventoryHeight * cellSize);
+        //Vector2 canvasTopLeft = new Vector2(canvasWidth * 0.5f - gridSize.x - margin.x, canvasHeight * 0.5f - margin.y);
 
-        Vector2 mouseGrid = new Vector2(pos.x - canvasTopRight.x, canvasTopRight.y - pos.y);
+        Vector2 canvasTopLeft = getTopLeft();
+
+        Vector2 mouseGrid = new Vector2(pos.x - canvasTopLeft.x, canvasTopLeft.y - pos.y + cellSize);
         int cellX = Mathf.FloorToInt(mouseGrid.x / cellSize);
         int cellY = Mathf.FloorToInt(mouseGrid.y / cellSize);
 
         return new Vector2Int(cellX, cellY);
+    }
+
+    private Vector2 getTopLeft()
+    {
+        Vector2 gridSize = new Vector2(inventoryWidth * cellSize, inventoryHeight * cellSize);
+        return new Vector2(canvasWidth * 0.5f - gridSize.x - margin.x, canvasHeight * 0.5f - cellSize - margin.y);
     }
 
     public bool inGrid(Vector2 cellPos)
@@ -173,6 +190,7 @@ public class InventoryGridScript : MonoBehaviour
                 }
             }
         }
+        checkItems();
     }
 
     //Debug Function for fun~
@@ -181,11 +199,12 @@ public class InventoryGridScript : MonoBehaviour
         GameObject selectedCell;
         if (cellPos.x >= 0 && cellPos.x < inventoryWidth && cellPos.y >= 0 && cellPos.y < inventoryHeight)
         {
-            //Debug.Log($"on cell:{cellPos.x},{cellPos.y}");
+            //Debug.Log($"on cell:{cellPos.x},{cellPos.y},{inventoryGrid[cellPos.x,cellPos.y].item}");
             selectedCell = inventoryGrid[cellPos.x, cellPos.y].cellObject;
             RectTransform cellRect = selectedCell.GetComponent<RectTransform>();
             cellRect.localScale = Vector3.Lerp(cellRect.localScale, new Vector3(1.2f, 1.2f, 1f), 0.3f);
             resetCellScale(selectedCell);
+
         }
         else
         {
@@ -206,6 +225,25 @@ public class InventoryGridScript : MonoBehaviour
                     cellRect.localScale = Vector3.Lerp(cellRect.localScale, new Vector3(defaultScale, defaultScale, 1f), 0.3f);
                 }
             }
+        }
+    }
+
+    public void checkItems()
+    {
+        Debug.Log("equipped Items :");
+        equippedItems.Clear();
+        foreach(InvCellData cellData in inventoryGrid)
+        {
+            if (cellData.item != null && !equippedItems.Contains(cellData.item))
+            {
+                equippedItems.Add(cellData.item);
+            }
+        }
+
+        //debug
+        foreach(GameObject huhu in equippedItems)
+        {
+            Debug.Log("item: "+huhu);
         }
     }
 }

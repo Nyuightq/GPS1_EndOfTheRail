@@ -40,8 +40,7 @@ public class Item : MonoBehaviour
 
         itemShape = itemData.getShapeGrid();
 
-        shapeHeight = itemShape.GetLength(1) * cellSize;
-        shapeWidth = itemShape.GetLength(0) * cellSize;
+        
 
         
     }
@@ -59,6 +58,10 @@ public class Item : MonoBehaviour
 
         //rectTransform.pivot = image.sprite.pivot / image.sprite.rect.size;
 
+        RectTransform myRect = GetComponent<RectTransform>();
+        //myRect.anchorMin = new Vector2(0f, 1f);
+        //myRect.anchorMax = new Vector2(0f, 1f);
+        //myRect.pivot = new Vector2(0, 1f);
 
         Vector2 topLeft = new Vector2(rectTransform.position.x - shapeWidth / 2, rectTransform.position.y + shapeHeight / 2);
 
@@ -69,6 +72,8 @@ public class Item : MonoBehaviour
 
     private void generatePreview()
     {
+        shapeHeight = itemShape.GetLength(1) * cellSize;
+        shapeWidth = itemShape.GetLength(0) * cellSize;
         for (int x = 0; x < shapeWidth / cellSize; x++)
         {
             for (int y = 0; y < shapeHeight / cellSize; y++)
@@ -98,6 +103,39 @@ public class Item : MonoBehaviour
                 }
             }
         }
+        rectTransform.SetAsLastSibling();
     }
 
+    public void rotateShape(ItemShapeCell[,] currentItemShape)
+    {
+        int shapeHeight = currentItemShape.GetLength(1);
+        int shapeWidth = currentItemShape.GetLength(0);
+
+        ItemShapeCell[,] rotatedShape = new ItemShapeCell[shapeHeight, shapeWidth];
+
+        for (int x = 0; x < shapeWidth; x++)
+        {
+            for (int y = 0; y < shapeHeight; y++)
+            {
+                rotatedShape[shapeHeight - 1 - y, x] = currentItemShape[x, y];
+            }
+        }
+        
+        foreach(GameObject cell in shape)
+        {
+            Destroy(cell);
+        }
+        shape.Clear();
+        itemShape = rotatedShape;
+        generatePreview();
+
+        //temp code
+        rectTransform.localRotation *= Quaternion.Euler(0, 0, -90f);
+
+        RectTransform itemRect = GetComponent<RectTransform>();
+        itemRect.sizeDelta = new Vector2(itemRect.sizeDelta.y,itemRect.sizeDelta.x);
+
+        Debug.Log("rotated!!");
+        //return rotatedShape;
+    }
 }

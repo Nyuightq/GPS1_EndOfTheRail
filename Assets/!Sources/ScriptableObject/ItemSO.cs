@@ -23,7 +23,6 @@ public class ItemSO : ScriptableObject
 
     private void OnEnable()
     {
-        // ✅ Only resize when needed (don’t overwrite user data)
         if (itemShape == null || itemShape.Length != itemWidth * itemHeight)
         {
             resizeShape();
@@ -53,7 +52,6 @@ public class ItemSO : ScriptableObject
             Array.Copy(itemShape, newShape, copyLength);
         }
 
-        // ✅ Ensure all cells exist
         for (int i = 0; i < newSize; i++)
         {
             if (newShape[i] == null)
