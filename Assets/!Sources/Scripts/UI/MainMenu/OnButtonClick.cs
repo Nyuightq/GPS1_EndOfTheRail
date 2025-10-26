@@ -1,19 +1,31 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 public class OnButtonClick : MonoBehaviour
 {
     [SerializeField] private Animator sideSliderAnimator;
 
+    
+    [Header("UI References")]
     [SerializeField] private GameObject optionMenuText;
     [SerializeField] private GameObject shaderToggle;
     [SerializeField] private GameObject volumeToggle;
     [SerializeField] private GameObject volumeIcon;
-
     [SerializeField] private GameObject creditsText;
     [SerializeField] private GameObject creditsNames;
 
+    [Header("Audio Sources")]
+    [SerializeField] private AudioSource sfxAudioSource;
+    [SerializeField] private AudioClip startClip;
+    [SerializeField] private AudioClip optionsInClip;
+    [SerializeField] private AudioClip optionsOutClip;
+    [SerializeField] private AudioClip creditsInClip;
+    [SerializeField] private AudioClip creditsOutClip;
+    [SerializeField] private AudioClip exitClip;
+
+    [Header("Booleans")]
     private bool isSideSliderOpen = false;
     private bool optionsClicked = false;
     private bool creditsClicked = false;
@@ -35,13 +47,26 @@ public class OnButtonClick : MonoBehaviour
 
     public void OnStartButton()
     {
+        PlaySFX(startClip);
+
+        StartCoroutine(WaitThenStart());
+    }
+
+    private IEnumerator WaitThenStart()
+    {
+        yield return new WaitForSeconds(1.25f);
+
         SceneManager.LoadScene("CutScene01");
+
+        Debug.Log("Dramatic entrance!");
     }
     
     public void OnOptionsButton()
     {
         if (isSideSliderOpen && optionsClicked == true)
         {
+            PlaySFX(optionsOutClip);
+            
             sideSliderAnimator.Play("CloseSideSliderAnim", 0, 0f);
 
             optionsClicked = false;
@@ -55,6 +80,8 @@ public class OnButtonClick : MonoBehaviour
 
         if (!isSideSliderOpen)
         {
+            PlaySFX(optionsInClip);
+            
             sideSliderAnimator.Play("SideSliderAnim", 0, 0f);
 
             optionsClicked = true;
@@ -92,6 +119,8 @@ public class OnButtonClick : MonoBehaviour
         {
             sideSliderAnimator.Play("CloseSideSliderAnim", 0, 0f);
 
+            PlaySFX(creditsOutClip);
+
             creditsClicked = false;
             isSideSliderOpen = false;
 
@@ -103,6 +132,8 @@ public class OnButtonClick : MonoBehaviour
 
         if (!isSideSliderOpen)
         {
+            PlaySFX(creditsInClip);
+            
             sideSliderAnimator.Play("SideSliderAnim", 0, 0f);
 
             optionsClicked = false;
@@ -134,7 +165,29 @@ public class OnButtonClick : MonoBehaviour
         }
     }
 
-    IEnumerator optionContentsOpen()
+    public void OnExitButton()
+    {
+        PlaySFX(exitClip);
+
+        StartCoroutine(WaitThenExit());
+    }
+
+    private IEnumerator WaitThenExit()
+    {
+        yield return new WaitForSeconds(1.25f);
+
+        Application.Quit();
+
+        Debug.Log("Dramatic exit!");
+    }
+
+    private void PlaySFX(AudioClip clip)
+    {
+        if (clip != null && sfxAudioSource != null)
+            sfxAudioSource.PlayOneShot(clip);
+    }
+
+    private IEnumerator optionContentsOpen()
     {
         yield return new WaitForSeconds(0.35f);
 
@@ -146,7 +199,7 @@ public class OnButtonClick : MonoBehaviour
         Debug.Log("Options content displayed!");
     }
 
-    IEnumerator optionContentsClose()
+    private IEnumerator optionContentsClose()
     {
         yield return new WaitForSeconds(0.0f);
 
@@ -158,7 +211,7 @@ public class OnButtonClick : MonoBehaviour
         Debug.Log("Options content closed!");
     }
 
-    IEnumerator creditsContentsOpen()
+    private IEnumerator creditsContentsOpen()
     {
         yield return new WaitForSeconds(0.35f);
 
@@ -168,7 +221,7 @@ public class OnButtonClick : MonoBehaviour
         Debug.Log("Credits content displayed!");
     }
 
-    IEnumerator creditsContentsClose()
+    private IEnumerator creditsContentsClose()
     {
         yield return new WaitForSeconds(0.0f);
 
@@ -176,11 +229,5 @@ public class OnButtonClick : MonoBehaviour
         creditsNames.SetActive(false);
 
         Debug.Log("Credits content closed!");
-    }
-
-    public void OnExitButton()
-    {
-        Application.Quit();
-        Debug.Log("Exit Game Success!");
     }
 }

@@ -5,11 +5,18 @@ using UnityEngine.EventSystems;
 public class OnCRTToggle : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private Image crtToggle;
+    [SerializeField] private AudioSource checkOnAudio;
+    [SerializeField] private AudioSource checkOffAudio;
 
     [SerializeField] private Color normalColor = new Color(255f / 255f, 255f / 255f, 255f / 255f);
     [SerializeField] private Color clickColor = new Color(201f / 255f, 192f / 255f, 61f / 255f);
 
     private bool isToggled = false;
+
+    private void Start()
+    {
+        crtToggle.color = normalColor;
+    }
 
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -18,6 +25,15 @@ public class OnCRTToggle : MonoBehaviour, IPointerClickHandler
             isToggled = !isToggled;
 
             crtToggle.color = isToggled ? clickColor : normalColor;
+        }
+
+        if (isToggled && checkOnAudio != null)
+        {
+            checkOnAudio.Play();
+        }
+        else if (!isToggled && checkOffAudio != null)
+        {
+            checkOffAudio.Play();
         }
     }
 }
