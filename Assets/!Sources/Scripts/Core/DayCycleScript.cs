@@ -32,15 +32,13 @@ public class DayCycleScript : MonoBehaviour
 
     [SerializeField] private Transform playerTrain;
 
-
-
-
-
     private enum TimeState { Day, Night }
+    public bool IsDayTime => currentTime == TimeState.Day;
 
     public void setTilesMoved(int val) { tilesMoved = val; }
-    public void addTilesMoved(int val) { tilesMoved += val; } 
+    public void addTilesMoved(int val) { tilesMoved += val; }
     public int getTilesMoved() { return tilesMoved; }
+
 
     private void Start()
     {

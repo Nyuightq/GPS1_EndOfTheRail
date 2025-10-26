@@ -33,6 +33,7 @@ public class TrainMovement : MonoBehaviour
 
     // NEW: Track if we've already triggered event tile for current position
     private Vector3Int? lastEventTilePos = null;
+    private bool wasOnRestPoint = false;
 
     private void Awake()
     {
@@ -230,14 +231,25 @@ public class TrainMovement : MonoBehaviour
                     }
                 }
 
+                // Check if collided to Rest point
                 moving = false;
+
+                // Check if we LEFT a rest point (we were on one, now we're not)
+                bool isCurrentlyOnRestPoint = gridScript.IsRestTile(tilePos);
+
+                if (wasOnRestPoint && !isCurrentlyOnRestPoint && restPointManager != null)
+                {
+                    Debug.Log("Train left Rest Point - hiding UI");
+                    restPointManager.OnRestPointExited();
+                }
+
+                wasOnRestPoint = isCurrentlyOnRestPoint;
 
                 // Check if collided to Rest point
                 if (gridScript.IsRestTile(tilePos))
                 {
                     Debug.Log("Reached Rest Point - Entering Plan Phase");
                     
-                    // ADD THESE DEBUG LINES:
                     if (restPointManager == null)
                     {
                         Debug.LogError("RestPointManager is NULL! Please assign it in the inspector.");
@@ -251,14 +263,6 @@ public class TrainMovement : MonoBehaviour
                     GameStateManager.SetPhase(Phase.Plan);
                     gridScript.refreshRoute();
                     enabled = false;
-                }
-                
-                if (moving && restPointManager != null && prevRail != null)
-                {
-                    if (prevRail.railType == RailData.railTypes.rest)
-                    {
-                        restPointManager.OnRestPointExited();
-                    }
                 }
 
             }
