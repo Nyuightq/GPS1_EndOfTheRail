@@ -8,6 +8,11 @@ using UnityEngine;
 public class CombatComponentEntity : CombatEntity
 {
     // Update is called once per frame
+    protected override void Start()
+    {
+        base.Start();
+        _isComponent = true;
+    }
     public void Initialize() // (EnemyData data)
     {
         // entityName = data.enemyName;

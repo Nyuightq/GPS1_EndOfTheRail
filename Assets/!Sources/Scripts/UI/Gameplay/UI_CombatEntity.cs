@@ -78,20 +78,12 @@ public class UI_CombatEntity : MonoBehaviour
             pos.y += parabola * peakHeight;
 
             rect.localPosition = pos;
-
-            // 漸淡
+            
             tmp.color = new Color(startColor.r, startColor.g, startColor.b, 1 - t);
 
             yield return null;
         }
 
         Destroy(go);
-    }
-
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

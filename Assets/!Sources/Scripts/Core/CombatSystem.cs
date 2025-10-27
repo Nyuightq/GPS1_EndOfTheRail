@@ -11,6 +11,7 @@ using System;
 public class CombatSystem : MonoBehaviour
 {
     public CombatPlayerEntity player;
+    public List<CombatComponentEntity> components = new List<CombatComponentEntity>();
     public List<CombatEnemyEntity> enemies = new List<CombatEnemyEntity>();
     private int rewardScraps;
     private float battleSpeed = 1.0f;
@@ -27,17 +28,23 @@ public class CombatSystem : MonoBehaviour
     //     StartBattle();
     // }
 
-    public void InitializeBattle(CombatPlayerEntity playerEntity, List<CombatEnemyEntity> enemyEntities)
+    public void InitializeBattle(CombatPlayerEntity playerEntity, List<CombatEnemyEntity> enemyEntities, List<CombatComponentEntity> componentEntities)
     {
         if (tooltip == null) tooltip = UI_CombatTooltipDetail.Instance;
-        
+
         player = playerEntity;
+        components = componentEntities;
         enemies = enemyEntities;
 
         if (player != null)
         {
-            player.OnAttackReady += HandleAttack;
+            // player.OnAttackReady += HandleAttack;
             player.OnDeath += HandleDeath;
+        }
+
+        foreach (var component in components)
+        {
+            component.OnAttackReady += HandleAttack;
         }
 
         foreach (var enemy in enemies)
@@ -66,7 +73,13 @@ public class CombatSystem : MonoBehaviour
         float delta = Time.deltaTime * battleSpeed;
 
         if (player != null && !player.IsDead)
-            player.UpdateCombat(delta);
+        {
+            foreach (var component in components)
+            {
+                component.UpdateCombat(delta);
+                Debug.Log("Updating");
+            }
+        }
 
         foreach (var enemy in enemies)
         {
@@ -79,12 +92,12 @@ public class CombatSystem : MonoBehaviour
     // Subscribed event from StartBattle(), instance.OnAttackReady return (CombatEntity this);
     private void HandleAttack(CombatEntity attacker)
     {
-        if (attacker == player)
+        if (attacker is CombatComponentEntity componentAttacker)
         {
             var target = enemies.Find(e => e != null && !e.IsDead);
             if (target != null)
             {
-                attacker.Attack(target);
+                componentAttacker.Attack(target);
             }
         }
         // Assume attacker == enemy

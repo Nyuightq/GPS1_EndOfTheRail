@@ -12,6 +12,7 @@ public class CombatManager : MonoBehaviour
     [Header("Player & Enemy Prefabs")]
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private GameObject enemyPrefab;
+    [SerializeField] private GameObject defaultComponentPrefab;
     [SerializeField] private Transform playerSpawnPoint;
     [SerializeField] private Transform enemySpawnParent;
 
@@ -46,21 +47,31 @@ public class CombatManager : MonoBehaviour
         CombatPlayerEntity playerEntity = playerObj.GetComponent<CombatPlayerEntity>();
         playerEntity.InitialHealth(GameStateManager.Instance.playerStatus.Hp, GameStateManager.Instance.playerStatus.MaxHp);
 
+        List<CombatComponentEntity> components = new List<CombatComponentEntity>();
+        int componentsCount = 1;// UnityEngine.Random.Range(1, 2);
+        for (int i = 0; i< componentsCount; i++)
+        {
+            GameObject componentObj = Instantiate(defaultComponentPrefab, playerSpawnPoint);
+            // componentObj.transform.localPosition = spawnPositions[i];
+            CombatComponentEntity componentEntity = componentObj.GetComponent<CombatComponentEntity>();
+            components.Add(componentEntity);
+        }
+
         // Generate enemies
         List<CombatEnemyEntity> enemies = new List<CombatEnemyEntity>();
         int enemyCount = UnityEngine.Random.Range(2, 5); 
-        Vector3[] spawnPositions = GetEnemySpawnPositionsCircle(enemyCount, 24f);
+        Vector3[] enemySpawnPositions = GetEnemySpawnPositionsCircle(enemyCount, 24f);
 
         for (int i = 0; i < enemyCount; i++)
         {
             GameObject enemyObj = Instantiate(enemyPrefab, enemySpawnParent);
-            enemyObj.transform.localPosition = spawnPositions[i];
+            enemyObj.transform.localPosition = enemySpawnPositions[i];
             CombatEnemyEntity enemyEntity = enemyObj.GetComponent<CombatEnemyEntity>();
             enemies.Add(enemyEntity);
         }
 
         // Pass enemies data to CombatSystem
-        combatSystem.InitializeBattle(playerEntity, enemies);
+        combatSystem.InitializeBattle(playerEntity, enemies, components);
         combatSystem.onBattleEnd += EndCombat;
 
         Debug.Log("[CombatManager] Combat setup completed!");

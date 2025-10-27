@@ -20,6 +20,7 @@ public class CombatEntity : MonoBehaviour
     [SerializeField] protected int _attackSpeed; // 1 speed = 0.26sec
     [SerializeField] protected int _attackDamage;
     [SerializeField] protected int _attackDamageVariance;
+    protected bool _isComponent = false;
     // Extra Properties
     public bool IsDead => _hp <= 0;
     private float _attackTimer = 0.0f;
@@ -44,7 +45,7 @@ public class CombatEntity : MonoBehaviour
     public float AttackTakenTime => _attackTakenTime;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    protected virtual void Start()
     {
         if (_hp == 0) _hp = _maxHp;
     }
@@ -55,9 +56,9 @@ public class CombatEntity : MonoBehaviour
     }
 
     // This function is called from CombatManager to update attackTimer
-    public void UpdateCombat(float deltaTime)
+    public virtual void UpdateCombat(float deltaTime)
     {
-        if (IsDead) return;
+        if (IsDead && _isComponent == false) return;
 
         _attackTimer += deltaTime;
         if (_attackTimer >= _attackTakenTime)
