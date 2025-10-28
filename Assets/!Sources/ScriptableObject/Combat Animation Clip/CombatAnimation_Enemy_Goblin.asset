@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 200ae588e1c03344a8e5e85e7c93cdb1, type: 3}
+  m_Name: CombatAnimation_Enemy_Goblin
+  m_EditorClassIdentifier: 
+  idleSprites:
+  - sprite: {fileID: -301888259, guid: 8ca1c72588319fa4182a020995b09028, type: 3}
+    duration: 0.3
+  - sprite: {fileID: -1269449796, guid: 8ca1c72588319fa4182a020995b09028, type: 3}
+    duration: 0.3
+  windupSprites:
+  - sprite: {fileID: -104157591, guid: 8ca1c72588319fa4182a020995b09028, type: 3}
+    duration: 0.2
+  - sprite: {fileID: -1269449796, guid: 8ca1c72588319fa4182a020995b09028, type: 3}
+    duration: 0.2
+  - sprite: {fileID: 1710518393, guid: 8ca1c72588319fa4182a020995b09028, type: 3}
+    duration: 0.15
+  - sprite: {fileID: 704849653, guid: 8ca1c72588319fa4182a020995b09028, type: 3}
+    duration: 0.15
+  attackSprites:
+  - sprite: {fileID: 274685468, guid: 8ca1c72588319fa4182a020995b09028, type: 3}
+    duration: 0.2
+  recoverySprites:
+  - sprite: {fileID: -1377368205, guid: 8ca1c72588319fa4182a020995b09028, type: 3}
+    duration: 0.15

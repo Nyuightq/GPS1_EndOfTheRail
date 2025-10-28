@@ -4369,7 +4369,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   combatUIPanel: {fileID: 9051725637360210555}
   playerPrefab: {fileID: 5098948779927698787, guid: 72799084f92538a4799b7dab6335d503, type: 3}
-  enemyPrefab: {fileID: 6709867778072561585, guid: 279cc029755cb1c44b14a7eacc24d47d, type: 3}
+  enemyPrefab: {fileID: 6709867778072561585, guid: fe1742e6a8700014fa045b2c4dcab72d, type: 3}
+  defaultComponentPrefab: {fileID: 5098948779927698787, guid: 37f418334037fd6428b9c4675ec62957, type: 3}
   playerSpawnPoint: {fileID: 7218836290128771022}
   enemySpawnParent: {fileID: 1531655843379797974}
   combatSystem: {fileID: 8034567536615623285}
@@ -8523,8 +8524,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
+  components: []
   enemies: []
-  battleSpeed: 1
 --- !u!114 &2121995272
 MonoBehaviour:
   m_ObjectHideFlags: 0

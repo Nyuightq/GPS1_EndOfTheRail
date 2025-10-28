@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 200ae588e1c03344a8e5e85e7c93cdb1, type: 3}
+  m_Name: CombatAnimation_Enemy_TreeMan
+  m_EditorClassIdentifier: 
+  idleSprites:
+  - sprite: {fileID: -102677052, guid: b8b06c8e2ef22a441b5dec6de5595183, type: 3}
+    duration: 0
+  windupSprites:
+  - sprite: {fileID: -1666763938, guid: b8b06c8e2ef22a441b5dec6de5595183, type: 3}
+    duration: 0.15
+  - sprite: {fileID: -438787699, guid: b8b06c8e2ef22a441b5dec6de5595183, type: 3}
+    duration: 0.25
+  - sprite: {fileID: 278495594, guid: b8b06c8e2ef22a441b5dec6de5595183, type: 3}
+    duration: 0.15
+  - sprite: {fileID: 631673055, guid: b8b06c8e2ef22a441b5dec6de5595183, type: 3}
+    duration: 0.25
+  attackSprites:
+  - sprite: {fileID: 1339061296, guid: b8b06c8e2ef22a441b5dec6de5595183, type: 3}
+    duration: 0.3
+  recoverySprites: []
