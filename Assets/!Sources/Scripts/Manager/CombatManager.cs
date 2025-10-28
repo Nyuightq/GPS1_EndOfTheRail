@@ -19,8 +19,18 @@ public class CombatManager : MonoBehaviour
     [Header("System")]
     [SerializeField] private CombatSystem combatSystem;
 
+    [Header("Combat Stats")]
+    public int totalCombatsFaced = 0;
+    public int totalEncountersFaced = 0;
     // Event for TrainFreezeController
     public static event System.Action OnCombatClosed;
+
+        public enum CombatType
+        {
+            Standard,
+            Encounter
+        }
+
 
     private void Awake()
     {
@@ -35,8 +45,14 @@ public class CombatManager : MonoBehaviour
             combatUIPanel.SetActive(false);
     }
 
-    public void StartCombat()
+    public void StartCombat(CombatType combatType = CombatType.Standard)
     {
+        // Increment counters based on type
+        if (combatType == CombatType.Standard)
+            totalCombatsFaced++;
+        else
+            totalEncountersFaced++;
+
         Debug.Log("Combat started against enemies!");
 
         if (combatUIPanel != null)
@@ -47,6 +63,7 @@ public class CombatManager : MonoBehaviour
         CombatPlayerEntity playerEntity = playerObj.GetComponent<CombatPlayerEntity>();
         playerEntity.InitialHealth(GameStateManager.Instance.playerStatus.Hp, GameStateManager.Instance.playerStatus.MaxHp);
 
+        // Generate Components
         List<CombatComponentEntity> components = new List<CombatComponentEntity>();
         int componentsCount = 1;// UnityEngine.Random.Range(1, 2);
         for (int i = 0; i< componentsCount; i++)
@@ -75,6 +92,8 @@ public class CombatManager : MonoBehaviour
         combatSystem.onBattleEnd += EndCombat;
 
         Debug.Log("[CombatManager] Combat setup completed!");
+        Debug.Log($"[CombatManager] Combat setup completed! Type: {combatType}, " +
+                $"Total Combats: {totalCombatsFaced}, Total Encounters: {totalEncountersFaced}");
     }
 
     // Used in StartCombat, auto initialize position for enemies.

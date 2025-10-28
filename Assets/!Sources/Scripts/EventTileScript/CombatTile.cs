@@ -47,7 +47,8 @@ public class CombatTile : EventTile
         // Start combat
         if (CombatManager.Instance != null)
         {
-            CombatManager.Instance.StartCombat();
+            CombatManager.Instance.StartCombat(CombatManager.CombatType.Standard);
+
 
             // Subscribe to combat close event once
             CombatManager.OnCombatClosed -= DeleteCombatTile;

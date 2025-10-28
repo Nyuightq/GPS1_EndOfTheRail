@@ -3,7 +3,8 @@ using TMPro;
 
 public class OnSpeedToggle : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI speedButtonText;
+    public static OnSpeedToggle Instance;
+    [SerializeField] private TMP_Text speedButtonText;
     [SerializeField] private string firstText = "N";
     [SerializeField] private string secondText = "X2";
 
@@ -11,11 +12,16 @@ public class OnSpeedToggle : MonoBehaviour
 
     // Global speed multiplier accessible to all other scripts
     public static float SpeedMultiplier = 1f;
+
+    private void Start()
+    {
+        Instance = this;
+    }
     public void OnSpeedButton()
     {
-        isToggled = !isToggled;
+        Instance.isToggled = !Instance.isToggled;
         //speedButtonText.text = isToggled ? secondText : firstText;
-        SpeedMultiplier = isToggled ? 4f : 1f; // <– core logic
-        speedButtonText.text = isToggled ? secondText : firstText;
+        SpeedMultiplier = isToggled ? 4f : 1f; // <ï¿½ core logic
+        Instance.speedButtonText.text = Instance.isToggled ? secondText : firstText;
     }
 }
