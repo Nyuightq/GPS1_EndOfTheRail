@@ -18,7 +18,7 @@ public class Item : MonoBehaviour
     public itemState state = itemState.unequipped;
 
     [SerializeField] private Image sprite;
-    [SerializeField] private ItemSO itemData;
+    [SerializeField] public ItemSO itemData;
     [SerializeField] private GameObject inventoryCellPrefab;
     public ItemShapeCell[,] itemShape { get; private set; }
 
@@ -33,20 +33,18 @@ public class Item : MonoBehaviour
     int cellSize = 16;
 
 
-    private void Awake()
+    private void OnEnable()
     {
         rectTransform = sprite.GetComponent<RectTransform>();
         image = sprite.GetComponent<Image>();
-
-        itemShape = itemData.getShapeGrid();
-
-        
 
         
     }
 
     private void Start()
     {
+        itemShape = itemData.getShapeGrid();
+
         if (itemData != null && itemData.itemSprite != null)
         {
             image.sprite = itemData.itemSprite;
@@ -54,14 +52,8 @@ public class Item : MonoBehaviour
         image.SetNativeSize();
         RectTransform itemRect = GetComponent<RectTransform>();
         itemRect.sizeDelta = rectTransform.sizeDelta;
-        //itemRect.
-
-        //rectTransform.pivot = image.sprite.pivot / image.sprite.rect.size;
 
         RectTransform myRect = GetComponent<RectTransform>();
-        //myRect.anchorMin = new Vector2(0f, 1f);
-        //myRect.anchorMax = new Vector2(0f, 1f);
-        //myRect.pivot = new Vector2(0, 1f);
 
         Vector2 topLeft = new Vector2(rectTransform.position.x - shapeWidth / 2, rectTransform.position.y + shapeHeight / 2);
 
@@ -121,13 +113,7 @@ public class Item : MonoBehaviour
             }
         }
         
-        foreach(GameObject cell in shape)
-        {
-            Destroy(cell);
-        }
-        shape.Clear();
-        itemShape = rotatedShape;
-        generatePreview();
+        refreshShape(rotatedShape);
 
         //temp code
         rectTransform.localRotation *= Quaternion.Euler(0, 0, -90f);
@@ -138,4 +124,17 @@ public class Item : MonoBehaviour
         Debug.Log("rotated!!");
         //return rotatedShape;
     }
+
+    public void refreshShape(ItemShapeCell[,] newShape)
+    {
+        foreach (GameObject cell in shape)
+        {
+            Destroy(cell);
+        }
+        shape.Clear();
+        itemShape = newShape;
+        generatePreview();
+        Debug.Log("REFRESHED!");
+    }
+
 }

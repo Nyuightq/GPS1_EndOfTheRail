@@ -3,10 +3,14 @@
 // Author: User
 // Description: -
 // --------------------------------------------------------------
+using NUnit.Framework.Interfaces;
+using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
+using static UnityEditor.Progress;
 
 public class InvCellData
 {
@@ -33,8 +37,11 @@ public class InventoryGridScript : MonoBehaviour
 
     [SerializeField] private float defaultScale = 0.9f;
 
-    [SerializeField] GameObject itemSpawn;
-
+    [SerializeField] private bool spawnItemInInventory;
+    [SerializeField] private Vector2 spawnCentreOffset = Vector2.zero;
+    [SerializeField] private int spawnMargin = 5;
+    [SerializeField] private GameObject itemSpawn;
+    [SerializeField] private List<ItemSO> startingItems;
 
     //public Dictionary<GameObject, InvCellData> equippedItems = new Dictionary<GameObject, InvCellData>();
 
@@ -55,13 +62,28 @@ public class InventoryGridScript : MonoBehaviour
         
     }
 
-    private void Start()
+    private IEnumerator Start()
     {
         canvasWidth = inventoryRect.rect.width;
         canvasHeight = inventoryRect.rect.height;
 
         generateGrid();
+
+        if (spawnItemInInventory)
+        {
+            foreach (ItemSO startingItem in startingItems)
+            {
+                addItem(itemSpawn, startingItem);
+                yield return null;
+            }
+        }
+        else
+        {
+            spawnItems(itemSpawn, startingItems, spawnCentreOffset, spawnMargin);
+        }
     }
+
+
 
     private void Update()
     {
@@ -140,9 +162,6 @@ public class InventoryGridScript : MonoBehaviour
 
     public Vector2Int getCellAtPos(Vector2 pos)
     {
-        //Vector2 gridSize = new Vector2(inventoryWidth * cellSize, inventoryHeight * cellSize);
-        //Vector2 canvasTopLeft = new Vector2(canvasWidth * 0.5f - gridSize.x - margin.x, canvasHeight * 0.5f - margin.y);
-
         Vector2 canvasTopLeft = getTopLeft();
 
         Vector2 mouseGrid = new Vector2(pos.x - canvasTopLeft.x, canvasTopLeft.y - pos.y + cellSize);
@@ -246,4 +265,93 @@ public class InventoryGridScript : MonoBehaviour
             Debug.Log("item: "+huhu);
         }
     }
+
+    public void addItem(GameObject item, ItemSO itemData)
+    {
+        Vector2 canvasTopLeft = getTopLeft();
+        
+        int itemWidth = itemData.itemWidth;
+        int itemHeight = itemData.itemHeight;
+
+
+        ItemShapeCell[,] itemShape = itemData.getShapeGrid();
+
+        Debug.Log("starting placement search");
+        for (int x = 0; x<inventoryWidth; x++)
+        {
+            for (int y = 0; y < inventoryHeight; y++) 
+            {
+                bool canPlace = true;
+                for (int cellX = 0; cellX < itemWidth; cellX++) 
+                {
+                    for (int cellY = 0; cellY < itemHeight; cellY++)
+                    {
+                        int checkX = x + cellX;
+                        int checkY = y + cellY;
+
+                        if (checkX >= inventoryWidth || checkY >= inventoryHeight)
+                        {
+                            canPlace = false;
+                            break;
+                        }
+
+                        if (itemShape[cellX,cellY].filled && inventoryGrid[cellX + x, cellY + y].item != null)
+                        {
+                            canPlace = false;
+                            break;
+                        }
+                    }
+                    if (!canPlace) break;
+                }
+
+                if (canPlace) 
+                {
+                    Debug.Log("valid spot found!");
+                    Vector2 origin = getLocalPosGrid(new Vector2(x,y));
+                    Vector2 itemCentre = origin + new Vector2(itemWidth * 8f - 8f, -itemHeight * 8f + 8f);
+
+                    GameObject newItem = Instantiate(item, inventoryRect);
+                    Item itemScript = newItem.GetComponent<Item>();
+                    itemScript.itemData = itemData;
+
+                    //itemScript.refreshShape(itemData.getShapeGrid());
+
+                    RectTransform itemRect = newItem.GetComponent<RectTransform>();
+                    itemRect.anchoredPosition = itemCentre;
+                    ItemDragManager dragScript = newItem.GetComponent<ItemDragManager>();
+
+                    StartCoroutine(attachNextFrame(dragScript));
+                    //dragScript.attachToInventory();
+                    Debug.Log("placed!");
+                    return;
+                }
+            }
+        }
+    }
+
+    private IEnumerator attachNextFrame(ItemDragManager drag)
+    {
+        yield return null; // wait 1 frame
+        drag.attachToInventory();
+    }
+
+    private void spawnItems(GameObject itemPrefab, List<ItemSO> itemList, Vector2 pos, float spawnMarginX)
+    {
+        float offsetX = pos.x;
+        float totalWidth = spawnMarginX * (itemList.Count - 1);
+        foreach (ItemSO startingItem in itemList) totalWidth += startingItem.itemWidth * cellSize;
+
+        for (int i = 0; i < itemList.Count; i++)
+        {
+            GameObject newItem = Instantiate(itemPrefab, inventoryRect);
+            Item itemScript = newItem.GetComponent<Item>();
+            itemScript.itemData = itemList[i];
+
+            RectTransform newItemRect = newItem.GetComponent<RectTransform>();
+
+            newItemRect.anchoredPosition = new Vector2(offsetX - totalWidth * 0.5f, pos.y);
+            offsetX += itemList[i].itemWidth * cellSize + spawnMarginX;
+        }
+    }
+
 }

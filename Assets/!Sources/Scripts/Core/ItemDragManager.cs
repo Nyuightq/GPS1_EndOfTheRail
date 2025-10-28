@@ -27,20 +27,21 @@ public class ItemDragManager : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     private bool dragging;
 
-    private void Awake()
+    private void OnEnable()
     {
         rectTransform = GetComponent<RectTransform>();
-        
+
         canvasGroup = gameObject.AddComponent<CanvasGroup>();
 
         itemScript = GetComponent<Item>();
-        
+
+        canvas = GetComponentInParent<Canvas>();
+        inventoryGridScript = FindFirstObjectByType<InventoryGridScript>().GetComponent<InventoryGridScript>();
     }
 
     private void Start()
     {
-        canvas = GetComponentInParent<Canvas>();
-        inventoryGridScript = FindFirstObjectByType<InventoryGridScript>().GetComponent<InventoryGridScript>();
+        
     }
 
     public void Update()
@@ -71,14 +72,30 @@ public class ItemDragManager : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
         dragging = false;
 
-        if(itemScript.state == Item.itemState.unequipped)
+        attachToInventory();
+    }
+
+    //hanldes being able to drag stuff
+    public void OnDrag(PointerEventData eventData)
+    {
+        //gameObject.transform.position = eventData.position;
+        dragDir = eventData.position;
+        float moveX = Mathf.Lerp(rectTransform.position.x, dragDir.x, 0.2f);
+        float moveY = Mathf.Lerp(rectTransform.position.y, dragDir.y, 0.2f);
+        rectTransform.position = new Vector2(moveX, moveY);
+        //Debug.Log("dragging " + gameObject + " to " + eventData);
+    }
+
+    public void attachToInventory()
+    {
+        if (itemScript.state == Item.itemState.unequipped)
         {
-            foreach(GameObject shapeCell in itemScript.shape)
+            foreach (GameObject shapeCell in itemScript.shape)
             {
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(inventoryGridScript.inventoryRect, shapeCell.transform.position, null, out Vector2 localPos);
 
                 Vector2 cellPos = inventoryGridScript.getCellAtPos(localPos);
-                if(inventoryGridScript.inGrid(cellPos) && inventoryGridScript.inventoryGrid[(int)cellPos.x,(int)cellPos.y].item == null)
+                if (inventoryGridScript.inGrid(cellPos) && inventoryGridScript.inventoryGrid[(int)cellPos.x, (int)cellPos.y].item == null)
                 {
                     //Debug.Log("OOOGA BOOGA");
                     Debug.Log(cellPos);
@@ -87,7 +104,7 @@ public class ItemDragManager : MonoBehaviour, IBeginDragHandler, IDragHandler, I
                 {
                     return;
                 }
-        
+
             }
             Debug.Log("Item Attached!!!");
 
@@ -95,10 +112,7 @@ public class ItemDragManager : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             int itemHeight = itemScript.itemShape.GetLength(1);
 
             //look into this
-            Vector2 screenTopLeft = RectTransformUtility.WorldToScreenPoint(
-            null,
-            rectTransform.TransformPoint(new Vector2(-itemWidth * 16 / 2f, itemHeight * 16 / 2f) + new Vector2(8f,-8f))
-            );
+            Vector2 screenTopLeft = RectTransformUtility.WorldToScreenPoint(null, rectTransform.TransformPoint(new Vector2(-itemWidth * 16 / 2f, itemHeight * 16 / 2f) + new Vector2(8f, -8f)));
 
 
             RectTransformUtility.ScreenPointToLocalPointInRectangle(inventoryGridScript.inventoryRect, screenTopLeft, null, out Vector2 topLeftCell);
@@ -114,30 +128,13 @@ public class ItemDragManager : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             Vector2 actualItemCellPos = inventoryGridScript.getLocalPosGrid(itemCellPos);
 
 
-            
+
             rectTransform.anchoredPosition = actualItemCellPos;
 
             itemScript.state = Item.itemState.equipped;
 
-            
+
         }
-        //Debug.Log("end drag" + gameObject);
     }
-
-    //hanldes being able to drag stuff
-    public void OnDrag(PointerEventData eventData)
-    {
-        //gameObject.transform.position = eventData.position;
-        dragDir = eventData.position;
-        float moveX = Mathf.Lerp(rectTransform.position.x, dragDir.x, 0.2f);
-        float moveY = Mathf.Lerp(rectTransform.position.y, dragDir.y, 0.2f);
-        rectTransform.position = new Vector2(moveX, moveY);
-        //Debug.Log("dragging " + gameObject + " to " + eventData);
-    }
-
-    //private ItemShapeCell[,] RotateShape(ItemShapeCell[,] itemShape)
-    //{
-
-    //}
 
 }
