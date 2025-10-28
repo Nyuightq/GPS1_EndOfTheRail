@@ -106,8 +106,8 @@ public class WinLoseManager : MonoBehaviour
 
         if (currentRail != null && currentRail.railType == RailData.railTypes.end)
         {
-            if (playerStatus != null && crystalHP != null &&
-                playerStatus.Hp > 0 && crystalHP.currentHP > 0)
+            if (playerStatus != null &&
+                playerStatus.Hp > 0 && playerStatus.CrystalHp > 0)
             {
                 TriggerWin();
             }

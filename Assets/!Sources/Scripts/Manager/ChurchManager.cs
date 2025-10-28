@@ -65,11 +65,12 @@ public class ChurchManager : MonoBehaviour
                                "You sense the Crystal’s pulse weaken... yet the altar glows warmly, offering restoration.";
         }
 
-        CrystalHP crystal = FindFirstObjectByType<CrystalHP>();
-        if (crystal != null && yesButtonText != null)
+        PlayerStatusManager playerStatus = GameStateManager.Instance.playerStatus;
+
+        if (playerStatus != null && yesButtonText != null)
         {
-            int currentHp = crystal.currentHP;
-            int maxHp = crystal.maxHP;
+            int currentHp = playerStatus.CrystalHp;
+            int maxHp = playerStatus.MaxCrystalHp;
             int healedHp = Mathf.Min(currentHp + healAmount, maxHp);
             yesButtonText.text = $"{currentHp}→{healedHp} HP";
         }
