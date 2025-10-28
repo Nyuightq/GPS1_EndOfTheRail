@@ -32,8 +32,14 @@ public class DayCycleScript : MonoBehaviour
 
     [SerializeField] private Transform playerTrain;
 
-    private enum TimeState { Day, Night }
+    public enum TimeState { Day, Night }//changed to public (its for the day progress slider
     public bool IsDayTime => currentTime == TimeState.Day;
+    [Header("Public getters for Day Progress Slider")]
+    public int TilesMoved => tilesMoved;
+    public int DayLength => dayLength;
+    public int DayLengthMod => dayLengthMod;
+    public int NightLength => nightLength;
+    public TimeState CurrentTime => currentTime;
 
     public void setTilesMoved(int val) { tilesMoved = val; }
     public void addTilesMoved(int val) { tilesMoved += val; }

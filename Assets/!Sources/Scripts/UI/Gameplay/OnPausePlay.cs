@@ -67,4 +67,21 @@ public class OnPausePlay : MonoBehaviour
 
         pausePlayImage.sprite = isToggled ? playSprite : pauseSprite;
     }
+
+    public void ResetPauseState()
+    {
+        isPaused = false;
+        isToggled = false;
+
+        pausePlayImage.sprite = pauseSprite; // Make sure it shows the pause icon again
+        if (pausePlayPanel != null)
+            pausePlayPanel.SetActive(false);
+
+        foreach (var script in scriptsToPause)
+        {
+            if (script != null)
+                script.enabled = true;
+        }
+    }
+
 }
