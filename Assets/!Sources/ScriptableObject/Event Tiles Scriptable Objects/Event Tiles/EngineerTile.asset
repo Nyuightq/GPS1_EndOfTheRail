@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a7f3dd9daed1a346a52b7caefa2c9ab, type: 3}
   m_Name: EngineerTile
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 21300000, guid: 900583c8bd1ce73479e85fb59960f43c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 441ddc6d2c674e7439f8a235dee64871, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1

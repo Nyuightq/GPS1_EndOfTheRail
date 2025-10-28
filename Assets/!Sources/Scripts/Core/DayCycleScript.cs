@@ -32,15 +32,13 @@ public class DayCycleScript : MonoBehaviour
 
     [SerializeField] private Transform playerTrain;
 
-
-
-
-
     private enum TimeState { Day, Night }
+    public bool IsDayTime => currentTime == TimeState.Day;
 
     public void setTilesMoved(int val) { tilesMoved = val; }
-    public void addTilesMoved(int val) { tilesMoved += val; } 
+    public void addTilesMoved(int val) { tilesMoved += val; }
     public int getTilesMoved() { return tilesMoved; }
+
 
     private void Start()
     {
@@ -63,7 +61,7 @@ public class DayCycleScript : MonoBehaviour
 
                     Debug.Log("Night has begun!");
                    // replace SpawnNightEncounters();
-StartCoroutine(SpawnEncountersWithDelay(0.05f)); // tweak delay as needed (0.05 - 0.2)
+                    StartCoroutine(SpawnEncountersWithDelay(0.05f)); // tweak delay as needed (0.05 - 0.2)
 
                 }
                 break;
@@ -99,7 +97,7 @@ private void SpawnNightEncounters()
         return;
     }
 
-    RailGridScript grid = FindObjectOfType<RailGridScript>();
+    RailGridScript grid = FindFirstObjectByType<RailGridScript>();
     if (grid == null || grid.railDataMap == null)
     {
         Debug.LogWarning("No RailGridScript or rails found.");
@@ -108,7 +106,7 @@ private void SpawnNightEncounters()
 
     TrainMovement train = null;
     if (playerTrain != null) train = playerTrain.GetComponent<TrainMovement>();
-    if (train == null) train = FindObjectOfType<TrainMovement>();
+    if (train == null) train = FindFirstObjectByType<TrainMovement>();
 
     if (train == null)
     {

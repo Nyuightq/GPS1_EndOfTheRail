@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1428858132201245bb3059054ee0b3a, type: 3}
   m_Name: Biome Swamp Tile
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 21300000, guid: dda630f83c878e6478facf3752a40271, type: 3}
-  m_Color: {r: 0.034852218, g: 0.335849, b: 0.1656984, a: 1}
+  m_Sprite: {fileID: 21300000, guid: efe3f307c1e39f348b6cde6e8f8e322c, type: 3}
+  m_Color: {r: 0.62708664, g: 0.9150943, b: 0.45323068, a: 1}
   m_Transform:
     e00: 1
     e01: 0

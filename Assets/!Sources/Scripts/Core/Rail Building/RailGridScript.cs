@@ -174,6 +174,7 @@ public class RailGridScript : MonoBehaviour
         startPoint = c_endPoint;
         
         railDataMap = new_RailDataMap;
+        
     }
     public Vector3Int findEndPoint(Vector3Int startPoint)
     {
@@ -207,32 +208,45 @@ public class RailGridScript : MonoBehaviour
 
     public void travelCheck()
     {
-        if (validatePath(startPoint))
+    if (Input.GetKeyDown(KeyCode.Space) && validatePath(startPoint))
+    {
+        if (_trainRef == null) // Initial first train
         {
-            if (_trainRef == null) // Initial first train
+            foreach (var rail in railDataMap)
             {
-                foreach (var rail in railDataMap)
+                Vector3Int pos = rail.Key;
+                RailData data = rail.Value;
+                if (data.railType == RailData.railTypes.start)
                 {
-                    Vector3Int pos = rail.Key;
-                    RailData data = rail.Value;
-                    if (data.railType == RailData.railTypes.start)
+                    Vector3 worldPos = snapToGrid(pos);
+                    _trainRef = Instantiate(train, worldPos, Quaternion.identity);
+                    TrainMovement tm = _trainRef.GetComponent<TrainMovement>();
+                    tm.gridManager = gameObject;
+                    tm.dayCycleManager = dayCycleManager;
+                    
+                    // ADD THIS: Find and assign RestPointManager
+                    RestPointManager rpm = FindObjectOfType<RestPointManager>();
+                    if (rpm != null)
                     {
-                        Vector3 worldPos = snapToGrid(pos);
-                        _trainRef = Instantiate(train, worldPos, Quaternion.identity);
-                        TrainMovement tm = _trainRef.GetComponent<TrainMovement>();
-                        tm.gridManager = gameObject;
-                        tm.dayCycleManager = dayCycleManager;
-                        break;
+                        tm.restPointManager = rpm;
+                        Debug.Log("RestPointManager assigned to spawned train");
                     }
+                    else
+                    {
+                        Debug.LogError("RestPointManager not found in scene!");
+                    }
+                    
+                    break;
                 }
             }
-            else
-            {
-                _trainRef.GetComponent<TrainMovement>().enabled = true;
-            }
-
-            GameStateManager.SetPhase(Phase.Travel);
         }
+        else
+        {
+            _trainRef.GetComponent<TrainMovement>().enabled = true;
+        }
+
+        GameStateManager.SetPhase(Phase.Travel);
+    }
     }
 
     public bool validatePath(Vector3Int startPoint)
@@ -400,7 +414,7 @@ public class RailGridScript : MonoBehaviour
 
         return compiling_railDataMap;
     }
-    
+
     public void SpawnCombatTile(CombatTile combatTileSO)
     {
         List<Vector3Int> eligibleTiles = new List<Vector3Int>();
@@ -433,6 +447,15 @@ public class RailGridScript : MonoBehaviour
 
         // Store this for later if you want to revert after night
         Debug.Log($"Combat tile spawned at {randomPos}");
+    }
+
+    public bool IsRestTile(Vector3Int tilePos)
+    {
+        if (railDataMap.TryGetValue(tilePos, out RailData data))
+        {
+            return data.railType == RailData.railTypes.rest;
+        }
+        return false;
     }
 
 }

@@ -12,16 +12,34 @@ public class StoryTile : EventTile
 {
     [Header("Story Content")]
     [TextArea(3, 6)] 
-    public string storyText;        // Unique text shown for this tile
-    public Sprite storyImage;       // Optional: image to show
+    public string storyText;
+    public Sprite storyImage;
 
     private static Tilemap eventTilemap;
+    private static GameObject lastPlayer;
+    private static StoryTile lastTriggeredTile;
 
     public override void OnPlayerEnter(GameObject player)
     {
+        // Global debounce: skip if StoryManager is already active
+        if (StoryManager.Instance != null && StoryManager.Instance.IsStoryActive)
+        {
+            Debug.Log($"[StoryTile] StoryManager busy, ignoring tile {name}");
+            return;
+        }
+
+        // Skip duplicate triggers for same tile and player
+        if (lastPlayer == player && lastTriggeredTile == this)
+        {
+            Debug.Log($"[StoryTile] Duplicate trigger ignored for: {name}");
+            return;
+        }
+
+        lastPlayer = player;
+        lastTriggeredTile = this;
+
         Debug.Log($"Player entered Story Tile: {name}");
 
-        // Find and cache EventTilemap
         if (eventTilemap == null)
         {
             GameObject tilemapObj = GameObject.Find("EventTilemap");
@@ -29,28 +47,29 @@ public class StoryTile : EventTile
                 eventTilemap = tilemapObj.GetComponent<Tilemap>();
         }
 
-        // Snap train to exact center of this tile IMMEDIATELY
         if (eventTilemap != null)
         {
             Vector3Int tilePos = eventTilemap.WorldToCell(player.transform.position);
             Vector3 centerPos = eventTilemap.GetCellCenterWorld(tilePos);
             player.transform.position = centerPos;
-            
             Debug.Log($"[StoryTile] Snapped train to center at {tilePos}");
         }
 
-        // Get reference to TrainFreezeController AFTER snapping to center
-        TrainFreezeController freezeController = player.GetComponent<TrainFreezeController>();
+        var freezeController = player.GetComponent<TrainFreezeController>();
         if (freezeController != null)
             freezeController.FreezeTrain();
 
-        // Open Story UI with this tile's unique data
         StoryManager.Instance.OpenStoryUI(this, player);
     }
 
     public override void OnPlayerExit(GameObject player)
     {
+        if (lastPlayer == player)
+        {
+            lastPlayer = null;
+            lastTriggeredTile = null;
+        }
+
         Debug.Log($"Player exited Story Tile: {name}");
-        // You can optionally auto-close UI here, or leave it controlled by UI button.
     }
 }

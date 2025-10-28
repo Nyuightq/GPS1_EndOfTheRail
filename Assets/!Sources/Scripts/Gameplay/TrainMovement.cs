@@ -5,10 +5,11 @@ using UnityEngine;
 public class TrainMovement : MonoBehaviour
 {
     [Header("regular movement")]
-    [SerializeField] private float moveSpeed = 2.0f;
+    [SerializeField] private float moveSpeed = 3.0f; //it was 2.0f
     [Header("lerp movement option")]
     [SerializeField] private bool lerpMovement = false;
-    [SerializeField] private float lerpAmount = 0.1f;
+    public RestPointManager restPointManager;
+    [SerializeField] private float lerpAmount = 4.0f; //it was 0.1f
 
     public GameObject gridManager;
     public GameObject dayCycleManager;
@@ -32,10 +33,18 @@ public class TrainMovement : MonoBehaviour
 
     // NEW: Track if we've already triggered event tile for current position
     private Vector3Int? lastEventTilePos = null;
+    private bool wasOnRestPoint = false;
 
     private void Awake()
     {
         baseSpeed = moveSpeed;
+
+        restPointManager = FindObjectOfType<RestPointManager>();
+        if (restPointManager == null)
+            Debug.LogError("No RestPointManager found before train spawn!");
+        else
+            Debug.Log("Found RestPointManager: " + restPointManager.name);
+
     }
 
     public void ApplySpeedModifier(float reduction)
@@ -108,6 +117,22 @@ public class TrainMovement : MonoBehaviour
 
     void Update()
     {
+
+            if (restPointManager == null)
+            {
+                restPointManager = FindObjectOfType<RestPointManager>();
+                if (restPointManager == null)
+                {
+                    Debug.LogError("RestPointManager is NULL! Please assign it in the inspector.");
+                    return;
+                }
+            }
+        // Stop all updates when the game is paused
+        if (Mathf.Approximately(Time.timeScale, 0f) && moving)
+        {
+            return;
+        }
+
         if (!moving)
         {
             if (gridScript.railAtPos(tilePos))
@@ -141,15 +166,21 @@ public class TrainMovement : MonoBehaviour
 
                 if (lerpMovement)
                 {
-                    transform.position = Vector3.Lerp(transform.position, targetTilePos, lerpAmount);
+                    //transform.position = Vector3.Lerp(transform.position, targetTilePos, lerpAmount);
+                    //transform.position = Vector3.Lerp(transform.position, targetTilePos, lerpAmount * OnSpeedToggle.SpeedMultiplier);
+                    transform.position = Vector3.Lerp(transform.position, targetTilePos, lerpAmount * Time.deltaTime * 50f * OnSpeedToggle.SpeedMultiplier);
+
                     float x = Util.Approach(transform.position.x, targetTilePos.x, 0.001f);
                     float y = Util.Approach(transform.position.y, targetTilePos.y, 0.001f);
                     transform.position = new Vector2(x, y);
                 }
                 else
                 {
-                    float x = Util.Approach(transform.position.x, targetTilePos.x, moveSpeed * Time.deltaTime);
-                    float y = Util.Approach(transform.position.y, targetTilePos.y, moveSpeed * Time.deltaTime);
+                    //float x = Util.Approach(transform.position.x, targetTilePos.x, moveSpeed * Time.deltaTime);
+                    //float y = Util.Approach(transform.position.y, targetTilePos.y, moveSpeed * Time.deltaTime);
+                    float x = Util.Approach(transform.position.x, targetTilePos.x, moveSpeed * Time.deltaTime * OnSpeedToggle.SpeedMultiplier);
+                    float y = Util.Approach(transform.position.y, targetTilePos.y, moveSpeed * Time.deltaTime * OnSpeedToggle.SpeedMultiplier);
+
                     transform.position = new Vector2(x, y);
                 }
             }
@@ -212,20 +243,40 @@ public class TrainMovement : MonoBehaviour
                     }
                 }
 
+                // Check if collided to Rest point
                 moving = false;
 
-                // Check if collided to Rest point
-                if (gridScript.railAtPos(tilePos))
+                // Check if we LEFT a rest point (we were on one, now we're not)
+                bool isCurrentlyOnRestPoint = gridScript.IsRestTile(tilePos);
+
+                if (wasOnRestPoint && !isCurrentlyOnRestPoint && restPointManager != null)
                 {
-                    RailData currentRail = gridScript.railDataMap[tilePos];
-                    if (currentRail.railType == RailData.railTypes.rest)
-                    {
-                        Debug.Log("Phase - Plan");
-                        GameStateManager.SetPhase(Phase.Plan);
-                        gridScript.refreshRoute();
-                        GetComponent<TrainMovement>().enabled = false;
-                    }
+                    Debug.Log("Train left Rest Point - hiding UI");
+                    restPointManager.OnRestPointExited();
                 }
+
+                wasOnRestPoint = isCurrentlyOnRestPoint;
+
+                // Check if collided to Rest point
+                if (gridScript.IsRestTile(tilePos))
+                {
+                    Debug.Log("Reached Rest Point - Entering Plan Phase");
+                    
+                    if (restPointManager == null)
+                    {
+                        Debug.LogError("RestPointManager is NULL! Please assign it in the inspector.");
+                    }
+                    else
+                    {
+                        Debug.Log("Calling restPointManager.OnRestPointEntered()");
+                        restPointManager.OnRestPointEntered(this);
+                    }
+                    
+                    GameStateManager.SetPhase(Phase.Plan);
+                    gridScript.refreshRoute();
+                    enabled = false;
+                }
+
             }
         }
     }

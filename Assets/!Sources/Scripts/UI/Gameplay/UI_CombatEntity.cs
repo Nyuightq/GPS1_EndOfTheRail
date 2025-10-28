@@ -68,7 +68,7 @@ public class UI_CombatEntity : MonoBehaviour
 
         while (time < duration)
         {
-            time += Time.deltaTime;
+            time += Time.deltaTime * OnSpeedToggle.SpeedMultiplier;
             float t = time / duration;
 
             // ChatGPT: Using a parabola-like formula: y = 4t(1 - t) will produce an upward arc

@@ -39,7 +39,7 @@ public class CameraMovementTemp : MonoBehaviour
     {
         // Try auto-assign gridScript if not assigned
         if (gridScript == null)
-            gridScript = FindObjectOfType<RailGridScript>();
+            gridScript = FindFirstObjectByType<RailGridScript>();
 
         if (gridScript != null)
             CalculateBoundsFromGrid();
@@ -64,7 +64,7 @@ public class CameraMovementTemp : MonoBehaviour
     {
         if (followTarget == null)
         {
-            TrainMovement train = FindObjectOfType<TrainMovement>();
+            TrainMovement train = FindFirstObjectByType<TrainMovement>();
             if (train != null)
                 followTarget = train.transform;
         }

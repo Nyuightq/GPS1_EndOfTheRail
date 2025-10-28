@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
@@ -14,6 +15,10 @@ public class OnClickImage : MonoBehaviour
     [SerializeField] private GameObject narrative3Text;
     [SerializeField] private GameObject narrative4Text;
 
+    [SerializeField] private AudioSource clickAudio;
+
+    private bool clickedAudio = false;
+
     public void Start()
     {
         narrative1.SetActive(true);
@@ -26,6 +31,8 @@ public class OnClickImage : MonoBehaviour
         narrative2Text.SetActive(false);
         narrative3Text.SetActive(false);
         narrative4Text.SetActive(false);
+
+        clickedAudio = false;
     }
 
     public void OnNarrative1()
@@ -35,6 +42,9 @@ public class OnClickImage : MonoBehaviour
 
         narrative1.SetActive(false);
         narrative1Text.SetActive(false);
+
+        clickedAudio = true;
+        clickAudio.Play();
     }
 
     public void OnNarrative2()
@@ -44,6 +54,9 @@ public class OnClickImage : MonoBehaviour
 
         narrative2.SetActive(false);
         narrative2Text.SetActive(false);
+
+        clickedAudio = true;
+        clickAudio.Play();
     }
 
     public void OnNarrative3()
@@ -53,12 +66,25 @@ public class OnClickImage : MonoBehaviour
 
         narrative3.SetActive(false);
         narrative3Text.SetActive(false);
+
+        clickedAudio = true;
+        clickAudio.Play();
     }
 
     public void OnNarrative4()
     {
         narrative4.SetActive(false);
         narrative4Text.SetActive(false);
+
+        clickedAudio = true;
+        clickAudio.Play();
+
+        StartCoroutine(WaitThenNext());
+    }
+
+    private IEnumerator WaitThenNext()
+    {
+        yield return new WaitForSeconds(0.5f);
 
         SceneManager.LoadScene("SampleScene 1");
     }

@@ -3,6 +3,8 @@
 // Author: ZQlie
 // Description: -
 // --------------------------------------------------------------
+
+
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Tiles/BiomeSwampTile")]
@@ -20,25 +22,33 @@ public class BiomeSwampTile : EventTile
     }
 
     // When train enters this tile
-public override void OnPlayerEnter(GameObject player)
-{
-    TrainMovement train = player.GetComponent<TrainMovement>();
-    if (train == null)
+    public override void OnPlayerEnter(GameObject player)
     {
-        Debug.LogWarning("TrainMovement not found on player!");
-        return;
+        TrainMovement train = player.GetComponent<TrainMovement>();
+        if (train == null)
+        {
+            Debug.LogWarning("TrainMovement not found on player!");
+            return;
+        }
+
+        DayCycleScript dayCycle = train.dayCycleManager.GetComponent<DayCycleScript>();
+        if (dayCycle != null)
+        {
+            // Only apply debuff if it's currently DAYTIME
+            if (dayCycle.IsDayTime)
+            {
+                dayCycle.addTilesMoved(movementBonus - 1);
+                Debug.Log($"BiomeSwampTile triggered during DAY! Added {movementBonus} tile movement bonus.");
+            }
+            else
+            {
+                Debug.Log("BiomeSwampTile entered at NIGHT — no movement bonus applied.");
+            }
+        }
+
+        // Train speed still reduced (visual slow-down but faster tile progress)
+        train.ApplySpeedModifier(speedReduction);
     }
-
-    DayCycleScript dayCycle = train.dayCycleManager.GetComponent<DayCycleScript>();
-    if (dayCycle != null)
-    {
-        dayCycle.addTilesMoved(movementBonus - 1);
-        Debug.Log($"BiomeSwampTile triggered! Added {movementBonus} tile movement bonus.");
-    }
-
-    train.ApplySpeedModifier(speedReduction); // disables lerp internally
-}
-
 
     public override void OnPlayerExit(GameObject player)
     {
@@ -49,3 +59,4 @@ public override void OnPlayerEnter(GameObject player)
         }
     }
 }
+

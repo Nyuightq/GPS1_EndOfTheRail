@@ -5,12 +5,11 @@ using UnityEngine.Tilemaps;
 public class CombatTile : EventTile
 {
     [Header("Visuals")]
-    public Tile tileVisual; // <-- Drag a Tile asset here in Inspector
+    public Tile tileVisual; // Assign a Tile asset in the Inspector
 
-    [Header("Spawn Settings")]
-    [Range(0f, 1f)] public float spawnChance = 0.25f; // chance to spawn each night
 
     private static Tilemap eventTilemap;
+    private static Vector3Int? lastCombatTilePos;
 
     public override void OnPlayerEnter(GameObject player)
     {
@@ -24,33 +23,67 @@ public class CombatTile : EventTile
                 eventTilemap = tilemapObj.GetComponent<Tilemap>();
         }
 
-        // Snap train to exact center of this tile IMMEDIATELY
+        // Snap player (train) to tile center immediately
         if (eventTilemap != null)
         {
             Vector3Int tilePos = eventTilemap.WorldToCell(player.transform.position);
             Vector3 centerPos = eventTilemap.GetCellCenterWorld(tilePos);
             player.transform.position = centerPos;
-            
+
+            lastCombatTilePos = tilePos;
             Debug.Log($"[CombatTile] Snapped train to center at {tilePos}");
         }
 
         // Freeze train using TrainFreezeController AFTER snapping to center
         TrainFreezeController freezeController = player.GetComponent<TrainFreezeController>();
         if (freezeController == null)
-            freezeController = FindObjectOfType<TrainFreezeController>();
-            
+            freezeController = Object.FindFirstObjectByType<TrainFreezeController>();
+
         if (freezeController != null)
             freezeController.FreezeTrain();
+        else
+            Debug.LogWarning("[CombatTile] No TrainFreezeController found!");
 
         // Start combat
         if (CombatManager.Instance != null)
+        {
             CombatManager.Instance.StartCombat();
+
+            // Subscribe to combat close event once
+            CombatManager.OnCombatClosed -= DeleteCombatTile;
+            CombatManager.OnCombatClosed += DeleteCombatTile;
+        }
         else
-            Debug.LogWarning("No CombatManager found in scene!");
+        {
+            Debug.LogWarning("[CombatTile] No CombatManager found in scene!");
+        }
     }
 
     public override void OnPlayerExit(GameObject player)
     {
-        // Optional: handled automatically by CombatManager when it closes
+        // Optional safeguard: if somehow player exits before combat ends, delete the tile
+        DeleteCombatTile();
+    }
+
+    private static void DeleteCombatTile()
+    {
+        if (eventTilemap != null && lastCombatTilePos.HasValue)
+        {
+            Vector3Int pos = lastCombatTilePos.Value;
+            if (eventTilemap.GetTile(pos) != null)
+            {
+                eventTilemap.SetTile(pos, null);
+                Debug.Log($"[CombatTile] Deleted Combat Tile at {pos}");
+            }
+            else
+            {
+                Debug.Log($"[CombatTile] Tried to delete Combat Tile at {pos}, but no tile found.");
+            }
+
+            lastCombatTilePos = null;
+        }
+
+        // Unsubscribe to avoid duplicate calls
+        CombatManager.OnCombatClosed -= DeleteCombatTile;
     }
 }

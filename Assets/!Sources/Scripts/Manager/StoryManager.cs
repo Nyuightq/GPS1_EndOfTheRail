@@ -6,12 +6,14 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.EventSystems;
+using System.Collections;
 
 public class StoryManager : MonoBehaviour
 {
     public static StoryManager Instance { get; private set; }
 
-    // Event that TrainFreezeController listens to
+    // Event for train freeze controller
     public static event System.Action OnStoryClosed;
 
     [Header("UI References")]
@@ -20,6 +22,7 @@ public class StoryManager : MonoBehaviour
     [SerializeField] private Image storyImageUI;
     [SerializeField] private Button continueButton;
 
+    private bool isStoryActive = false; // Prevent re-entry until UI closes fully
     private GameObject currentPlayer;
     private StoryTile currentStoryTile;
 
@@ -42,41 +45,69 @@ public class StoryManager : MonoBehaviour
             continueButton.onClick.AddListener(CloseStoryUI);
     }
 
+    public bool IsStoryActive => isStoryActive;
+
     public void OpenStoryUI(StoryTile tile, GameObject player)
     {
-        currentPlayer = player;
-        currentStoryTile = tile;
-
-        if (storyPanel == null || storyTextUI == null)
+        if (isStoryActive)
         {
-            Debug.LogWarning("Story UI references missing!");
+            Debug.Log("[StoryManager] Story already active, ignoring new request.");
             return;
         }
 
-        // Display text
-        storyTextUI.text = tile.storyText;
+        currentPlayer = player;
+        currentStoryTile = tile;
+        isStoryActive = true;
 
-        // Display image (if any)
+        if (storyPanel == null || storyTextUI == null)
+        {
+            Debug.LogWarning("[StoryManager] Missing UI references!");
+            return;
+        }
+
+        storyTextUI.text = tile.storyText;
         if (storyImageUI != null)
         {
             storyImageUI.sprite = tile.storyImage;
             storyImageUI.gameObject.SetActive(tile.storyImage != null);
         }
 
+        StartCoroutine(ShowUIWithInputDelay());
+    }
+
+    private IEnumerator ShowUIWithInputDelay()
+    {
         storyPanel.SetActive(true);
+
+        // Disable button input for one frame to prevent double click issues
+        continueButton.interactable = false;
+        EventSystem.current.SetSelectedGameObject(null);
+        yield return null;
+        continueButton.interactable = true;
+
+        Debug.Log("[StoryManager] Story UI opened with one-frame delay");
     }
 
     public void CloseStoryUI()
     {
-        if (storyPanel != null)
-            storyPanel.SetActive(false);
+        if (!isStoryActive)
+            return;
 
+        storyPanel.SetActive(false);
         currentPlayer = null;
         currentStoryTile = null;
 
-        // Fire event to resume train
+        Debug.Log("Story UI closed. Event fired to resume train.");
         OnStoryClosed?.Invoke();
 
-        Debug.Log("Story UI closed. Event fired to resume train.");
+        // Small delay before reallowing triggers
+        StartCoroutine(ResetStoryActiveAfterDelay(0.25f));
+    }
+
+    private IEnumerator ResetStoryActiveAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        isStoryActive = false;
+        Debug.Log("[StoryManager] Ready for next story trigger.");
     }
 }
