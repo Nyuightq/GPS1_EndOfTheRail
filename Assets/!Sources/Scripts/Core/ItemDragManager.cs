@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Image))]
-public class ItemDragManager : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class ItemDragManager : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private float moveSpd;
 
@@ -25,8 +25,9 @@ public class ItemDragManager : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     private Vector2 dragDir;
 
-    private bool dragging;
+    private bool dragging, mouseOnItem;
 
+    #region Unity LifeCycle
     private void OnEnable()
     {
         rectTransform = GetComponent<RectTransform>();
@@ -39,22 +40,41 @@ public class ItemDragManager : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         inventoryGridScript = FindFirstObjectByType<InventoryGridScript>().GetComponent<InventoryGridScript>();
     }
 
-    private void Start()
-    {
-        
-    }
-
     public void Update()
     {
+        if(mouseOnItem)
+        {
+            if (Input.GetMouseButton(0)) dragging = true; else dragging = false;
+        }
+
         if(dragging)
         {
+            itemScript.rectTransform.localScale = Vector3.Lerp(itemScript.rectTransform.localScale, new Vector3(0.9f, 0.9f, 1f), 0.3f);
+
             if (Input.GetMouseButtonDown(1))
             {
                 Debug.Log("Attempting to rotate");
-                itemScript.rotateShape(itemScript.itemShape);
-
+                itemScript.rotateShape(itemScript.itemShape);                
             }
         }
+        else
+        {
+            if(itemScript.rectTransform.localScale != new Vector3(1f,1f,1f)) itemScript.rectTransform.localScale = Vector3.Lerp(itemScript.rectTransform.localScale, new Vector3(1f, 1f, 1f), 0.3f);
+        }
+
+        Debug.Log(dragging);
+    }
+    #endregion
+
+    #region holding/Dragging handlers
+    public void OnPointerEnter(PointerEventData pointerEventData)
+    {
+        mouseOnItem = true;
+    }
+
+    public void OnPointerExit (PointerEventData pointerEventData)
+    {
+        mouseOnItem = false;
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -85,6 +105,7 @@ public class ItemDragManager : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         rectTransform.position = new Vector2(moveX, moveY);
         //Debug.Log("dragging " + gameObject + " to " + eventData);
     }
+    #endregion
 
     public void attachToInventory()
     {

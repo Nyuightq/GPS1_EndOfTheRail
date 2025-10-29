@@ -62,6 +62,15 @@ public class Item : MonoBehaviour
         GetComponent<RectTransform>().SetAsLastSibling();
     }
 
+    private void Update()
+    {
+        //if (Input.GetKeyDown(KeyCode.KeypadEnter))
+        //{
+        //    itemShape = itemData.getShapeGrid();
+        //    refreshShape(itemShape);
+        //}
+    }
+
     private void generatePreview()
     {
         shapeHeight = itemShape.GetLength(1) * cellSize;

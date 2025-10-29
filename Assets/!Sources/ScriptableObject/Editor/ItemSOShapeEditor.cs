@@ -21,10 +21,10 @@ public class ItemSOEditor : Editor
         item.itemHeight = Mathf.Max(1, EditorGUILayout.IntField("Item Height", item.itemHeight));
 
         // Resize button
-        if (GUILayout.Button("Resize Shape"))
-        {
-            item.resizeShape();
-        }
+        //if (GUILayout.Button("Resize Shape"))
+        //{
+        //    item.resizeShape();
+        //}
 
         // Draw grid if valid size
         if (item.itemWidth > 0 && item.itemHeight > 0)

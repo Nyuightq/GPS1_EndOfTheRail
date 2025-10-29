@@ -26,6 +26,7 @@ public class InvCellData
 
 public class InventoryGridScript : MonoBehaviour
 {
+    [Header("Inventory Dimensions/Configs")]
     [SerializeField] public int inventoryWidth;
     [SerializeField] public int inventoryHeight;
 
@@ -37,6 +38,7 @@ public class InventoryGridScript : MonoBehaviour
 
     [SerializeField] private float defaultScale = 0.9f;
 
+    [Header("Item Spawning Configs")]
     [SerializeField] private bool spawnItemInInventory;
     [SerializeField] private Vector2 spawnCentreOffset = Vector2.zero;
     [SerializeField] private int spawnMargin = 5;
@@ -102,7 +104,7 @@ public class InventoryGridScript : MonoBehaviour
                 if(cell.item != null)
                 {
                     RectTransform cellRect = cell.cellObject.GetComponent<RectTransform>();
-                    cell.cellObject.transform.localScale = Vector3.Lerp(cellRect.localScale, new Vector3(1f, 1f, 1f), 0.3f);
+                    cell.cellObject.transform.localScale = Vector3.Lerp(cellRect.localScale, new Vector3(1.1f, 1.1f, 1f), 0.3f);
                 }
             }
         }
