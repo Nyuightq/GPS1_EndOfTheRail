@@ -77,7 +77,6 @@ public class CombatSystem : MonoBehaviour
             foreach (var component in components)
             {
                 component.UpdateCombat(delta);
-                Debug.Log("Updating");
             }
         }
 

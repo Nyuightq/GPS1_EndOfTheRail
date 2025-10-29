@@ -208,7 +208,7 @@ public class RailGridScript : MonoBehaviour
 
     public void travelCheck()
     {
-    if (Input.GetKeyDown(KeyCode.Space) && validatePath(startPoint))
+    if (validatePath(startPoint))
     {
         if (_trainRef == null) // Initial first train
         {
