@@ -17,49 +17,48 @@ public class ItemDragManager : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     private InventoryGridScript inventoryGridScript;
 
     private RectTransform rectTransform;
-    private Canvas canvas;
-    private CanvasGroup canvasGroup;
 
-    Vector2 itemCellPos;
-    Vector2 topLeftCellPos;
-
+    private Vector2 topLeftCellPos;
     private Vector2 dragDir;
-
     private bool dragging, mouseOnItem;
 
     #region Unity LifeCycle
     private void OnEnable()
     {
         rectTransform = GetComponent<RectTransform>();
-
-        canvasGroup = gameObject.AddComponent<CanvasGroup>();
-
         itemScript = GetComponent<Item>();
-
-        canvas = GetComponentInParent<Canvas>();
         inventoryGridScript = FindFirstObjectByType<InventoryGridScript>().GetComponent<InventoryGridScript>();
     }
 
     public void Update()
     {
+        //FIX TS, ENd drag has false positives, Find if we use any new input systems
         if(mouseOnItem)
         {
-            if (Input.GetMouseButton(0)) dragging = true; else dragging = false;
+            if (Input.GetMouseButtonDown(0)) dragging = true;
+            if (Input.GetMouseButtonUp(0)) dragging = false;
         }
 
         if(dragging)
         {
-            itemScript.rectTransform.localScale = Vector3.Lerp(itemScript.rectTransform.localScale, new Vector3(0.9f, 0.9f, 1f), 0.3f);
+            itemScript.spriteRectTransform.localScale = Vector3.Lerp(itemScript.spriteRectTransform.localScale, new Vector3(0.9f, 0.9f, 1f), 0.3f);
 
             if (Input.GetMouseButtonDown(1))
             {
                 Debug.Log("Attempting to rotate");
-                itemScript.rotateShape(itemScript.itemShape);                
+
+                if (topLeftCellPos != null && itemScript.state == Item.itemState.equipped)
+                {
+                    inventoryGridScript.MarkCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, null);
+                    itemScript.state = Item.itemState.unequipped;
+                }
+
+                itemScript.RotateShape(itemScript.itemShape);                
             }
         }
         else
         {
-            if(itemScript.rectTransform.localScale != new Vector3(1f,1f,1f)) itemScript.rectTransform.localScale = Vector3.Lerp(itemScript.rectTransform.localScale, new Vector3(1f, 1f, 1f), 0.3f);
+            if(itemScript.spriteRectTransform.localScale != new Vector3(1f,1f,1f)) itemScript.spriteRectTransform.localScale = Vector3.Lerp(itemScript.spriteRectTransform.localScale, new Vector3(1f, 1f, 1f), 0.3f);
         }
 
         Debug.Log(dragging);
@@ -80,10 +79,10 @@ public class ItemDragManager : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     public void OnBeginDrag(PointerEventData eventData)
     {
         dragging = true;
-        //Debug.Log("begin drag" + gameObject);
+
         if (topLeftCellPos != null && itemScript.state == Item.itemState.equipped)
         {
-            inventoryGridScript.markCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, null);
+            inventoryGridScript.MarkCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, null);
             itemScript.state = Item.itemState.unequipped;
         }
     }
@@ -91,23 +90,20 @@ public class ItemDragManager : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     public void OnEndDrag(PointerEventData eventData) 
     {
         dragging = false;
-
-        attachToInventory();
+        AttachToInventory();
     }
 
-    //hanldes being able to drag stuff
+    //handles being able to drag stuff
     public void OnDrag(PointerEventData eventData)
     {
-        //gameObject.transform.position = eventData.position;
         dragDir = eventData.position;
         float moveX = Mathf.Lerp(rectTransform.position.x, dragDir.x, 0.2f);
         float moveY = Mathf.Lerp(rectTransform.position.y, dragDir.y, 0.2f);
         rectTransform.position = new Vector2(moveX, moveY);
-        //Debug.Log("dragging " + gameObject + " to " + eventData);
     }
     #endregion
 
-    public void attachToInventory()
+    public void AttachToInventory()
     {
         if (itemScript.state == Item.itemState.unequipped)
         {
@@ -115,11 +111,10 @@ public class ItemDragManager : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             {
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(inventoryGridScript.inventoryRect, shapeCell.transform.position, null, out Vector2 localPos);
 
-                Vector2 cellPos = inventoryGridScript.getCellAtPos(localPos);
-                if (inventoryGridScript.inGrid(cellPos) && inventoryGridScript.inventoryGrid[(int)cellPos.x, (int)cellPos.y].item == null)
+                Vector2 cellPos = inventoryGridScript.GetCellAtPos(localPos);
+                if (inventoryGridScript.InGrid(cellPos) && inventoryGridScript.inventoryGrid[(int)cellPos.x, (int)cellPos.y].item == null)
                 {
-                    //Debug.Log("OOOGA BOOGA");
-                    Debug.Log(cellPos);
+                    //Debug.Log(cellPos);
                 }
                 else
                 {
@@ -132,30 +127,21 @@ public class ItemDragManager : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             int itemWidth = itemScript.itemShape.GetLength(0);
             int itemHeight = itemScript.itemShape.GetLength(1);
 
-            //look into this
             Vector2 screenTopLeft = RectTransformUtility.WorldToScreenPoint(null, rectTransform.TransformPoint(new Vector2(-itemWidth * 16 / 2f, itemHeight * 16 / 2f) + new Vector2(8f, -8f)));
 
-
             RectTransformUtility.ScreenPointToLocalPointInRectangle(inventoryGridScript.inventoryRect, screenTopLeft, null, out Vector2 topLeftCell);
-            topLeftCellPos = inventoryGridScript.getCellAtPos(topLeftCell/*+new Vector2(0,16)*/ /*new Vector2(-8,8)*/);
+            topLeftCellPos = inventoryGridScript.GetCellAtPos(topLeftCell);
+
+            Vector2 itemCellPos = new Vector2(topLeftCellPos.x + itemWidth / 2f - 0.5f, topLeftCellPos.y + itemHeight / 2f - 0.5f);
+            Vector2 actualItemCellPos = inventoryGridScript.GetLocalPosGrid(itemCellPos);
+
             Debug.Log(topLeftCell);
             Debug.Log(topLeftCellPos);
 
-            inventoryGridScript.markCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, gameObject);
-
-
-            Vector2 itemCellPos = new Vector2(topLeftCellPos.x + itemWidth / 2f - 0.5f, topLeftCellPos.y + itemHeight / 2f - 0.5f);
-
-            Vector2 actualItemCellPos = inventoryGridScript.getLocalPosGrid(itemCellPos);
-
-
+            inventoryGridScript.MarkCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, gameObject);
 
             rectTransform.anchoredPosition = actualItemCellPos;
-
             itemScript.state = Item.itemState.equipped;
-
-
         }
     }
-
 }

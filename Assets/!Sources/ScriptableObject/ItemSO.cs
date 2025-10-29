@@ -25,7 +25,7 @@ public class ItemSO : ScriptableObject
     {
         if (itemShape == null || itemShape.Length != itemWidth * itemHeight)
         {
-            resizeShape();
+            ResizeShape();
         }
     }
 
@@ -36,12 +36,12 @@ public class ItemSO : ScriptableObject
 
         int index = y * itemWidth + x;
         if (index >= itemShape.Length)
-            resizeShape();
+            ResizeShape();
 
         return itemShape[index];
     }
 
-    public void resizeShape()
+    public void ResizeShape()
     {
         int newSize = itemWidth * itemHeight;
         ItemShapeCell[] newShape = new ItemShapeCell[newSize];
@@ -61,13 +61,13 @@ public class ItemSO : ScriptableObject
         itemShape = newShape;
     }
 
-    public ItemShapeCell[,] getShapeGrid()
+    public ItemShapeCell[,] GetShapeGrid()
     {
         int totalCells = itemWidth * itemHeight;
 
         if (itemShape == null || itemShape.Length != totalCells)
         {
-            resizeShape(); // auto-fix
+            ResizeShape(); // auto-fix
         }
 
         ItemShapeCell[,] trueGrid = new ItemShapeCell[itemWidth, itemHeight];

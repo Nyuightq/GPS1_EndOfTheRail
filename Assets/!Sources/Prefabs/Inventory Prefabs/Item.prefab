@@ -90,9 +90,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccb30c2c567ed494b9143ff9dfd63dfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  state: 1
   sprite: {fileID: 7090436357072761648}
   itemData: {fileID: 11400000, guid: d044c032c2424e545937da643f79d6a6, type: 2}
   inventoryCellPrefab: {fileID: 4300450558859377986, guid: e00446c319aa05b42b284c6bc5658876, type: 3}
+  shapePreviewAlpha: 0.3
+  spriteRectTransform: {fileID: 0}
+  itemRect: {fileID: 0}
+  shape: []
 --- !u!114 &5478319767521092018
 MonoBehaviour:
   m_ObjectHideFlags: 0

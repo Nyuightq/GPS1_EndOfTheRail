@@ -20,64 +20,49 @@ public class Item : MonoBehaviour
     [SerializeField] private Image sprite;
     [SerializeField] public ItemSO itemData;
     [SerializeField] private GameObject inventoryCellPrefab;
+    [SerializeField] private float shapePreviewAlpha = 0.5f;
     public ItemShapeCell[,] itemShape { get; private set; }
-
-    private Image image;
-    public RectTransform rectTransform;
-
-    private GameObject shapePreviewCell;
+    public RectTransform spriteRectTransform, itemRect;
     public List<GameObject> shape = new List<GameObject>();
+    int shapeLocalHeight,shapeLocalWidth;
 
-    int shapeHeight;
-    int shapeWidth;
-    int cellSize = 16;
+    int cellSize = GameManager.cellSize;
 
-
+    #region Unity LifeCycle
     private void OnEnable()
     {
-        rectTransform = sprite.GetComponent<RectTransform>();
-        image = sprite.GetComponent<Image>();
-
-        
+        spriteRectTransform = sprite.GetComponent<RectTransform>();
     }
 
     private void Start()
     {
-        itemShape = itemData.getShapeGrid();
+        //Get the item Shape 2D Array 
+        itemShape = itemData.GetShapeGrid();
 
         if (itemData != null && itemData.itemSprite != null)
         {
-            image.sprite = itemData.itemSprite;
+            sprite.sprite = itemData.itemSprite;
         }
-        image.SetNativeSize();
-        RectTransform itemRect = GetComponent<RectTransform>();
-        itemRect.sizeDelta = rectTransform.sizeDelta;
 
-        RectTransform myRect = GetComponent<RectTransform>();
+        //Ensure that the sprite child and the actual object size is equal
+        sprite.SetNativeSize();
+        itemRect = GetComponent<RectTransform>();
+        itemRect.sizeDelta = spriteRectTransform.sizeDelta;
 
-        Vector2 topLeft = new Vector2(rectTransform.position.x - shapeWidth / 2, rectTransform.position.y + shapeHeight / 2);
-
-        generatePreview();
-        rectTransform.SetAsLastSibling();
+        GeneratePreview();
+        spriteRectTransform.SetAsLastSibling();
         GetComponent<RectTransform>().SetAsLastSibling();
     }
+    #endregion
 
-    private void Update()
+    private void GeneratePreview()
     {
-        //if (Input.GetKeyDown(KeyCode.KeypadEnter))
-        //{
-        //    itemShape = itemData.getShapeGrid();
-        //    refreshShape(itemShape);
-        //}
-    }
+        shapeLocalHeight = itemShape.GetLength(1) * cellSize;
+        shapeLocalWidth = itemShape.GetLength(0) * cellSize;
 
-    private void generatePreview()
-    {
-        shapeHeight = itemShape.GetLength(1) * cellSize;
-        shapeWidth = itemShape.GetLength(0) * cellSize;
-        for (int x = 0; x < shapeWidth / cellSize; x++)
+        for (int x = 0; x < shapeLocalWidth / cellSize; x++)
         {
-            for (int y = 0; y < shapeHeight / cellSize; y++)
+            for (int y = 0; y < shapeLocalHeight / cellSize; y++)
             {
                 if (itemShape[x, y].filled)
                 {
@@ -87,27 +72,28 @@ public class Item : MonoBehaviour
 
                     RectTransform shapeRect = newCell.GetComponent<RectTransform>();
 
-                    shapeRect.localScale = new Vector3(1, 1, 1);
+                    shapeRect.localScale = Vector3.one;
                     Image shapeImage = newCell.GetComponent<Image>();
-                    Color c = shapeImage.color;
-                    c.a = 0.5f;
-                    shapeImage.color = c;
+                    shapeImage.color = new Color(shapeImage.color.r,shapeImage.color.g,shapeImage.color.b,shapePreviewAlpha);
 
                     shapeRect.anchorMin = new Vector2(0f, 1f);
                     shapeRect.anchorMax = new Vector2(0f, 1f);
                     shapeRect.pivot = new Vector2(0.5f, 0.5f);
 
-                    shapeRect.anchoredPosition = new Vector2(x * cellSize + cellSize * 0.5f, -y * cellSize - cellSize * 0.5f);
+                    //get the position and offset to the centre of that cell
+                    Vector2 cellPos = new Vector2(x * cellSize + cellSize * 0.5f, -y * cellSize - cellSize * 0.5f);
+                    shapeRect.anchoredPosition = cellPos;
 
                     shape.Add(newCell);
-                    Debug.Log("added new cell");
+                    //Debug.Log("added new cell");
                 }
             }
         }
-        rectTransform.SetAsLastSibling();
+        //Make the Sprite of the item appear infront
+        spriteRectTransform.SetAsLastSibling();
     }
 
-    public void rotateShape(ItemShapeCell[,] currentItemShape)
+    public void RotateShape(ItemShapeCell[,] currentItemShape)
     {
         int shapeHeight = currentItemShape.GetLength(1);
         int shapeWidth = currentItemShape.GetLength(0);
@@ -122,11 +108,11 @@ public class Item : MonoBehaviour
             }
         }
         
-        refreshShape(rotatedShape);
+        RefreshShape(rotatedShape);
 
-        //temp code
-        rectTransform.localRotation *= Quaternion.Euler(0, 0, -90f);
+        spriteRectTransform.localRotation *= Quaternion.Euler(0, 0, -90f);
 
+        //resize item rect to match rotated sprite
         RectTransform itemRect = GetComponent<RectTransform>();
         itemRect.sizeDelta = new Vector2(itemRect.sizeDelta.y,itemRect.sizeDelta.x);
 
@@ -134,7 +120,7 @@ public class Item : MonoBehaviour
         //return rotatedShape;
     }
 
-    public void refreshShape(ItemShapeCell[,] newShape)
+    public void RefreshShape(ItemShapeCell[,] newShape)
     {
         foreach (GameObject cell in shape)
         {
@@ -142,8 +128,7 @@ public class Item : MonoBehaviour
         }
         shape.Clear();
         itemShape = newShape;
-        generatePreview();
+        GeneratePreview();
         Debug.Log("REFRESHED!");
     }
-
 }

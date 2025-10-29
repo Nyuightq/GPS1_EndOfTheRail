@@ -1762,7 +1762,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5282634000815766294, guid: e3a662f91b4fde741a27bd61097739d7, type: 3}
       propertyPath: defaultScale
-      value: 1
+      value: 0.95
       objectReference: {fileID: 0}
     - target: {fileID: 5282634000815766294, guid: e3a662f91b4fde741a27bd61097739d7, type: 3}
       propertyPath: startingItem
@@ -1790,11 +1790,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5282634000815766294, guid: e3a662f91b4fde741a27bd61097739d7, type: 3}
       propertyPath: spawnItemInInventory
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5282634000815766294, guid: e3a662f91b4fde741a27bd61097739d7, type: 3}
       propertyPath: startingItems.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5282634000815766294, guid: e3a662f91b4fde741a27bd61097739d7, type: 3}
       propertyPath: 'startingItems.Array.data[0]'
