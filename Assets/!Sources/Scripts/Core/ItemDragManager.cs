@@ -6,10 +6,11 @@
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Image))]
-public class ItemDragManager : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler
+public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private float moveSpd;
 
@@ -22,39 +23,33 @@ public class ItemDragManager : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     private Vector2 dragDir;
     private bool dragging, mouseOnItem;
 
+    InputActionMap playerActionMap;
+
     #region Unity LifeCycle
     private void OnEnable()
     {
+
         rectTransform = GetComponent<RectTransform>();
         itemScript = GetComponent<Item>();
         inventoryGridScript = FindFirstObjectByType<InventoryGridScript>().GetComponent<InventoryGridScript>();
+
+        InputManager.OnLeftClick += LeftClick;
+        InputManager.OnLeftRelease += LeftRelease;
+        InputManager.OnRightClick += RightClick;
+    }
+
+    private void OnDisable()
+    {
+        InputManager.OnLeftClick -= LeftClick;
+        InputManager.OnLeftRelease -= LeftRelease;
+        InputManager.OnRightClick -= RightClick;
     }
 
     public void Update()
     {
-        //FIX TS, ENd drag has false positives, Find if we use any new input systems
-        if(mouseOnItem)
-        {
-            if (Input.GetMouseButtonDown(0)) dragging = true;
-            if (Input.GetMouseButtonUp(0)) dragging = false;
-        }
-
         if(dragging)
         {
             itemScript.spriteRectTransform.localScale = Vector3.Lerp(itemScript.spriteRectTransform.localScale, new Vector3(0.9f, 0.9f, 1f), 0.3f);
-
-            if (Input.GetMouseButtonDown(1))
-            {
-                Debug.Log("Attempting to rotate");
-
-                if (topLeftCellPos != null && itemScript.state == Item.itemState.equipped)
-                {
-                    inventoryGridScript.MarkCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, null);
-                    itemScript.state = Item.itemState.unequipped;
-                }
-
-                itemScript.RotateShape(itemScript.itemShape);                
-            }
         }
         else
         {
@@ -86,23 +81,6 @@ public class ItemDragManager : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         mouseOnItem = false;
     }
 
-    public void OnBeginDrag(PointerEventData eventData)
-    {
-        dragging = true;
-
-        if (topLeftCellPos != null && itemScript.state == Item.itemState.equipped)
-        {
-            inventoryGridScript.MarkCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, null);
-            itemScript.state = Item.itemState.unequipped;
-        }
-    }
-
-    public void OnEndDrag(PointerEventData eventData) 
-    {
-        dragging = false;
-        AttachToInventory();
-    }
-
     //handles being able to drag stuff
     public void OnDrag(PointerEventData eventData)
     {
@@ -110,6 +88,45 @@ public class ItemDragManager : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         float moveX = Mathf.Lerp(rectTransform.position.x, dragDir.x, 0.2f);
         float moveY = Mathf.Lerp(rectTransform.position.y, dragDir.y, 0.2f);
         rectTransform.position = new Vector2(moveX, moveY);
+    }
+
+    private void LeftClick()
+    {
+        if (mouseOnItem)
+        {
+            dragging = true;
+
+            if (topLeftCellPos != null && itemScript.state == Item.itemState.equipped)
+            {
+                inventoryGridScript.MarkCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, null);
+                itemScript.state = Item.itemState.unequipped;
+            }
+        }
+    }
+
+    private void LeftRelease()
+    {
+        if (mouseOnItem)
+        {
+            dragging = false;
+            AttachToInventory();
+        }
+    }
+
+    private void RightClick()
+    {
+        if (dragging)
+        {
+            Debug.Log("Attempting to rotate");
+
+            if (topLeftCellPos != null && itemScript.state == Item.itemState.equipped)
+            {
+                inventoryGridScript.MarkCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, null);
+                itemScript.state = Item.itemState.unequipped;
+            }
+
+            itemScript.RotateShape(itemScript.itemShape);
+        }
     }
     #endregion
 
