@@ -125,4 +125,9 @@ public class CameraMovementTemp : MonoBehaviour
 
         return new Vector3(clampedX, clampedY, pos.z);
     }
+
+    public Vector3 ClampToBounds(Vector3 pos)
+    {
+        return ClampPosition(pos);
+    }
 }
