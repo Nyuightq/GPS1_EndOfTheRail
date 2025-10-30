@@ -1,4 +1,4 @@
-// --------------------------------------------------------------
+﻿// --------------------------------------------------------------
 // Creation Date: 2025-10-20 01:24
 // Author: User
 // Description: -
@@ -6,6 +6,7 @@
 using System;
 using UnityEngine;
 
+[System.Serializable]
 public class ItemShapeCell
 {
     public bool filled;
@@ -17,24 +18,30 @@ public class ItemSO : ScriptableObject
     public Sprite itemSprite;
     public string itemName;
     public int itemWidth, itemHeight;
-    private ItemShapeCell[] itemShape;
 
+    [SerializeField] private ItemShapeCell[] itemShape;
 
     private void OnEnable()
     {
-        itemShape = new ItemShapeCell[itemWidth * itemHeight];
+        if (itemShape == null || itemShape.Length != itemWidth * itemHeight)
+        {
+            ResizeShape();
+        }
     }
 
     public ItemShapeCell GetCell(int x, int y)
     {
-        if (itemShape == null || x < 0 || y < 0 || x >= itemWidth || y >= itemHeight) return null;
+        if (itemShape == null || x < 0 || y < 0 || x >= itemWidth || y >= itemHeight)
+            return null;
 
         int index = y * itemWidth + x;
-        if (index >= itemShape.Length) resizeShape();
+        if (index >= itemShape.Length)
+            ResizeShape();
 
         return itemShape[index];
     }
-    public void resizeShape()
+
+    public void ResizeShape()
     {
         int newSize = itemWidth * itemHeight;
         ItemShapeCell[] newShape = new ItemShapeCell[newSize];
@@ -47,20 +54,22 @@ public class ItemSO : ScriptableObject
 
         for (int i = 0; i < newSize; i++)
         {
-            if (newShape[i] == null) newShape[i] = new ItemShapeCell();
+            if (newShape[i] == null)
+                newShape[i] = new ItemShapeCell();
         }
 
         itemShape = newShape;
     }
 
-    public ItemShapeCell[,] getShapeGrid()
+    public ItemShapeCell[,] GetShapeGrid()
     {
         int totalCells = itemWidth * itemHeight;
 
         if (itemShape == null || itemShape.Length != totalCells)
         {
-            resizeShape(); // auto-fix
+            ResizeShape(); // auto-fix
         }
+
         ItemShapeCell[,] trueGrid = new ItemShapeCell[itemWidth, itemHeight];
 
         for (int y = 0; y < itemHeight; y++)
@@ -68,7 +77,6 @@ public class ItemSO : ScriptableObject
             for (int x = 0; x < itemWidth; x++)
             {
                 int index = y * itemWidth + x;
-                // double safety check
                 if (index < itemShape.Length)
                     trueGrid[x, y] = itemShape[index];
             }

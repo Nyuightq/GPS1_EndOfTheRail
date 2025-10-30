@@ -1,4 +1,4 @@
-// --------------------------------------------------------------
+﻿// --------------------------------------------------------------
 // Creation Date: 2025-10-20 02:07
 // Author: User
 // Description: -
@@ -21,10 +21,10 @@ public class ItemSOEditor : Editor
         item.itemHeight = Mathf.Max(1, EditorGUILayout.IntField("Item Height", item.itemHeight));
 
         // Resize button
-        if (GUILayout.Button("Resize Shape"))
-        {
-            item.resizeShape();
-        }
+        //if (GUILayout.Button("Resize Shape"))
+        //{
+        //    item.resizeShape();
+        //}
 
         // Draw grid if valid size
         if (item.itemWidth > 0 && item.itemHeight > 0)
@@ -47,7 +47,6 @@ public class ItemSOEditor : Editor
             }
         }
 
-        // Apply changes
         if (GUI.changed)
         {
             EditorUtility.SetDirty(item);

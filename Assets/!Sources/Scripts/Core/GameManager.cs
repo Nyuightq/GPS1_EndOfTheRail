@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour
     public static event Action<Vector3Int, Tile,RailData> onSpawnTile;
     public static event Action<Vector3Int> onDestroyTile;
 
+    [SerializeField] public static int cellSize = 16;
+
     void Awake()
     {
         if(instance != null && instance != gameObject)

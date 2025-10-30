@@ -47,7 +47,8 @@ MonoBehaviour:
   inventoryWidth: 5
   inventoryHeight: 4
   inventoryCell: {fileID: 4300450558859377986, guid: e00446c319aa05b42b284c6bc5658876, type: 3}
-  inventoryCanvas: {fileID: 0}
+  inventoryCanvas: {fileID: 1436225316591645104, guid: eed21bde0ef44f944949cf4338a7b9b3, type: 3}
   cellSize: 16
   margin: {x: 10, y: 10}
   defaultScale: 0.9
+  itemSpawn: {fileID: 1370236390757358858, guid: 8c2f567f71b3a814fa5c27c0e4f7bf57, type: 3}
