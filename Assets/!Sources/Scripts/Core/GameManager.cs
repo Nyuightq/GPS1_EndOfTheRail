@@ -14,7 +14,11 @@ public class GameManager : MonoBehaviour
     public static event Action<Vector3Int, Tile,RailData> onSpawnTile;
     public static event Action<Vector3Int> onDestroyTile;
 
+    [SerializeField] GameObject inputManagerPrefab;
     [SerializeField] public static int cellSize = 16;
+
+    public static InputManager input { get; private set; }
+    private GameObject inputManager;
 
     void Awake()
     {
@@ -25,6 +29,14 @@ public class GameManager : MonoBehaviour
         }
         instance = this;
         DontDestroyOnLoad(instance);
+
+        if(GameObject.Find("InputManager"))
+        {
+            return;
+        }
+
+        inputManager = Instantiate(inputManagerPrefab);
+        DontDestroyOnLoad(inputManager);
     }
 
     public static void spawnTile(Vector3Int cellPos,Tile sprite ,RailData data)
