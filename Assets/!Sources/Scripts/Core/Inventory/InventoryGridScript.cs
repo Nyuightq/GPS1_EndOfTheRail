@@ -10,6 +10,7 @@ using UnityEngine.InputSystem;
 
 public class InvCellData
 {
+    public bool active;
     public GameObject cellObject;
     public GameObject item;
 

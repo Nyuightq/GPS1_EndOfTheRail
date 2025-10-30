@@ -62,6 +62,16 @@ public class ItemDragManager : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         }
 
         Debug.Log(dragging);
+
+        switch (itemScript.state)
+        {
+            case Item.itemState.equipped:
+                foreach (GameObject shapeCell in itemScript.shape) shapeCell.SetActive(false);
+                break;
+            case Item.itemState.unequipped:
+                foreach (GameObject shapeCell in itemScript.shape) shapeCell.SetActive(true);
+                break;
+        }
     }
     #endregion
 
