@@ -43,13 +43,6 @@ public class BuildRails : MonoBehaviour
     }
 
     #region Unity Life Cycle
-    private void OnEnable()
-    {
-        // The rail building related data is reset due to Phase state is change and make the BuildRail being disabled and enable
-        // Might still have some problem happens if keep it here.
-        _lastBuiltRail = null;
-        railLine = null;
-    }
     private void Awake()
     {
         grid = gridManager.GetComponent<Grid>();
@@ -57,6 +50,16 @@ public class BuildRails : MonoBehaviour
         previewRenderer = gameObject.AddComponent<SpriteRenderer>();
         previewRenderer.sortingLayerName = "Ui";
         previewRenderer.sprite = railPreview;
+    }
+
+    private void OnEnable()
+    {
+        gridScript.OnRefreshRoute += RefreshBuildRail;
+    }
+
+    private void OnDisable()
+    {
+        gridScript.OnRefreshRoute -= RefreshBuildRail;
     }
 
     void Update()
@@ -70,11 +73,11 @@ public class BuildRails : MonoBehaviour
         bool onRail = gridScript.railAtPos(tilePos);
         if (_lastBuiltRail != null)
         {
-            railLine = gridScript.railDataMap[(Vector3Int) _lastBuiltRail].line;
+            railLine = gridScript.railDataMap[(Vector3Int)_lastBuiltRail].line;
         }
-        
+
         TileBase eventTile = eventTilemap.GetTile(tilePos);
-        bool isNonTraversable = eventTile is NonTraversableTile;
+        bool isNonTraversable = eventTile is NonTraversableTile || gridScript.railAtPosIsDisabled(tilePos); // First condition of nonTraversable tile
 
         if (Input.GetMouseButton(0)) isHolding = true; else isHolding = false;
 
@@ -125,6 +128,14 @@ public class BuildRails : MonoBehaviour
         HandleDeleteInput(tilePos);
     }
     #endregion
+    
+    private void RefreshBuildRail()
+    {
+        // The rail building related data is reset due to Phase state is change and make the BuildRail being disabled and enable
+        // Might still have some problem happens if keep it here.
+        _lastBuiltRail = null;
+        railLine = null;
+    }
 
     #region Mouse Preview & Build State
     private Vector3Int ReadMousePointingSnapPoint()

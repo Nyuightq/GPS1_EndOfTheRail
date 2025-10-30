@@ -15,6 +15,7 @@ public class RailData
     public enum directionType { Incoming, Outgoing }
 
     public railTypes railType = railTypes.normal;
+    public bool IsDisabled => railType == railTypes.disabled;
     public Vector2 directionIn;
     public Vector2 directionOut;
     private Vector3Int pos;
@@ -102,7 +103,9 @@ public class RailGridScript : MonoBehaviour
     public Vector3Int endPoint;
     private GameObject _trainRef;
 
-    public Dictionary<Vector3Int,RailData> railDataMap = new Dictionary<Vector3Int,RailData>();
+    public Dictionary<Vector3Int, RailData> railDataMap = new Dictionary<Vector3Int, RailData>();
+    public delegate void RefreshRouteEvent();
+    public event RefreshRouteEvent OnRefreshRoute;
 
     void Awake()
     {
@@ -168,13 +171,13 @@ public class RailGridScript : MonoBehaviour
         Vector3Int c_endPoint = findEndPoint(startPoint);
         if (c_endPoint == startPoint) Debug.Log("Fuckyou");
 
-        new_RailDataMap[startPoint].railType = RailData.railTypes.disabled;
+        new_RailDataMap[startPoint].railType = RailData.railTypes.rest;
         new_RailDataMap[c_endPoint].railType = RailData.railTypes.start;
 
         startPoint = c_endPoint;
-        
+
         railDataMap = new_RailDataMap;
-        
+        OnRefreshRoute?.Invoke(); // Return refresh action to BuildRail.cs that contain RailGridScript reference.
     }
     public Vector3Int findEndPoint(Vector3Int startPoint)
     {
@@ -225,7 +228,7 @@ public class RailGridScript : MonoBehaviour
                     tm.dayCycleManager = dayCycleManager;
                     
                     // ADD THIS: Find and assign RestPointManager
-                    RestPointManager rpm = FindObjectOfType<RestPointManager>();
+                    RestPointManager rpm = FindFirstObjectByType<RestPointManager>();
                     if (rpm != null)
                     {
                         tm.restPointManager = rpm;
@@ -262,7 +265,7 @@ public class RailGridScript : MonoBehaviour
         foreach (Vector3Int direction in directions)
         {
             Vector3Int tile = startPoint + direction;
-            if (railAtPos(tile))
+            if (railAtPos(tile) && !railAtPosIsDisabled(tile))
             {
                 List<Vector3Int> lineList = railDataMap[tile].line.line;
                 Debug.Log("Last rail type: "
@@ -314,6 +317,16 @@ public class RailGridScript : MonoBehaviour
         return null;
     }
 
+    public bool railAtPosIsDisabled(Vector3Int tilePos)
+    {
+        if (railDataMap.TryGetValue(tilePos, out RailData data))
+        {
+            return data.IsDisabled;
+        }
+
+        return false;
+    }
+
     private void spawnTile(Vector3Int tilePos, Tile sprite, RailData data)
     {
         railTileMap.SetTile(tilePos, sprite);
@@ -352,7 +365,11 @@ public class RailGridScript : MonoBehaviour
         List<Vector3Int> adjacentList = getAdjacentTiles(tilePos);
         foreach (Vector3Int adjacent in adjacentList)
         {
-            if (railAtPos(adjacent)) return true;
+            if (railAtPos(adjacent))
+            {
+                if (railDataMap[adjacent].IsDisabled != true)
+                return true;
+            }
         }
         return false;
     }
@@ -407,6 +424,11 @@ public class RailGridScript : MonoBehaviour
                     else if (tile == restPointSprite)
                     {
                         compiling_railDataMap[tilePos] = new RailData(tilePos, RailData.railTypes.rest);
+                    }
+                    else if (tile != null)
+                    {
+                        Debug.Log("Registered disabled rail: " + tilePos);
+                        compiling_railDataMap[tilePos] = new RailData(tilePos, RailData.railTypes.disabled);
                     }
                 }
             }
