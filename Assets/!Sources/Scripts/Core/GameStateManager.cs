@@ -131,8 +131,8 @@ public class GameStateManager : MonoBehaviour
         {
             // Enable configuration interactive system
         }
-        
-                if (_phase == Phase.Lose)
+
+        if (_phase == Phase.Lose)
         {
             // Disable configuration interactive system
         }
@@ -141,4 +141,15 @@ public class GameStateManager : MonoBehaviour
             // Enable configuration interactive system
         }
     }
+    
+    public void DestroyInstance()
+    {
+        if (Instance != null)
+        {
+            Destroy(Instance.gameObject);
+            Instance = null; // OK because this is inside CombatManager
+            Debug.Log("[GameStateManager] Instance destroyed for replay.");
+        }
+    }
+
 }

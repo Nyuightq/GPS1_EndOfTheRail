@@ -141,4 +141,14 @@ public class TransactionManager : MonoBehaviour
         if (scrapText != null)
             scrapText.text = "Scraps: " + currentPlayer.scrapCount;
     }
+
+    public void DestroyInstance()
+{
+    if (Instance != null)
+    {
+        Destroy(Instance.gameObject);
+        Instance = null; // OK because this is inside TransactionManager
+        Debug.Log("[TransactionManager] Instance destroyed for replay.");
+    }
+}
 }

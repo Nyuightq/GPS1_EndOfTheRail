@@ -143,4 +143,15 @@ public class CombatManager : MonoBehaviour
         // Notify TrainFreezeController to resume movement
         OnCombatClosed?.Invoke();
     }
+
+    public void DestroyInstance()
+    {
+        if (Instance != null)
+        {
+            Destroy(Instance.gameObject);
+            Instance = null; // OK because this is inside CombatManager
+            Debug.Log("[CombatManager] Instance destroyed for replay.");
+        }
+    }
+
 }

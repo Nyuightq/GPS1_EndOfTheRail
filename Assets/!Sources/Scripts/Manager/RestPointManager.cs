@@ -163,4 +163,6 @@ public class RestPointManager : MonoBehaviour
         healAmount = amount;
         scrapCost = cost;
     }
+
+    
 }

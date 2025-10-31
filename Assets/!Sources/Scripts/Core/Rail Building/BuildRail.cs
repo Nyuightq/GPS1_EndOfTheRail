@@ -103,6 +103,10 @@ public class BuildRails : MonoBehaviour
             RailData data = new RailData(tilePos);
 
             GameManager.spawnTile(tilePos, defaultTile, data);
+
+            //Play sfx
+            SoundManager.Instance.PlaySFX("RailBuildSuccess");
+            
             gridScript.railDataMap[tilePos].setLine(railLine);
             railLine.line.Add(tilePos);
 

@@ -79,4 +79,14 @@ public void CloseRewardUI()
         if (scrapText != null)
             scrapText.text = "Scraps: " + currentPlayer.scrapCount;
     }
+
+    public void DestroyInstance()
+    {
+        if (Instance != null)
+        {
+            Destroy(Instance.gameObject);
+            Instance = null; // OK because this is inside Reward Manager
+            Debug.Log("[RewardManager] Instance destroyed for replay.");
+        }
+    }
 }
