@@ -5,6 +5,7 @@
 //              current GameManager.cs worked as TileMap utility function script
 //              therefore create an actual GameManager in name [GameStateManager.cs]
 // --------------------------------------------------------------
+using DG.Tweening;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -42,6 +43,7 @@ public class GameStateManager : MonoBehaviour
     // private UIManager _uiManager;
     [SerializeField] private GameObject _railBuilderManager;
     [SerializeField] private GameObject _planPhasePanel;
+    private RectTransform _planPhaseRect;
 
     private void Awake()
     {
@@ -52,6 +54,8 @@ public class GameStateManager : MonoBehaviour
         }
 
         Instance = this;
+        //
+        _planPhaseRect = _planPhasePanel.GetComponent<RectTransform>();
         // DontDestroyOnLoad(gameObject);
 
         // Find Manager inside the scene
@@ -98,13 +102,13 @@ public class GameStateManager : MonoBehaviour
             // Enable Planning phase related UI
             // Enable Rail building and hover UI
             _railBuilderManager.SetActive(true);
-            _planPhasePanel.SetActive(true);
+            TogglePlanPanel(true);
             CameraMovementTemp.ToggleCameraFollowMode(false);
         }
         else if (_phase == Phase.Travel)
         {
             _railBuilderManager.SetActive(false);
-            _planPhasePanel.SetActive(false);
+            TogglePlanPanel(false);
             CameraMovementTemp.ToggleCameraFollowMode(true);
             // Disable camera Move
             // Disable Planning phase related UI
@@ -131,14 +135,32 @@ public class GameStateManager : MonoBehaviour
         {
             // Enable configuration interactive system
         }
-        
-                if (_phase == Phase.Lose)
+
+        if (_phase == Phase.Lose)
         {
             // Disable configuration interactive system
         }
         else
         {
             // Enable configuration interactive system
+        }
+    }
+    
+    private void TogglePlanPanel(bool show)
+    {
+        // Ensure active if showing
+        if (show)
+        {
+            _planPhasePanel.SetActive(true);
+            _planPhaseRect.DOKill(); // stop previous tweens
+            // _planPhaseRect.anchoredPosition = new Vector2(0, -200f); // start off-screen (adjust value as needed)
+            _planPhaseRect.DOAnchorPosY(80f, 0.6f).SetEase(Ease.OutBack);
+        }
+        else
+        {
+            _planPhaseRect.DOKill();
+            _planPhaseRect.DOAnchorPosY(0f, 0.6f).SetEase(Ease.InBack)
+                .OnComplete(() => _planPhasePanel.SetActive(false));
         }
     }
 }
