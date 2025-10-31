@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: Crystal Of Purity
   itemWidth: 3
   itemHeight: 3
+  itemEffectPrefab: {fileID: 1402620435838575468, guid: 5eeb9b7e2b166584f8dee1e8f45404f3, type: 3}
   itemShape:
   - filled: 0
   - filled: 1

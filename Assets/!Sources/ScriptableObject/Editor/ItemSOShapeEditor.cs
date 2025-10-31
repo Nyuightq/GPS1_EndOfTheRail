@@ -17,6 +17,7 @@ public class ItemSOEditor : Editor
         // Draw default fields for width/height
         item.itemName = EditorGUILayout.TextField("Item Name", item.itemName);
         item.itemSprite = (Sprite)EditorGUILayout.ObjectField("Item Sprite", item.itemSprite, typeof(Sprite), false);
+        item.itemEffectPrefab = (GameObject)EditorGUILayout.ObjectField("Item Effect", item.itemEffectPrefab, typeof(GameObject), false);
         item.itemWidth = Mathf.Max(1, EditorGUILayout.IntField("Item Width", item.itemWidth));
         item.itemHeight = Mathf.Max(1, EditorGUILayout.IntField("Item Height", item.itemHeight));
 

@@ -13,14 +13,14 @@ public class CombatComponentEntity : CombatEntity
         base.Start();
         _isComponent = true;
     }
-    public void Initialize() // (EnemyData data)
+    public void Initialize(CombatComponentData data)
     {
-        // entityName = data.enemyName;
+        entityName = data.name;
         // _maxHp = data.maxHp;
         // _hp = data.maxHp;
-        // _attackDamage = data.attackDamage;
-        // _attackSpeed = data.attackSpeed;
-        // _attackDamageVariance = data.attackVariance;
+        _attackDamage = data.attackDamage;
+        _attackSpeed = data.attackSpeed;
+        _attackDamageVariance = data.attackVariance;
         // _defense = data.defense;
         // _evasion = data.evasion;
     }

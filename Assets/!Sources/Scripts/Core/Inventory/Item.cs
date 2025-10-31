@@ -19,6 +19,7 @@ public class Item : MonoBehaviour
 
     [SerializeField] private Image sprite;
     [SerializeField] public ItemSO itemData;
+    public ItemEffect itemEffect;
     [SerializeField] private GameObject inventoryCellPrefab;
     [SerializeField] private float shapePreviewAlpha = 0.5f;
     public ItemShapeCell[,] itemShape { get; private set; }
@@ -42,6 +43,12 @@ public class Item : MonoBehaviour
         if (itemData != null && itemData.itemSprite != null)
         {
             sprite.sprite = itemData.itemSprite;
+        }
+
+        if (itemEffect == null && itemData.itemEffectPrefab != null)
+        {
+            var effectObj = Instantiate(itemData.itemEffectPrefab, transform);
+            itemEffect = effectObj.GetComponent<ItemEffect>();
         }
 
         //Ensure that the sprite child and the actual object size is equal

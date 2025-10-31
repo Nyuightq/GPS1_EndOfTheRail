@@ -18,6 +18,7 @@ public class ItemSO : ScriptableObject
     public Sprite itemSprite;
     public string itemName;
     public int itemWidth, itemHeight;
+    public GameObject itemEffectPrefab;
 
     [SerializeField] private ItemShapeCell[] itemShape;
 

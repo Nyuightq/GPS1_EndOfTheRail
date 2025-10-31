@@ -58,25 +58,65 @@ public class CombatManager : MonoBehaviour
         if (combatUIPanel != null)
             combatUIPanel.SetActive(true);
 
+        // ===========================
+        // Instantiate combat entities
+        // ===========================
         // Generate player
         GameObject playerObj = Instantiate(playerPrefab, playerSpawnPoint.position, Quaternion.identity, playerSpawnPoint);
         CombatPlayerEntity playerEntity = playerObj.GetComponent<CombatPlayerEntity>();
         playerEntity.InitialHealth(GameStateManager.Instance.playerStatus.Hp, GameStateManager.Instance.playerStatus.MaxHp);
 
         // Generate Components
+        List<CombatComponentEntity> components = GenerateComponents();
+
+        // Generate enemies
+        List<CombatEnemyEntity> enemies = GenerateEnemies();
+        // ===========================
+        // Instantiate combat entities
+        // ===========================
+
+        // Pass enemies data to CombatSystem
+        combatSystem.InitializeBattle(playerEntity, enemies, components);
+        combatSystem.onBattleEnd += EndCombat;
+
+        Debug.Log($"[CombatManager] Combat setup completed! Type: {combatType}, " +
+                $"Total Combats: {totalCombatsFaced}, Total Encounters: {totalEncountersFaced}");
+    }
+
+    private List<CombatComponentEntity> GenerateComponents()
+    {
+        List<CombatComponentData> componentDatas = InventoryItemManager.Instance.PrepareBattleComponents();
+        Debug.Log("Test" + componentDatas);
         List<CombatComponentEntity> components = new List<CombatComponentEntity>();
-        int componentsCount = 1;// UnityEngine.Random.Range(1, 2);
-        for (int i = 0; i< componentsCount; i++)
+
+        if (componentDatas != null)
         {
+            Vector3[] componentSpawnPositions = GetComponentSpawnPositionsCircle(componentDatas.Count, 32f);
+            Debug.Log("GenerateComponents Action: componentsData != null");
+            for (int i = 0; i < componentDatas.Count; i++)
+            {
+                GameObject componentObj = Instantiate(defaultComponentPrefab, playerSpawnPoint);
+                componentObj.transform.localPosition = componentSpawnPositions[i];
+                CombatComponentEntity componentEntity = componentObj.GetComponent<CombatComponentEntity>();
+                componentEntity.Initialize(componentDatas[i]);
+                components.Add(componentEntity);
+            }
+        }
+        else
+        {
+            Debug.Log("GenerateComponents Action: componentsData == null");
             GameObject componentObj = Instantiate(defaultComponentPrefab, playerSpawnPoint);
-            // componentObj.transform.localPosition = spawnPositions[i];
             CombatComponentEntity componentEntity = componentObj.GetComponent<CombatComponentEntity>();
             components.Add(componentEntity);
         }
 
-        // Generate enemies
+        return components;
+    }
+
+    private List<CombatEnemyEntity> GenerateEnemies()
+    {
         List<CombatEnemyEntity> enemies = new List<CombatEnemyEntity>();
-        int enemyCount = UnityEngine.Random.Range(2, 5); 
+        int enemyCount = UnityEngine.Random.Range(2, 5);
         Vector3[] enemySpawnPositions = GetEnemySpawnPositionsCircle(enemyCount, 24f);
 
         for (int i = 0; i < enemyCount; i++)
@@ -87,13 +127,27 @@ public class CombatManager : MonoBehaviour
             enemies.Add(enemyEntity);
         }
 
-        // Pass enemies data to CombatSystem
-        combatSystem.InitializeBattle(playerEntity, enemies, components);
-        combatSystem.onBattleEnd += EndCombat;
+        return enemies;
+    }
+    
+    private Vector3[] GetComponentSpawnPositionsCircle(int count, float radius)
+    {
+        Vector3[] positions = new Vector3[count];
 
-        Debug.Log("[CombatManager] Combat setup completed!");
-        Debug.Log($"[CombatManager] Combat setup completed! Type: {combatType}, " +
-                $"Total Combats: {totalCombatsFaced}, Total Encounters: {totalEncountersFaced}");
+        float startAngle = 90f;
+
+        for (int i = 0; i < count; i++)
+        {
+            float angle = startAngle + (360f / count) * i;
+            float rad = angle * Mathf.Deg2Rad;
+
+            float x = Mathf.Cos(rad) * radius;
+            float y = Mathf.Sin(rad) * radius;
+
+            positions[i] = new Vector3(x, y, 0f);
+        }
+
+        return positions;
     }
 
     // Used in StartCombat, auto initialize position for enemies.

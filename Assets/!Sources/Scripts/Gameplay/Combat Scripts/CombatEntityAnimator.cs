@@ -7,10 +7,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
+[RequireComponent(typeof(CombatEntity))]
 public class CombatEntityAnimator : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private CombatEntity entity;
+    private CombatEntity _entity;
     [SerializeField] private Image imageRenderer;
 
     [Header("Animation Data")]
@@ -26,26 +27,26 @@ public class CombatEntityAnimator : MonoBehaviour
 
     private void Awake()
     {
-        if (entity == null) entity = GetComponent<CombatEntity>();
+        if (_entity == null) _entity = GetComponent<CombatEntity>();
         if (imageRenderer == null)
             imageRenderer = GetComponentInChildren<Image>();
 
         // 🔹 Subscribe to event that occur when attack interval bar already cast and return to 0.0 sec.
-        entity.OnAttackReady += TriggerAttackSequence;
+        _entity.OnAttackReady += TriggerAttackSequence;
     }
 
     private void OnDestroy()
     {
-        if (entity != null)
-            entity.OnAttackReady -= TriggerAttackSequence;
+        if (_entity != null)
+            _entity.OnAttackReady -= TriggerAttackSequence;
     }
 
     private void Update()
     {
-        if (entity == null || animationClip == null || entity.IsDead)
+        if (_entity == null || animationClip == null || _entity.IsDead)
             return;
 
-        float remainToAttack = entity.AttackTakenTime - entity.RemainingAttackTimer;
+        float remainToAttack = _entity.AttackTakenTime - _entity.RemainingAttackTimer;
 
         // If attack triggered: Attack → Recovery → Idle
         if (_attackTriggered)
