@@ -16,9 +16,9 @@ public class CombatEntityAnimator : MonoBehaviour
     [Header("Animation Data")]
     public CombatAnimationClip animationClip;
 
-    private float timer;
+    // private float timer;
     private List<CombatAnimationClip.FrameData> currentFrames;
-    private int currentIndex;
+    // private int currentIndex;
     private AnimPhase _phase = AnimPhase.Idle;
 
     private bool _attackTriggered = false;
@@ -103,8 +103,8 @@ public class CombatEntityAnimator : MonoBehaviour
 
         _phase = phaseName;
         currentFrames = new List<CombatAnimationClip.FrameData>(frames);
-        currentIndex = 0;
-        timer = 0f;
+        // currentIndex = 0;
+        // timer = 0f;
     }
 
     private void PlayFrame_TimeDriven(float elapsed, float totalDuration)

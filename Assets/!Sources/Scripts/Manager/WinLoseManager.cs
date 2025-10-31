@@ -43,11 +43,11 @@ public class WinLoseManager : MonoBehaviour
 
         // Try to auto-assign runtime-spawned references
         if (trainMovement == null)
-            trainMovement = FindObjectOfType<TrainMovement>();
+            trainMovement = FindFirstObjectByType<TrainMovement>();
         if (playerStatus == null)
-            playerStatus = FindObjectOfType<PlayerStatusManager>();
+            playerStatus = FindFirstObjectByType<PlayerStatusManager>();
         if (gridManager == null)
-            gridManager = FindObjectOfType<RailGridScript>();
+            gridManager = FindFirstObjectByType<RailGridScript>();
 
         if (trainMovement == null)
             Debug.LogWarning("WinLoseManager could not find TrainMovement at start.");

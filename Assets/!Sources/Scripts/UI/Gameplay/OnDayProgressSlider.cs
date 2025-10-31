@@ -9,7 +9,7 @@ public class OnDayProgressSlider : MonoBehaviour
     private void Start()
     {
         if (dayCycle == null)
-            dayCycle = FindObjectOfType<DayCycleScript>();
+            dayCycle = FindFirstObjectByType<DayCycleScript>();
 
         if (progressSlider == null)
             progressSlider = GetComponent<Slider>();

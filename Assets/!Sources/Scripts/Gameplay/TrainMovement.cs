@@ -39,7 +39,7 @@ public class TrainMovement : MonoBehaviour
     {
         baseSpeed = moveSpeed;
 
-        restPointManager = FindObjectOfType<RestPointManager>();
+        restPointManager = FindFirstObjectByType<RestPointManager>();
         if (restPointManager == null)
             Debug.LogError("No RestPointManager found before train spawn!");
         else
@@ -120,7 +120,7 @@ public class TrainMovement : MonoBehaviour
 
             if (restPointManager == null)
             {
-                restPointManager = FindObjectOfType<RestPointManager>();
+                restPointManager = FindFirstObjectByType<RestPointManager>();
                 if (restPointManager == null)
                 {
                     Debug.LogError("RestPointManager is NULL! Please assign it in the inspector.");

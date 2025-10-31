@@ -8,16 +8,23 @@ using UnityEngine;
 public class CombatPlayerEntity : CombatEntity
 {
     private PlayerStatusManager playerStatus;
-    public void Start()
+    protected override void Start()
     {
         playerStatus = GameStateManager.Instance.playerStatus;
     }
-    
+
     public void InitialHealth(int currentHp, int maxHp)
     {
         _hp = currentHp;
         _maxHp = maxHp;
         // Update UI
+        combatEntityUI?.UpdateHealthBar(_hp * 1.0f, _maxHp * 1.0f);
+    }
+    
+    public void HealCurrentHp(int amount)
+    {
+        _hp += amount;
+        _hp = Mathf.Clamp(_hp, 0, _maxHp);
         combatEntityUI?.UpdateHealthBar(_hp * 1.0f, _maxHp * 1.0f);
     }
     
