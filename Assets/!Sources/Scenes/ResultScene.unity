@@ -3286,6 +3286,10 @@ PrefabInstance:
       propertyPath: 'scriptsToPause.Array.data[17]'
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 9050324350717705938, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 3635070415123915753, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
