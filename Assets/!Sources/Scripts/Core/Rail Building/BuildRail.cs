@@ -265,6 +265,35 @@ public class BuildRails : MonoBehaviour
     // ==================
     #region Rail Deletetion
     /// <summary>
+    /// Reset button function from GameGeneral_UI > Canvas > UI_PlanPhasePanel > Reset Button
+    /// </summary>
+    public void OnResetRails()
+    {
+        bool isEmptyStart = !gridScript.hasConnection(gridScript.startPoint);
+        if (isEmptyStart)
+        {
+            Debug.Log("SFX_RailOnReset_Failed");
+            // Play Sound > SFX_RailOnReset_Failed
+            return;
+        }
+
+        if (railLine == null) return;
+        // Check if continuing an existing line safely
+        if (railLine?.line != null && railLine?.line.Count > 0)
+        {
+            Vector3Int firstRail = railLine.line[1];
+            DeleteCertainRail(firstRail);
+
+            Debug.Log("SFX_RailOnReset_Success > " + firstRail);
+            // Play Sound > SFX_RailOnReset_Success
+        }
+
+        // Fetch the 
+        // DeleteCertainRail(Vector3Int tilePos);
+        // Play Sound > SFX_RailOnReset_Success
+    }
+    
+    /// <summary>
     /// Handles deletion of the last placed rail when right-clicking.
     /// </summary>
     private void HandleDeleteInput(Vector3Int tilePos)
