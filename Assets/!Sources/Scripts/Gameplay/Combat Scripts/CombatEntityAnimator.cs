@@ -51,26 +51,26 @@ public class CombatEntityAnimator : MonoBehaviour
         // If attack triggered: Attack → Recovery → Idle
         if (_attackTriggered)
         {
-            _attackElapsed += Time.deltaTime;
+            // _attackElapsed += Time.deltaTime;
 
             float attackDuration = animationClip.AttackDuration;
             float recoveryDuration = animationClip.RecoveryDuration;
 
-            if (_attackElapsed < attackDuration)
+            if (_entity.RemainingAttackTimer < attackDuration)
             {
                 SetPhase(AnimPhase.Attack, animationClip.attackSprites);
-                PlayFrame_TimeDriven(_attackElapsed, attackDuration);
+                PlayFrame_TimeDriven(_entity.RemainingAttackTimer, attackDuration);
             }
-            else if (_attackElapsed < attackDuration + recoveryDuration)
+            else if (_entity.RemainingAttackTimer < attackDuration + recoveryDuration)
             {
                 SetPhase(AnimPhase.Recovery, animationClip.recoverySprites);
-                PlayFrame_TimeDriven(_attackElapsed - attackDuration, recoveryDuration);
+                PlayFrame_TimeDriven(_entity.RemainingAttackTimer - attackDuration, recoveryDuration);
             }
             else
             {
                 // attack ended, return to Idle
                 _attackTriggered = false;
-                _attackElapsed = 0f;
+                // _attackElapsed = 0f;
                 SetPhase(AnimPhase.Idle, animationClip.idleSprites);
                 PlayFrame_TimeDriven(0f, animationClip.IdleDuration);
             }

@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System;
 
 public class CombatManager : MonoBehaviour
 {
@@ -11,7 +10,7 @@ public class CombatManager : MonoBehaviour
 
     [Header("Player & Enemy Prefabs")]
     [SerializeField] private GameObject playerPrefab;
-    [SerializeField] private GameObject enemyPrefab;
+    [SerializeField] private List<GameObject> enemyPrefabs;
     [SerializeField] private GameObject defaultComponentPrefab;
     [SerializeField] private Transform playerSpawnPoint;
     [SerializeField] private Transform enemySpawnParent;
@@ -116,12 +115,12 @@ public class CombatManager : MonoBehaviour
     private List<CombatEnemyEntity> GenerateEnemies()
     {
         List<CombatEnemyEntity> enemies = new List<CombatEnemyEntity>();
-        int enemyCount = UnityEngine.Random.Range(2, 5);
+        int enemyCount = Random.Range(2, 5);
         Vector3[] enemySpawnPositions = GetEnemySpawnPositionsCircle(enemyCount, 24f);
 
         for (int i = 0; i < enemyCount; i++)
         {
-            GameObject enemyObj = Instantiate(enemyPrefab, enemySpawnParent);
+            GameObject enemyObj = Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Count)], enemySpawnParent);
             enemyObj.transform.localPosition = enemySpawnPositions[i];
             CombatEnemyEntity enemyEntity = enemyObj.GetComponent<CombatEnemyEntity>();
             enemies.Add(enemyEntity);
@@ -138,7 +137,7 @@ public class CombatManager : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-            float angle = startAngle + (360f / count) * i;
+            float angle = startAngle /*+ (360f / count)* i */;
             float rad = angle * Mathf.Deg2Rad;
 
             float x = Mathf.Cos(rad) * radius;
@@ -184,17 +183,4 @@ public class CombatManager : MonoBehaviour
         OnCombatClosed?.Invoke();
     }
 
-    public void EndCombat()
-    {
-        combatSystem.onBattleEnd -= EndCombat;
-        combatSystem.Test_BattleForceCancel();
-
-        if (combatUIPanel != null)
-            combatUIPanel.SetActive(false);
-
-        Debug.Log("Combat forced to end.");
-
-        // Notify TrainFreezeController to resume movement
-        OnCombatClosed?.Invoke();
-    }
 }

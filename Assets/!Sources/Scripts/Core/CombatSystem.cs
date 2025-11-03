@@ -10,6 +10,7 @@ using System;
 
 public class CombatSystem : MonoBehaviour
 {
+    [SerializeField] private UI_CombatRewardPanel rewardPanelRef;
     public CombatPlayerEntity player;
     public List<CombatComponentEntity> components = new List<CombatComponentEntity>();
     public List<CombatEnemyEntity> enemies = new List<CombatEnemyEntity>();
@@ -22,11 +23,6 @@ public class CombatSystem : MonoBehaviour
     public delegate void GameEvent(bool value, int remainHp);
     public event GameEvent onBattleEnd;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    // void Start()
-    // {
-    //     StartBattle();
-    // }
 
     public void InitializeBattle(CombatPlayerEntity playerEntity, List<CombatEnemyEntity> enemyEntities, List<CombatComponentEntity> componentEntities)
     {
@@ -38,7 +34,6 @@ public class CombatSystem : MonoBehaviour
 
         if (player != null)
         {
-            // player.OnAttackReady += HandleAttack;
             player.OnDeath += HandleDeath;
         }
 
@@ -148,9 +143,22 @@ public class CombatSystem : MonoBehaviour
 
         if (playerWon)
         {
-            GiveReward(100);
-        }
+            GiveReward(100, () =>
+            {
+                PlayerStatusManager playerStatus = GameStateManager.Instance.playerStatus;
+                playerStatus.RewardScraps(100);
 
+                CleanupBattle(remainHp, playerWon);
+            });
+        }
+        else
+        {
+            CleanupBattle(remainHp, playerWon);
+        }
+    }
+
+    private void CleanupBattle(int remainHp, bool playerWon)
+    {
         if (player != null)
         {
             Destroy(player.gameObject);
@@ -167,28 +175,10 @@ public class CombatSystem : MonoBehaviour
         tooltip.Hide();
     }
 
-    
-    public void Test_BattleForceCancel()
+    private void GiveReward(int amount, Action onRewardComplete)
     {
-        int remainHp = player.CurrentHp;
-        if (player != null)
-        {
-            Destroy(player.gameObject);
-        }
-
-        foreach (var enemy in enemies)
-        {
-            if (enemy != null)
-                Destroy(enemy.gameObject);
-        }
-        enemies.Clear();
-
-        onBattleEnd?.Invoke(true, remainHp);
+        // Initialize the panel with the reward amount and callback
+        rewardPanelRef.Setup(amount, onRewardComplete);
     }
     
-    
-    public void GiveReward(int amount)
-    {
-        Debug.Log("[CombatManager] Player received reward: " + amount);
-    }
 }
