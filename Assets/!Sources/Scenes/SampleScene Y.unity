@@ -1795,6 +1795,14 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5282634000815766294, guid: e3a662f91b4fde741a27bd61097739d7, type: 3}
+      propertyPath: inventoryWidthMax
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5282634000815766294, guid: e3a662f91b4fde741a27bd61097739d7, type: 3}
+      propertyPath: inventoryHeightMax
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5282634000815766294, guid: e3a662f91b4fde741a27bd61097739d7, type: 3}
       propertyPath: spawnCentreOffset.x
       value: 0
       objectReference: {fileID: 0}

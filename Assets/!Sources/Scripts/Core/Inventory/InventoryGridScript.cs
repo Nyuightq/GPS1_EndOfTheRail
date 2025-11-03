@@ -5,7 +5,6 @@
 // --------------------------------------------------------------
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -32,16 +31,15 @@ public class InventoryGridScript : MonoBehaviour
         locked
     }
 
-
     [Header("Inventory Dimensions/Configs")]
     [SerializeField] public int inventoryWidth;
     [SerializeField] public int inventoryHeight;
+    [SerializeField] private int inventoryWidthMax;
+    [SerializeField] private int inventoryHeightMax;
 
     [SerializeField] private GameObject inventoryCell;
     [SerializeField] private Canvas inventoryCanvas;
-
     [SerializeField] private Vector2 margin;
-
     [SerializeField] private float defaultScale = 0.9f;
 
     [Header("Item Spawning Configs")]
@@ -50,6 +48,9 @@ public class InventoryGridScript : MonoBehaviour
     [SerializeField] private int spawnMargin = 5;
     [SerializeField] private GameObject itemSpawn;
     [SerializeField] private List<ItemSO> startingItems;
+
+    [Header("Do Not Change")]
+    [SerializeField] private InventoryState currentInventoryState;
 
     public RectTransform inventoryRect { get; private set; }
     public InvCellData[,] inventoryGrid;
@@ -62,10 +63,9 @@ public class InventoryGridScript : MonoBehaviour
     private float canvasWidth;
     private float canvasHeight;
 
-    private bool init = true;
+    
 
-    [Header("Do Not Change")]
-    [SerializeField] private InventoryState currentInventoryState;
+
     public InventoryState CurrentInventoryState
     {
         get
@@ -91,8 +91,6 @@ public class InventoryGridScript : MonoBehaviour
         }
     }
 
-    
-
     #region Unity Lifecycle
     void Awake()
     {
@@ -105,6 +103,7 @@ public class InventoryGridScript : MonoBehaviour
         InputManager.OnLeftClick += LeftClick;        
     }
 
+    //slight delay for start so i can properly generate the grid
     private IEnumerator Start()
     {
         canvasWidth = inventoryRect.rect.width;
@@ -165,6 +164,7 @@ public class InventoryGridScript : MonoBehaviour
             if(CurrentInventoryState != InventoryState.adding) CurrentInventoryState = InventoryState.adding; else CurrentInventoryState = InventoryState.normal;
         }
 
+        //for if stuff needs to be done for different inventory states
         switch(currentInventoryState)
         {
             case InventoryState.normal:
@@ -174,17 +174,17 @@ public class InventoryGridScript : MonoBehaviour
 
                 break;
             case InventoryState.adding:
-                
                 break;
         }
     }
     #endregion
 
+    #region input handling
     private void LeftClick()
     {
         if(currentInventoryState == InventoryState.adding)
         {
-            foreach (Vector2 pos in GetInventoryOuterBounds())
+            foreach (Vector2 pos in GetExpendableCells())
             {
                 if (GetCellAtPos(getMousePosGrid()) == pos)
                 {
@@ -194,6 +194,7 @@ public class InventoryGridScript : MonoBehaviour
             }
         }    
     }
+    #endregion
 
     private void GenerateGrid()
     {
@@ -208,7 +209,7 @@ public class InventoryGridScript : MonoBehaviour
                     GameObject newCell = Instantiate(inventoryCell, inventoryRect);
                     RectTransform cellRect = newCell.GetComponent<RectTransform>();
 
-                    Debug.Log("NEW INVENTORY CELL CREATED");
+                    //Debug.Log("NEW INVENTORY CELL CREATED");
 
                     inventoryGrid[x, y].cellObject = newCell;
 
@@ -231,6 +232,12 @@ public class InventoryGridScript : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// mark the cells within the shape in the grid with the item's id
+    /// </summary>
+    /// <param name="startingCell"></param>
+    /// <param name="itemShape"></param>
+    /// <param name="itemId"></param>
     public void MarkCells(Vector2Int startingCell, ItemShapeCell[,] itemShape, GameObject itemId)
     {
         for (int x = 0; x < itemShape.GetLength(0); x++)
@@ -284,6 +291,9 @@ public class InventoryGridScript : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// adds the marked cell items into a list
+    /// </summary>
     public void CheckItems()
     {
         Debug.Log("equipped Items :");
@@ -394,9 +404,16 @@ public class InventoryGridScript : MonoBehaviour
             ClearUpgradePreview();
         }
 
-        List<Vector2> outerBounds = GetInventoryOuterBounds();
+        List<Vector2> outerBounds = GetExpendableCells();
         foreach(Vector2 cell in outerBounds)
         {
+            //if the preview cell is 
+            if ((inventoryWidth >= inventoryWidthMax && (cell.x < 0 || cell.x >= inventoryWidth)) || 
+               (inventoryHeight >= inventoryHeightMax && (cell.y < 0 || cell.y >= inventoryHeight)))
+            {
+                continue;
+            }
+
             GameObject previewCell = Instantiate(inventoryCell, inventoryRect);
             RectTransform previewRect = previewCell.GetComponent<RectTransform>();
 
@@ -418,12 +435,10 @@ public class InventoryGridScript : MonoBehaviour
         }
     }
 
-    private void ClearUpgradePreview()
-    {
-        foreach (GameObject previewCell in previewCells) Destroy(previewCell);
-        previewCells.Clear();
-    }
-
+    /// <summary>
+    /// expends the inventory in the given position
+    /// </summary>
+    /// <param name="cellPos"></param>
     private void ExpandInventory(Vector2 cellPos)
     {
         InvCellData[,] newInventory;
@@ -438,11 +453,11 @@ public class InventoryGridScript : MonoBehaviour
         }
         else
         {
-            if(!InGrid( new Vector2 (cellPos.x,0)))
+            if(!InGrid( new Vector2 (cellPos.x,0)) && inventoryWidth < inventoryWidthMax)
             {
                 inventoryWidth += 1;
             }
-            if(!InGrid(new Vector2 (0,cellPos.y)))
+            if(!InGrid(new Vector2 (0,cellPos.y)) && inventoryHeight < inventoryHeightMax)
             {
                 inventoryHeight += 1;
             }
@@ -452,10 +467,9 @@ public class InventoryGridScript : MonoBehaviour
             int oldInventoryWidth = inventoryGrid.GetLength(0);
             int oldInventoryHeight = inventoryGrid.GetLength(1);
 
-            int offsetX = (Mathf.Sign(cellPos.x) == -1f) ? 1 : 0;
-            int offsetY = ((Mathf.Sign(cellPos.y) == -1f)) ? 1 : 0;
-
-            int goRight = (cellPos.x >= oldInventoryWidth) ? 1 : 0;
+            int expandLeft = (Mathf.Sign(cellPos.x) == -1f) ? 1 : 0;
+            int expandDown = ((Mathf.Sign(cellPos.y) == -1f)) ? 1 : 0;
+            int expandRight = (cellPos.x >= oldInventoryWidth) ? 1 : 0;
 
             for (int x=0;x<inventoryWidth;x++)
             {
@@ -463,15 +477,15 @@ public class InventoryGridScript : MonoBehaviour
                 {
                     if (x < oldInventoryWidth && y < oldInventoryHeight)
                     {
-                        newInventory[x + offsetX, y + offsetY] = inventoryGrid[x, y];
+                        newInventory[x + expandLeft, y + expandDown] = inventoryGrid[x, y];
                     }
                     else
                     {
-                        int newCellsPosX = x - (x * offsetX);
-                        int newCellsPosY = y - (y * offsetY);
+                        int newCellsPosX = x - (x * expandLeft);
+                        int newCellsPosY = y - (y * expandDown);
 
-                        newInventory[x - (x * offsetX), y - (y * offsetY)] = new InvCellData(null, false);
-                        if (newCellsPosX == (int)cellPos.x + offsetX && newCellsPosY == (int)cellPos.y + offsetY) 
+                        newInventory[x - (x * expandLeft), y - (y * expandDown)] = new InvCellData(null, false);
+                        if (newCellsPosX == (int)cellPos.x + expandLeft && newCellsPosY == (int)cellPos.y + expandDown) 
                         {
                             newInventory[newCellsPosX, newCellsPosY] = new InvCellData(null,true);
                         }
@@ -484,7 +498,7 @@ public class InventoryGridScript : MonoBehaviour
             {
                 if (item != null)
                 {
-                    item.GetComponent<RectTransform>().anchoredPosition += new Vector2(-GameManager.cellSize * goRight, -GameManager.cellSize * offsetY);
+                    item.GetComponent<RectTransform>().anchoredPosition += new Vector2(-GameManager.cellSize * expandRight, -GameManager.cellSize * expandDown);
                 }
             }
 
@@ -528,11 +542,16 @@ public class InventoryGridScript : MonoBehaviour
         return new Vector2(canvasWidth * 0.5f - gridSize.x - margin.x, canvasHeight * 0.5f - cellSize - margin.y);
     }
 
+    /// <summary>
+    /// returns true if the 2D array cell position is within the grid bounds 
+    /// </summary>
+    /// <param name="cellPos">2D array coordinates</param>
+    /// <returns></returns>
     public bool InGrid(Vector2 cellPos)
     {
         return (cellPos.x >= 0 && cellPos.x < inventoryWidth && cellPos.y >= 0 && cellPos.y < inventoryHeight);
     }
-
+    
     public Vector2 getMousePosGrid()
     {
         Vector2 mousePos;
@@ -541,11 +560,14 @@ public class InventoryGridScript : MonoBehaviour
         return mousePos;
     }
 
-    private List<Vector2> GetInventoryOuterBounds()
+    /// <summary>
+    /// Get expendable cells (adjacent empty cells)
+    /// </summary>
+    /// <returns></returns>
+    private List<Vector2> GetExpendableCells()
     {
         List<Vector2> outerBounds = new List<Vector2>();
         Vector2[] directions = { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
-
 
         for (int x = 0; x < inventoryWidth; x++)
         {
@@ -565,6 +587,12 @@ public class InventoryGridScript : MonoBehaviour
             }
         }
         return outerBounds;
+    }
+
+    private void ClearUpgradePreview()
+    {
+        foreach (GameObject previewCell in previewCells) Destroy(previewCell);
+        previewCells.Clear();
     }
     #endregion
 }
