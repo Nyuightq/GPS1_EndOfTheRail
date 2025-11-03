@@ -56,7 +56,7 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
             if(itemScript.spriteRectTransform.localScale != new Vector3(1f,1f,1f)) itemScript.spriteRectTransform.localScale = Vector3.Lerp(itemScript.spriteRectTransform.localScale, new Vector3(1f, 1f, 1f), 0.3f);
         }
 
-        Debug.Log(dragging);
+        //Debug.Log(dragging);
 
         switch (itemScript.state)
         {
@@ -139,7 +139,9 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(inventoryGridScript.inventoryRect, shapeCell.transform.position, null, out Vector2 localPos);
 
                 Vector2 cellPos = inventoryGridScript.GetCellAtPos(localPos);
-                if (inventoryGridScript.InGrid(cellPos) && inventoryGridScript.inventoryGrid[(int)cellPos.x, (int)cellPos.y].item == null)
+                InvCellData localGridCellPos = inventoryGridScript.inventoryGrid[(int)cellPos.x, (int)cellPos.y];
+
+                if (inventoryGridScript.InGrid(cellPos) && localGridCellPos.item == null && localGridCellPos.active)
                 {
                     //Debug.Log(cellPos);
                 }
