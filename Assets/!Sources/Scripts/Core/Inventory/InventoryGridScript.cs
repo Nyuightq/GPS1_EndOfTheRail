@@ -188,14 +188,14 @@ public class InventoryGridScript : MonoBehaviour
     #region input handling
     private void LeftClick()
     {
-        if(currentInventoryState == InventoryState.adding && GameManager.instance.playerStatus.Scraps >= currentCost)
+        if(currentInventoryState == InventoryState.adding)
         {
-            GameManager.instance.playerStatus.ConsumeScraps(currentCost);
-            currentCost = (int)(currentCost * costMultiplier);
             foreach (Vector2 pos in GetExpendableCells())
             {
-                if (GetCellAtPos(getMousePosGrid()) == pos)
+                if (GetCellAtPos(getMousePosGrid()) == pos && GameManager.instance.playerStatus.Scraps >= currentCost)
                 {
+                    GameManager.instance.playerStatus.ConsumeScraps(currentCost);
+                    currentCost = (int)(currentCost * costMultiplier);
                     ExpandInventory(pos);
                     return;
                 }
