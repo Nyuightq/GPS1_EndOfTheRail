@@ -1,13 +1,14 @@
 // --------------------------------------------------------------
-// Creation Date: 2025-10-13
-// Author: ZQlie
-// Description: Handles win/lose conditions based on player and crystal HP,
-// and when player reaches the end point. Pauses game on win/lose.
+// Creation Date: 2025-10-31
+// Description: Handles win/lose conditions and triggers transitions
 // --------------------------------------------------------------
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
+
+#if UNITY_EDITOR
+using UnityEditor.SceneManagement;
+#endif
 
 public class WinLoseManager : MonoBehaviour
 {
@@ -15,22 +16,25 @@ public class WinLoseManager : MonoBehaviour
     [SerializeField] private PlayerStatusManager playerStatus;
     [SerializeField] private TrainMovement trainMovement;
     [SerializeField] private RailGridScript gridManager;
+    [SerializeField] private DayCycleScript dayCycle;
+    [SerializeField] private CombatManager combatManager;
+    
+    [Header("Data")]
+    [SerializeField] private RunStatsData runStatsData; // Reference to ScriptableObject
 
-    [Header("UI Panels")]
-    [SerializeField] private GameObject winPanel;
-    [SerializeField] private GameObject losePanel;
-    [SerializeField] private Button replayButtonWin;
-    [SerializeField] private Button replayButtonLose;
+    [Header("Scene Settings")]
+    [SerializeField] private string resultSceneName = "ResultScene"; // Change this to your actual scene name
+    [SerializeField] private float transitionDelay = 1f;
+    [SerializeField] private bool useEditorSceneLoading = true; // Enable for editor testing without Build Settings
 
     [Header("Game State")]
     public bool isGameOver = false;
-    public bool isPlayerWin = false;
 
     private bool _initialized = false;
 
     private IEnumerator Start()
     {
-        yield return null; // wait one frame so all dynamic objects can spawn
+        yield return null; // Wait one frame for dynamic objects to spawn
         _initialized = true;
 
         if (replayButtonWin != null)
@@ -42,17 +46,19 @@ public class WinLoseManager : MonoBehaviour
         if (losePanel != null) losePanel.SetActive(false);
 
         // Try to auto-assign runtime-spawned references
-        if (trainMovement == null)
-            trainMovement = FindFirstObjectByType<TrainMovement>();
-        if (playerStatus == null)
-            playerStatus = FindFirstObjectByType<PlayerStatusManager>();
-        if (gridManager == null)
-            gridManager = FindFirstObjectByType<RailGridScript>();
+        // if (trainMovement == null)
+        //     trainMovement = FindFirstObjectByType<TrainMovement>();
+        // if (playerStatus == null)
+        //     playerStatus = FindFirstObjectByType<PlayerStatusManager>();
+        // if (gridManager == null)
+        //     gridManager = FindFirstObjectByType<RailGridScript>();
 
-        if (trainMovement == null)
-            Debug.LogWarning("WinLoseManager could not find TrainMovement at start.");
-        else
-            Debug.Log($"TrainMovement assigned: {trainMovement.name}");
+        // if (trainMovement == null)
+        //     Debug.LogWarning("WinLoseManager could not find TrainMovement at start.");
+        // else
+        //     Debug.Log($"TrainMovement assigned: {trainMovement.name}");
+        // Auto-assign runtime-spawned references
+        TryAssignReferences();
     }
 
     private void Update()
@@ -60,18 +66,57 @@ public class WinLoseManager : MonoBehaviour
         if (!_initialized || isGameOver) return;
 
         // Re-assign if still missing
-        if (trainMovement == null)
-            trainMovement = FindFirstObjectByType<TrainMovement>();
-        if (playerStatus == null)
-            playerStatus = FindFirstObjectByType<PlayerStatusManager>();
-        if (gridManager == null)
-            gridManager = FindFirstObjectByType<RailGridScript>();
+        TryAssignReferences();
 
         if (trainMovement == null || playerStatus == null || gridManager == null)
             return;
 
         CheckHealthCondition();
         CheckWinCondition();
+    }
+
+    private void TryAssignReferences()
+    {
+        if (trainMovement == null)
+        {
+            trainMovement = FindFirstObjectByType<TrainMovement>();
+            if (trainMovement != null)
+                Debug.Log($"[WinLoseManager] Found TrainMovement: {trainMovement.name}");
+            else
+                Debug.LogWarning("[WinLoseManager] TrainMovement not found!");
+        }
+        
+        if (playerStatus == null)
+        {
+            playerStatus = FindFirstObjectByType<PlayerStatusManager>();
+            if (playerStatus != null)
+                Debug.Log($"[WinLoseManager] Found PlayerStatusManager: {playerStatus.name}");
+            else
+                Debug.LogWarning("[WinLoseManager] PlayerStatusManager not found!");
+        }
+        
+        if (gridManager == null)
+        {
+            gridManager = FindFirstObjectByType<RailGridScript>();
+            if (gridManager != null)
+                Debug.Log($"[WinLoseManager] Found RailGridScript: {gridManager.name}");
+            else
+                Debug.LogWarning("[WinLoseManager] RailGridScript not found!");
+        }
+        
+        if (dayCycle == null)
+        {
+            dayCycle = FindFirstObjectByType<DayCycleScript>();
+            if (dayCycle != null)
+                Debug.Log($"[WinLoseManager] Found DayCycleScript: {dayCycle.name}");
+        }
+        
+        if (combatManager == null)
+        {
+            combatManager = CombatManager.Instance;
+            if (combatManager != null)
+                Debug.Log($"[WinLoseManager] Found CombatManager.Instance");
+        }
     }
 
     private void CheckHealthCondition()
@@ -81,7 +126,7 @@ public class WinLoseManager : MonoBehaviour
         if (playerStatus.Hp <= 0)
         {
             Debug.Log("Player Lost! Reason: Player HP reached 0.");
-            TriggerLose("Player HP reached 0");
+            TriggerLose("HP reached 0");
         }
         else if (playerStatus.CrystalHp <= 0)
         {
@@ -114,26 +159,27 @@ public class WinLoseManager : MonoBehaviour
         }
     }
 
-    private void TriggerWin()
+    public void TriggerWin()
     {
+        if (isGameOver) return;
+
         isGameOver = true;
-        isPlayerWin = true;
-
-        if (trainMovement != null)
-            trainMovement.enabled = false;
-
-        Debug.Log("Player Won! Reached End Point Safely!");
-        GameStateManager.SetPhase(Phase.Win);
-
         Time.timeScale = 0f;
-        if (winPanel != null)
-            winPanel.SetActive(true);
+
+        Debug.Log("Win triggered! Saving stats and transitioning...");
+
+        // Save run stats
+        SaveCurrentRunStats(true, "");
+
+        // Transition to result scene
+        StartCoroutine(TransitionToResultScene());
     }
 
     private void TriggerLose(string reason = "Unknown")
     {
+        if (isGameOver) return;
+
         isGameOver = true;
-        isPlayerWin = false;
 
         if (trainMovement != null)
             trainMovement.enabled = false;
@@ -141,16 +187,76 @@ public class WinLoseManager : MonoBehaviour
         Debug.Log($"Player Lost! Reason: {reason}");
         GameStateManager.SetPhase(Phase.Lose);
 
+        // Save run stats
+        SaveCurrentRunStats(false, reason);
+
         Time.timeScale = 0f;
-        if (losePanel != null)
-            losePanel.SetActive(true);
+
+        // Transition to result scene
+        StartCoroutine(TransitionToResultScene());
     }
 
-    private void ReloadScene()
+    private void SaveCurrentRunStats(bool won, string loseReason)
     {
+        if (runStatsData == null)
+        {
+            Debug.LogWarning("RunStatsData ScriptableObject is not assigned! Cannot save stats.");
+            return;
+        }
+
+        if (playerStatus == null)
+        {
+            Debug.LogWarning("PlayerStatusManager is null! Cannot save stats.");
+            return;
+        }
+
+        int days = dayCycle != null ? dayCycle.GetDay() : 0;
+        int totalCombats = combatManager != null ? 
+            (combatManager.totalCombatsFaced + combatManager.totalEncountersFaced) : 0;
+
+        runStatsData.SaveRunStats(
+            playerStatus.Hp,
+            playerStatus.MaxHp,
+            playerStatus.CrystalHp,
+            playerStatus.MaxCrystalHp,
+            playerStatus.Scraps,
+            days,
+            totalCombats,
+            0, // encounters (if tracked separately)
+            won,
+            loseReason
+        );
+    }
+
+    private IEnumerator TransitionToResultScene()
+    {
+        Debug.Log($"Transitioning to '{resultSceneName}' in {transitionDelay} seconds...");
+
+        float elapsed = 0f;
+        while (elapsed < transitionDelay)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
         Time.timeScale = 1f;
-        Scene currentScene = SceneManager.GetActiveScene();
-        SceneManager.LoadScene(currentScene.buildIndex);
-        Debug.Log("Reloading scene...");
+        
+        if (!string.IsNullOrEmpty(resultSceneName))
+        {
+            try
+            {
+                SceneManager.LoadScene(resultSceneName);
+                Debug.Log($"Loading result scene: {resultSceneName}");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Failed to load scene '{resultSceneName}': {e.Message}");
+                Debug.LogError("Make sure the scene is added to Build Settings (File → Build Settings → Add Open Scenes)");
+            }
+        }
+        else
+        {
+            Debug.LogError("Result scene name not set in WinLoseManager!");
+        }
     }
 }

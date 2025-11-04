@@ -5,6 +5,15 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
+  - enabled: 0
+    path: Assets/!Sources/Scenes/BootStrapScene.unity
+    guid: a10b1e087178daa46bb010af19aff42e
+  - enabled: 1
+    path: Assets/!Sources/Scenes/LatestUpdate Z.unity
+    guid: 64005930cbad2894e8bf514f5f8a57ea
+  - enabled: 1
+    path: Assets/!Sources/Scenes/ResultScene.unity
+    guid: b8bfc7eea3911114d8b07771f911ab22
   - enabled: 1
     path: Assets/!Sources/Scenes/MainMenu.unity
     guid: 11c8addfc836f1f4aa0a4e31da769e96

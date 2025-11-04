@@ -162,4 +162,14 @@ public class GameStateManager : MonoBehaviour
                 .OnComplete(() => _planPhasePanel.SetActive(false));
         }
     }
+    public void DestroyInstance()
+    {
+        if (Instance != null)
+        {
+            Destroy(Instance.gameObject);
+            Instance = null; // OK because this is inside CombatManager
+            Debug.Log("[GameStateManager] Instance destroyed for replay.");
+        }
+    }
+
 }

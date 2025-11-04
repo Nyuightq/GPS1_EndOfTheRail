@@ -117,4 +117,15 @@ public class ChurchManager : MonoBehaviour
         IsCooldownActive = false;
         Debug.Log("[ChurchManager] Cooldown finished, ready for next trigger.");
     }
+
+    public void DestroyInstance()
+{
+    if (Instance != null)
+    {
+        Destroy(Instance.gameObject);
+        Instance = null; // OK because this is inside ChurchManager
+        Debug.Log("[ChurchManager] Instance destroyed for replay.");
+    }
+}
+
 }

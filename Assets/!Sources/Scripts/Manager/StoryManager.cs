@@ -110,4 +110,17 @@ public class StoryManager : MonoBehaviour
         isStoryActive = false;
         Debug.Log("[StoryManager] Ready for next story trigger.");
     }
+
+    public void DestroyInstance()
+{
+    if (Instance != null)
+    {
+        Destroy(Instance.gameObject);
+        Instance = null; // OK because this is inside StoryManager
+        Debug.Log("[StoryManager] Instance destroyed for replay.");
+    }
+}
+
+
+    
 }

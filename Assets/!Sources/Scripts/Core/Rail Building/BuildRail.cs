@@ -103,6 +103,10 @@ public class BuildRails : MonoBehaviour
             RailData data = new RailData(tilePos);
 
             GameManager.spawnTile(tilePos, defaultTile, data);
+
+            //Play sfx
+            SoundManager.Instance.PlaySFX("SFX_RailBuilding_Success");
+            
             gridScript.railDataMap[tilePos].setLine(railLine);
             railLine.line.Add(tilePos);
 
@@ -259,6 +263,9 @@ public class BuildRails : MonoBehaviour
             Vector3Int currentRail = railLine.line[^1];
             Vector2 newDir = new Vector2(currentRail.x - prevRail.x, currentRail.y - prevRail.y);
             gridScript.railDataMap[railLine.line[^2]].setDirection(newDir, RailData.directionType.Outgoing);
+
+            //Put SFX - RailBuilding_LinkEnded here
+            SoundManager.Instance.PlaySFX("SFX_RailBuilding_LinkEnded");
         }
     }
     #endregion
@@ -296,6 +303,32 @@ public class BuildRails : MonoBehaviour
     /// <summary>
     /// Handles deletion of the last placed rail when right-clicking.
     /// </summary>
+    ///     /// <summary>
+    /// Reset button function from GameGeneral_UI > Canvas > UI_PlanPhasePanel > Reset Button
+    /// </summary>
+    public void OnResetRails()
+    {
+        bool isEmptyStart = !gridScript.hasConnection(gridScript.startPoint);
+        if (isEmptyStart)
+        {
+            Debug.Log("SFX_RailOnReset_Failed");
+            SoundManager.Instance.PlaySFX("SFX_RailOnReset_Failed");
+            // Play Sound > SFX_RailOnReset_Failed
+            return;
+        }
+
+        if (railLine == null) return;
+        // Check if continuing an existing line safely
+        if (railLine?.line != null && railLine?.line.Count > 0)
+        {
+            Vector3Int firstRail = railLine.line[1];
+            DeleteCertainRail(firstRail);
+
+            Debug.Log("SFX_RailOnReset_Success > " + firstRail);
+            // Play Sound > SFX_RailOnReset_Success
+            SoundManager.Instance.PlaySFX("SFX_RailOnReset_Success");
+        }
+    }
     private void HandleDeleteInput(Vector3Int tilePos)
     {
         if (!Input.GetMouseButton(1)) return;
@@ -304,6 +337,11 @@ public class BuildRails : MonoBehaviour
 
     private void DeleteCertainRail(Vector3Int tilePos)
     {
+        // Put SFX - RailOnDelete_Success here. (Only play this RailOnDelete sfx if there is rail being deleted, 
+        // Don't repeat it instantly if this action deleted multiple rail at once.)
+        SoundManager.Instance.PlaySFX("SFX_RailOnDelete_Success");
+        Debug.Log("Play - RailOnDelete_Success");
+
         Vector3Int lastTile = tilePos;
 
         if (!gridScript.railDataMap.ContainsKey(lastTile)) return;

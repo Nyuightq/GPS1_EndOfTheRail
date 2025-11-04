@@ -282,6 +282,9 @@ public class RailGridScript : MonoBehaviour
                     if (railDataMap[lineList[0]].railType == RailData.railTypes.start && (railDataMap[lineList[^1]].railType == RailData.railTypes.end || railDataMap[lineList[^1]].railType == RailData.railTypes.rest))
                     {
                         Debug.Log("Go");
+
+                        SoundManager.Instance.PlaySFX("SFX_ValidateRoute_Success");
+
                         railDataMap[lineList[0]].setDirection(new Vector2(lineList[1].x - lineList[0].x, lineList[1].y - lineList[0].y), RailData.directionType.Outgoing);
                         railDataMap[lineList[1]].setDirection(new Vector2(lineList[0].x - lineList[1].x, lineList[0].y - lineList[1].y), RailData.directionType.Incoming);
                         railDataMap[lineList[^2]].setDirection(new Vector2(lineList[^1].x - lineList[^2].x, lineList[^1].y - lineList[^2].y), RailData.directionType.Outgoing);
@@ -291,6 +294,7 @@ public class RailGridScript : MonoBehaviour
 
             }
         }
+        SoundManager.Instance.PlaySFX("SFX_ValidateRoute_Failed");
         return false;
     }
     

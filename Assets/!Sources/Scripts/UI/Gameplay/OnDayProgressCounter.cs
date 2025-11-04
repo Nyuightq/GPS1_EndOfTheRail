@@ -5,45 +5,28 @@ using TMPro;
 public class OnDayProgressCounter : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private Slider dayProgressSlider;   // Assign your slider here
-    [SerializeField] private TextMeshProUGUI dayCounterText;        // Optional: UI text to display the count
-
-    [Header("Settings")]
-    [SerializeField] private int currentDay = 0;
-
-    private bool dayCounted = false;
+    [SerializeField] private DayCycleScript dayCycle;      // Reference to your DayCycleScript
+    [SerializeField] private TextMeshProUGUI dayCounterText;
 
     private void Start()
     {
+        if (dayCycle == null)
+            dayCycle = FindObjectOfType<DayCycleScript>();
+
         UpdateDayCounterText();
     }
 
     private void Update()
     {
-        if (dayProgressSlider == null)
+        if (dayCycle == null || dayCounterText == null)
             return;
 
-        // When slider reaches the end (1.0), trigger counter ONCE
-        if (dayProgressSlider.value >= 1f && !dayCounted)
-        {
-            currentDay++;
-            dayCounted = true;
-            UpdateDayCounterText();
-            Debug.Log($"New day reached! Current day: {currentDay}");
-        }
-
-        // Reset when slider returns to 0 (start of new day/night cycle)
-        if (dayProgressSlider.value <= 0f && dayCounted)
-        {
-            dayCounted = false;
-        }
+        UpdateDayCounterText();
     }
 
     private void UpdateDayCounterText()
     {
-        if (dayCounterText != null)
-        {
-            dayCounterText.text = $"Day {currentDay}";
-        }
+        // Display the actual day count from DayCycleScript
+        dayCounterText.text = $"Day {dayCycle.GetDay()}";
     }
 }

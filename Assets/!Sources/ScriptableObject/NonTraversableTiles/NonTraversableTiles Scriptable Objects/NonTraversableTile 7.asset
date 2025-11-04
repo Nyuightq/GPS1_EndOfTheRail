@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 811563fb803ecdf4e8b2c3dbce293235, type: 3}
   m_Name: NonTraversableTile 7
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 21300000, guid: ef32a0fafe8ca8049b04c9fc5fbedb37, type: 3}
+  m_Sprite: {fileID: -1288299482, guid: 7a279435a334c8b478d6f044b5556bfc, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
