@@ -1370,13 +1370,41 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: baseCost
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: currentCost
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: costMultiplier
+      value: 1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: inventoryWidth
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: inventoryHeight
-      value: 7
+      value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: inventoryWidthMax
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: inventoryHeightMax
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: startingItems.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: 'startingItems.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: d044c032c2424e545937da643f79d6a6, type: 2}
     - target: {fileID: 8911030689567367474, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: rewardPanelRef
       value: 
@@ -1586,6 +1614,10 @@ PrefabInstance:
       propertyPath: _railBuilderManager
       value: 
       objectReference: {fileID: 880395500}
+    - target: {fileID: 8579136974911738680, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: playerStatus
+      value: 
+      objectReference: {fileID: 808508310}
     - target: {fileID: 8579136974911738680, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: inputManagerPrefab
       value: 
