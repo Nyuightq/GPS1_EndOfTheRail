@@ -42,6 +42,10 @@ public class InventoryGridScript : MonoBehaviour
     [SerializeField] private Vector2 margin;
     [SerializeField] private float defaultScale = 0.9f;
 
+    [Header("Inventory Expansion stuff")]
+    [SerializeField] private int baseCost;
+    [SerializeField] private float costMultiplier;
+
     [Header("Item Spawning Configs")]
     [SerializeField] private bool spawnItemInInventory;
     [SerializeField] private Vector2 spawnCentreOffset = Vector2.zero;
@@ -51,6 +55,7 @@ public class InventoryGridScript : MonoBehaviour
 
     [Header("Do Not Change")]
     [SerializeField] private InventoryState currentInventoryState;
+    [SerializeField] private int currentCost;
 
     public RectTransform inventoryRect { get; private set; }
     public InvCellData[,] inventoryGrid;
@@ -63,6 +68,7 @@ public class InventoryGridScript : MonoBehaviour
     private float canvasWidth;
     private float canvasHeight;
 
+    
     
 
 
@@ -100,6 +106,7 @@ public class InventoryGridScript : MonoBehaviour
 
     private void OnEnable()
     {
+        currentCost = baseCost;
         InputManager.OnLeftClick += LeftClick;        
     }
 
@@ -133,7 +140,6 @@ public class InventoryGridScript : MonoBehaviour
             SpawnItems(itemSpawn, startingItems, spawnCentreOffset, spawnMargin);
         }
     }
-
 
 
     private void Update()
@@ -182,8 +188,10 @@ public class InventoryGridScript : MonoBehaviour
     #region input handling
     private void LeftClick()
     {
-        if(currentInventoryState == InventoryState.adding)
+        if(currentInventoryState == InventoryState.adding && GameManager.instance.playerStatus.Scraps >= currentCost)
         {
+            GameManager.instance.playerStatus.ConsumeScraps(currentCost);
+            currentCost = (int)(currentCost * costMultiplier);
             foreach (Vector2 pos in GetExpendableCells())
             {
                 if (GetCellAtPos(getMousePosGrid()) == pos)

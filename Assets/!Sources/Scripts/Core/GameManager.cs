@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject inputManagerPrefab;
     [SerializeField] public static int cellSize = 16;
 
+    public PlayerStatusManager playerStatus;
     public static InputManager input { get; private set; }
     private GameObject inputManager;
 
@@ -35,6 +36,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        playerStatus = GetComponent<PlayerStatusManager>();
         inputManager = Instantiate(inputManagerPrefab);
         DontDestroyOnLoad(inputManager);
     }
