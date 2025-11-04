@@ -1522,6 +1522,22 @@ PrefabInstance:
       propertyPath: playerSpawnPoint
       value: 
       objectReference: {fileID: 7573968344778825728}
+    - target: {fileID: 3609722059929364384, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: enemyPrefabs.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3609722059929364384, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: 'enemyPrefabs.Array.data[0]'
+      value: 
+      objectReference: {fileID: 6709867778072561585, guid: 279cc029755cb1c44b14a7eacc24d47d, type: 3}
+    - target: {fileID: 3609722059929364384, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: 'enemyPrefabs.Array.data[1]'
+      value: 
+      objectReference: {fileID: 6709867778072561585, guid: 15ccc458248c1ed4eb2b1440a60217d0, type: 3}
+    - target: {fileID: 3609722059929364384, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: 'enemyPrefabs.Array.data[2]'
+      value: 
+      objectReference: {fileID: 6709867778072561585, guid: fe1742e6a8700014fa045b2c4dcab72d, type: 3}
     - target: {fileID: 4926789502135262990, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: acceptButton
       value: 
