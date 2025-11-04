@@ -21,7 +21,7 @@ public class RailPlacementValidator : MonoBehaviour
         Vector3Int cellPos = eventTilemap.WorldToCell(position);
         TileBase tile = eventTilemap.GetTile(cellPos);
 
-        if (tile is NonTraversableTile)
+        if (tile != null /*tile is NonTraversableTile*/)
         {
             Debug.Log("Cannot build rail here — NonTraversableTile detected!");
             return false;
