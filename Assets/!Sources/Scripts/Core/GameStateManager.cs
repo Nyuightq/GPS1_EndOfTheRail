@@ -135,7 +135,6 @@ public class GameStateManager : MonoBehaviour
         {
             // Enable configuration interactive system
         }
-
         if (_phase == Phase.Lose)
         {
             // Disable configuration interactive system

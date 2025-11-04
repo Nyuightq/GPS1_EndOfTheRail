@@ -77,7 +77,7 @@ public class BuildRails : MonoBehaviour
         }
 
         TileBase eventTile = eventTilemap.GetTile(tilePos);
-        bool isNonTraversable = eventTile is NonTraversableTile || gridScript.railAtPosIsDisabled(tilePos); // First condition of nonTraversable tile
+        bool isNonTraversable = eventTile != null /*eventTile is NonTraversableTile || eventTile is NonTraversableRuleTile*/ || gridScript.railAtPosIsDisabled(tilePos); // First condition of nonTraversable tile
 
         if (Input.GetMouseButton(0)) isHolding = true; else isHolding = false;
 
