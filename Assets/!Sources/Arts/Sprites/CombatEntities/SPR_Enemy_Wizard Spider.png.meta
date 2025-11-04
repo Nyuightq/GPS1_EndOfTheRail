@@ -1,43 +1,46 @@
 fileFormatVersion: 2
-guid: c7c887f8dc8b7fc4795e7017ccaffe95
+guid: 06f2218061a904946a7f896b3fcd43eb
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7754841000899246028
-    second: SPR_Enemy_WizardSpider_0
+      213: -6442982394739215938
+    second: spider_real-Sheet_0
   - first:
-      213: 7164785248118795242
-    second: SPR_Enemy_WizardSpider_1
+      213: 5128706351233166190
+    second: spider_real-Sheet_1
   - first:
-      213: 8416975875605942098
-    second: SPR_Enemy_WizardSpider_2
+      213: 9067234247356557409
+    second: spider_real-Sheet_2
   - first:
-      213: -21533495090676029
-    second: SPR_Enemy_WizardSpider_3
+      213: 6683486541691946265
+    second: spider_real-Sheet_3
   - first:
-      213: -2114157738651461708
-    second: SPR_Enemy_WizardSpider_4
+      213: -3770332417656848495
+    second: spider_real-Sheet_4
   - first:
-      213: -7770660739739972189
-    second: SPR_Enemy_WizardSpider_5
+      213: 6568467418519897127
+    second: spider_real-Sheet_5
   - first:
-      213: -4996001914893008363
-    second: SPR_Enemy_WizardSpider_6
+      213: -6176913671524019578
+    second: spider_real-Sheet_6
   - first:
-      213: -5181723945448119653
-    second: SPR_Enemy_WizardSpider_7
+      213: -7057589239040925226
+    second: spider_real-Sheet_7
   - first:
-      213: -7980896242953528945
-    second: SPR_Enemy_WizardSpider_8
+      213: 2483186580090444447
+    second: spider_real-Sheet_8
   - first:
-      213: -5573612749124215891
-    second: SPR_Enemy_WizardSpider_9
+      213: 2439571370339487384
+    second: spider_real-Sheet_9
   - first:
-      213: -2120299300107867937
-    second: SPR_Enemy_WizardSpider_10
+      213: -6387657120279091685
+    second: spider_real-Sheet_10
   - first:
-      213: 6356811986188870321
-    second: SPR_Enemy_WizardSpider_11
+      213: 317943438966998009
+    second: spider_real-Sheet_11
+  - first:
+      213: 2402513939635672769
+    second: spider_real-Sheet_12
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -129,24 +132,11 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 1
-    textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: SPR_Enemy_WizardSpider_0
+      name: SPR_Enemy_Wizard Spider_0
       rect:
         serializedVersion: 2
         x: 0
@@ -161,14 +151,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5bce2c993ea5e684ebe88738db81bb95
-      internalID: -350667719
+      spriteID: ba95c6563feb58d408e464bc89a35896
+      internalID: -227466460
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SPR_Enemy_WizardSpider_1
+      name: SPR_Enemy_Wizard Spider_1
       rect:
         serializedVersion: 2
         x: 32
@@ -183,14 +173,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2fb39547629ec3644a594e1d19a56c7c
-      internalID: -936023191
+      spriteID: ff7fddce5c601bd42be600d6f67b8b7c
+      internalID: -526927245
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SPR_Enemy_WizardSpider_2
+      name: SPR_Enemy_Wizard Spider_2
       rect:
         serializedVersion: 2
         x: 64
@@ -205,14 +195,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2cde1fcfd9161cb45a890dc7a3b67710
-      internalID: 376349596
+      spriteID: 1f767c57a0305ce41bdcc6622078b974
+      internalID: -473254096
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SPR_Enemy_WizardSpider_3
+      name: SPR_Enemy_Wizard Spider_3
       rect:
         serializedVersion: 2
         x: 96
@@ -227,14 +217,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9c74c0eaa32c11d4c9b3538944ab0a6c
-      internalID: -312669417
+      spriteID: 70bb0130f174f054792b424caff79bc7
+      internalID: -733168771
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SPR_Enemy_WizardSpider_4
+      name: SPR_Enemy_Wizard Spider_4
       rect:
         serializedVersion: 2
         x: 128
@@ -249,14 +239,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9cb5f7021c06d5f478b3aa0abf684c05
-      internalID: -61743748
+      spriteID: ed086cf88c271a74b87a99528984157c
+      internalID: 2106843777
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SPR_Enemy_WizardSpider_5
+      name: SPR_Enemy_Wizard Spider_5
       rect:
         serializedVersion: 2
         x: 160
@@ -271,14 +261,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 217f6102392de4343ad25f96864cd12e
-      internalID: -109750490
+      spriteID: 16f92b773910cd54a95b2b7ee84385a4
+      internalID: -2002607934
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SPR_Enemy_WizardSpider_6
+      name: SPR_Enemy_Wizard Spider_6
       rect:
         serializedVersion: 2
         x: 192
@@ -293,8 +283,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 682c4cf052e146745ba896e670c7271c
-      internalID: -2084366571
+      spriteID: d2f35e77c1a23f742bf00fcba21dc83e
+      internalID: -1152299475
       vertices: []
       indices: 
       edges: []
@@ -313,13 +303,13 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      SPR_Enemy_WizardSpider_0: -350667719
-      SPR_Enemy_WizardSpider_1: -936023191
-      SPR_Enemy_WizardSpider_2: 376349596
-      SPR_Enemy_WizardSpider_3: -312669417
-      SPR_Enemy_WizardSpider_4: -61743748
-      SPR_Enemy_WizardSpider_5: -109750490
-      SPR_Enemy_WizardSpider_6: -2084366571
+      SPR_Enemy_Wizard Spider_0: -227466460
+      SPR_Enemy_Wizard Spider_1: -526927245
+      SPR_Enemy_Wizard Spider_2: -473254096
+      SPR_Enemy_Wizard Spider_3: -733168771
+      SPR_Enemy_Wizard Spider_4: 2106843777
+      SPR_Enemy_Wizard Spider_5: -2002607934
+      SPR_Enemy_Wizard Spider_6: -1152299475
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

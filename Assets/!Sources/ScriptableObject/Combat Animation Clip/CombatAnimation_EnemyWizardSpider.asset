@@ -13,24 +13,24 @@ MonoBehaviour:
   m_Name: CombatAnimation_EnemyWizardSpider
   m_EditorClassIdentifier: 
   idleSprites:
-  - sprite: {fileID: -350667719, guid: c7c887f8dc8b7fc4795e7017ccaffe95, type: 3}
+  - sprite: {fileID: -227466460, guid: 06f2218061a904946a7f896b3fcd43eb, type: 3}
     duration: 0
   windupSprites:
-  - sprite: {fileID: -936023191, guid: c7c887f8dc8b7fc4795e7017ccaffe95, type: 3}
+  - sprite: {fileID: -526927245, guid: 06f2218061a904946a7f896b3fcd43eb, type: 3}
     duration: 0.2
-  - sprite: {fileID: 376349596, guid: c7c887f8dc8b7fc4795e7017ccaffe95, type: 3}
+  - sprite: {fileID: -473254096, guid: 06f2218061a904946a7f896b3fcd43eb, type: 3}
     duration: 0.2
-  - sprite: {fileID: -312669417, guid: c7c887f8dc8b7fc4795e7017ccaffe95, type: 3}
+  - sprite: {fileID: -733168771, guid: 06f2218061a904946a7f896b3fcd43eb, type: 3}
     duration: 0.15
-  - sprite: {fileID: -61743748, guid: c7c887f8dc8b7fc4795e7017ccaffe95, type: 3}
+  - sprite: {fileID: 2106843777, guid: 06f2218061a904946a7f896b3fcd43eb, type: 3}
     duration: 0.15
-  - sprite: {fileID: -312669417, guid: c7c887f8dc8b7fc4795e7017ccaffe95, type: 3}
+  - sprite: {fileID: -733168771, guid: 06f2218061a904946a7f896b3fcd43eb, type: 3}
     duration: 0.15
-  - sprite: {fileID: -61743748, guid: c7c887f8dc8b7fc4795e7017ccaffe95, type: 3}
+  - sprite: {fileID: 2106843777, guid: 06f2218061a904946a7f896b3fcd43eb, type: 3}
     duration: 0.15
   attackSprites:
-  - sprite: {fileID: -109750490, guid: c7c887f8dc8b7fc4795e7017ccaffe95, type: 3}
+  - sprite: {fileID: -2002607934, guid: 06f2218061a904946a7f896b3fcd43eb, type: 3}
     duration: 0.2
   recoverySprites:
-  - sprite: {fileID: -2084366571, guid: c7c887f8dc8b7fc4795e7017ccaffe95, type: 3}
+  - sprite: {fileID: -1152299475, guid: 06f2218061a904946a7f896b3fcd43eb, type: 3}
     duration: 0.2

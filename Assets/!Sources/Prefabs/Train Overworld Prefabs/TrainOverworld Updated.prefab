@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 3916417397513139688}
   - component: {fileID: 8691676583508352689}
   - component: {fileID: 2881910880133753551}
-  - component: {fileID: 3198998250507100638}
   - component: {fileID: 7307845020827095779}
   - component: {fileID: 7538922567300985469}
   m_Layer: 5
@@ -84,12 +83,12 @@ SpriteRenderer:
   m_SortingLayerID: 326082735
   m_SortingLayer: 2
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: b0e95f80aadf3234f93ae8c01f72aebc, type: 3}
+  m_Sprite: {fileID: 21300000, guid: da81a729a7d13524eae0656b07349d60, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.0625, y: 1}
+  m_Size: {x: 1.1875, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -109,6 +108,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 0
   lerpMovement: 1
+  restPointManager: {fileID: 0}
   lerpAmount: 0.1
   gridManager: {fileID: 5765065582379823760}
   dayCycleManager: {fileID: 0}
@@ -189,8 +189,8 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.0625, y: 1}
-    newSize: {x: 1.0625, y: 1}
+    oldSize: {x: 1.1875, y: 1}
+    newSize: {x: 1.1875, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -210,20 +210,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   eventTilemap: {fileID: 0}
---- !u!114 &3198998250507100638
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5765065582379823760}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 873e9968e904e8049b1b7c5fcfbb08b9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHP: 100
-  currentHP: 0
 --- !u!114 &7307845020827095779
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -248,6 +234,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0421f0ed4d7adf409d05061d5a60359, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  crystal: {fileID: 3198998250507100638}
   dayCycle: {fileID: 0}
   tilesPerHPLoss: 10

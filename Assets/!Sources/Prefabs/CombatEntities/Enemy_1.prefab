@@ -154,7 +154,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 9f8424a9c75928847b31058385395039, type: 3}
+  m_Sprite: {fileID: -227466460, guid: 06f2218061a904946a7f896b3fcd43eb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -669,7 +669,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 646ff2cf77a3e1544a795865e562a7f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entity: {fileID: 3515697015891253938}
   imageRenderer: {fileID: 4213233173429108572}
   animationClip: {fileID: 11400000, guid: e9c80bc114e1b69458a7b00e25d129bd, type: 2}
 --- !u!1 &7170102788963754161
