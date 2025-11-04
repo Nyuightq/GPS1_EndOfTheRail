@@ -37,13 +37,13 @@ public class WinLoseManager : MonoBehaviour
         yield return null; // Wait one frame for dynamic objects to spawn
         _initialized = true;
 
-        if (replayButtonWin != null)
-            replayButtonWin.onClick.AddListener(ReloadScene);
-        if (replayButtonLose != null)
-            replayButtonLose.onClick.AddListener(ReloadScene);
+        // if (replayButtonWin != null)
+        //     replayButtonWin.onClick.AddListener(ReloadScene);
+        // if (replayButtonLose != null)
+        //     replayButtonLose.onClick.AddListener(ReloadScene);
 
-        if (winPanel != null) winPanel.SetActive(false);
-        if (losePanel != null) losePanel.SetActive(false);
+        // if (winPanel != null) winPanel.SetActive(false);
+        // if (losePanel != null) losePanel.SetActive(false);
 
         // Try to auto-assign runtime-spawned references
         // if (trainMovement == null)
