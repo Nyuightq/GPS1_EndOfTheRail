@@ -167,9 +167,8 @@ public class RailGridScript : MonoBehaviour
         Dictionary<Vector3Int, RailData> new_RailDataMap = new Dictionary<Vector3Int, RailData>();
         new_RailDataMap = registerRails();
         // List<Vector3Int> linelist = railDataMap;
-        
+
         Vector3Int c_endPoint = findEndPoint(startPoint);
-        if (c_endPoint == startPoint) Debug.Log("Fuckyou");
 
         new_RailDataMap[startPoint].railType = RailData.railTypes.rest;
         new_RailDataMap[c_endPoint].railType = RailData.railTypes.start;
@@ -192,7 +191,7 @@ public class RailGridScript : MonoBehaviour
         foreach (Vector3Int direction in directions)
         {
             Vector3Int tile = startPoint + direction;
-            if (railAtPos(tile))
+            if (railAtPos(tile) && !railAtPosIsDisabled(tile))
             {
                 List<Vector3Int> lineList = railDataMap[tile].line.line;
                 Debug.Log("Last rail type: " + railDataMap[lineList[^1]].railType);
