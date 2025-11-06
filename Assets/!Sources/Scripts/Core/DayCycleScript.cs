@@ -25,8 +25,8 @@ public class DayCycleScript : MonoBehaviour
     [SerializeField] private GameObject nightPanel;
 
     [Header("Event Settings")]
-    [SerializeField] private Tilemap eventTilemap;          // ← Assign EventTilemap
-    [SerializeField] private EncounterTile encounterTileSO; // ← Assign EncounterTile ScriptableObject
+    [SerializeField] private Tilemap eventTilemap;          //Assign EventTilemap
+    [SerializeField] private EncounterTile encounterTileSO; //Assign EncounterTile ScriptableObject
     [SerializeField, Range(0f, 1f)] private float globalSpawnChance = 0.3f;
     public int GetDay() => day;
 
