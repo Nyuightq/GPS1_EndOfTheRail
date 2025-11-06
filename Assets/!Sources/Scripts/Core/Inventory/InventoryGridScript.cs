@@ -575,18 +575,18 @@ public class InventoryGridScript : MonoBehaviour
     private List<Vector2> GetExpendableCells()
     {
         List<Vector2> outerBounds = new List<Vector2>();
-        Vector2[] directions = { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
+        //Vector2[] directions = { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
 
         for (int x = 0; x < inventoryWidth; x++)
         {
             for (int y = 0; y < inventoryHeight; y++)
             {
-                foreach (Vector2 direction in directions)
+                foreach (Vector2 adjacentCell in GetAdjacentCell(new Vector2(x,y)))
                 {
                     if (inventoryGrid[x,y].active)
                     { 
-                        Vector2Int adjacentCell = Vector2Int.FloorToInt(new Vector2(x, y) + direction);
-                        if (!InGrid(adjacentCell) || inventoryGrid[adjacentCell.x, adjacentCell.y].active == false)
+                        //Vector2Int adjacentCell = Vector2Int.FloorToInt(new Vector2(x, y) + direction);
+                        if (!InGrid(adjacentCell) || inventoryGrid[(int)adjacentCell.x, (int)adjacentCell.y].active == false)
                         {
                             outerBounds.Add(adjacentCell);
                         }
@@ -595,6 +595,19 @@ public class InventoryGridScript : MonoBehaviour
             }
         }
         return outerBounds;
+    }
+
+
+    private List<Vector2> GetAdjacentCell(Vector2 gridPos)
+    {
+        List<Vector2> adjacentList = new List<Vector2>();
+        Vector2[] directions = { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
+
+        foreach(Vector2 direction in directions)
+        {
+            adjacentList.Add(gridPos + direction);
+        }
+        return adjacentList;
     }
 
     private void ClearUpgradePreview()
