@@ -71,11 +71,12 @@ public class CombatEntity : MonoBehaviour
 
     public virtual void TakeDamage(int dmg)
     {
-        _hp -= dmg;
-        Debug.Log(entityName + " takes " + dmg + " damage. HP: " + _hp);
-        OnTakeDamage?.Invoke(this, dmg);
+        int damageTaken = Math.Max(1, dmg - _defense);
+        _hp -= damageTaken;
+        Debug.Log(entityName + " takes " + damageTaken + " damage. HP: " + _hp);
+        OnTakeDamage?.Invoke(this, damageTaken);
         combatEntityUI?.UpdateHealthBar(_hp * 1.0f, _maxHp * 1.0f);
-        combatEntityUI?.ShowDamageText(dmg);
+        combatEntityUI?.ShowDamageText(damageTaken);
         if (IsDead == true && hasDied == false)
         {
             hasDied = true;

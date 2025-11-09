@@ -591,9 +591,9 @@ MonoBehaviour:
   cameraMovement: {fileID: 519420033}
   railGrid: {fileID: 0}
   gameplayCanvas: {fileID: 6892035427243502870}
-  holdTimeAtEnd: 2
-  moveDuration: 2
-  holdTimeAtStart: 1.5
+  holdTimeAtEnd: 0
+  moveDuration: 0
+  holdTimeAtStart: 0
   zoomedSize: 3.5
   zoomSpeed: 2
 --- !u!1 &689783406 stripped
@@ -782,7 +782,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 877e6bb0fe6113b44b09f11664cef806, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridManager: {fileID: 1745012626}
+  gridManager: {fileID: 689783406}
   defaultTile: {fileID: 11400000, guid: 29e7a9e41aea4b04995ff859ba91f1a7, type: 2}
   eventTilemap: {fileID: 1745012627}
   railPreview: {fileID: -756829269, guid: 18d91a242b0275946a0ab82bd4744fd7, type: 3}
@@ -955,11 +955,6 @@ GameObject:
 GameObject:
   m_CorrespondingSourceObject: {fileID: 9033457684471043684, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
   m_PrefabInstance: {fileID: 6892035427243502869}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &1745012626 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 247733543230019253, guid: e35c40bf68e01c14295b53f64dab5a19, type: 3}
-  m_PrefabInstance: {fileID: 729995366}
   m_PrefabAsset: {fileID: 0}
 --- !u!1839735485 &1745012627 stripped
 Tilemap:
@@ -1264,6 +1259,10 @@ PrefabInstance:
       propertyPath: crtEffect
       value: 
       objectReference: {fileID: 303467814}
+    - target: {fileID: 5040440218622767365, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -48
+      objectReference: {fileID: 0}
     - target: {fileID: 5585772667511067868, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -7.999878
@@ -1300,6 +1299,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 345226473, guid: 3b1e14aabc7a9d04da2a661a115e4072, type: 3}
+    - target: {fileID: 7162486196031514546, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7230495955123008709, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -1308,6 +1311,10 @@ PrefabInstance:
       propertyPath: playerStatus
       value: 
       objectReference: {fileID: 808508310}
+    - target: {fileID: 7959286852317353962, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 40
+      objectReference: {fileID: 0}
     - target: {fileID: 8234687122797773725, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_Type
       value: 0
@@ -1504,6 +1511,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 9070070225845602918, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 382762169}
+    - targetCorrespondingSourceObject: {fileID: 1149097582951933425, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      insertIndex: 3
+      addedObject: {fileID: 9038256463287646623}
   m_SourcePrefab: {fileID: 100100000, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
 --- !u!223 &6892035427243502870 stripped
 Canvas:
@@ -1714,6 +1724,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e6ae57f05704bb43bd026dcfe2e90dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!225 &9038256463287646623
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8592084312818648000}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

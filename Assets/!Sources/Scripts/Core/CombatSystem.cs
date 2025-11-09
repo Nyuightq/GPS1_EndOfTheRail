@@ -6,8 +6,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using System;
-
+using DG.Tweening;
+using Microsoft.Unity.VisualStudio.Editor;
 public class CombatSystem : MonoBehaviour
 {
     [SerializeField] private UI_CombatRewardPanel rewardPanelRef;
@@ -106,9 +108,25 @@ public class CombatSystem : MonoBehaviour
         death.OnAttackReady -= HandleAttack;
         death.OnDeath -= HandleDeath;
         ValidateEndCondition();
+        tooltip.Hide();
+
+        // Fetch death entity's UI_Component
+        UI_CombatEntityTooltipTrigger death_TooltipTrigger = death.GetComponent<UI_CombatEntityTooltipTrigger>();
+        UI_CombatEntity death_CombatUI = death.GetComponentInChildren<UI_CombatEntity>();
+        UnityEngine.UI.Image death_sprite = death.GetComponentInChildren<UnityEngine.UI.Image>();
+
+        death_TooltipTrigger.enabled = false;
+        death_CombatUI?.HideStatusBar();
 
         // Handle Visual effect logic for only that entity here
-        death.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        // The HandleDeath function also shared by disable entities when combat end and disable train combat UI
+        if (death.IsDead)
+        {
+            Sequence seq = DOTween.Sequence();
+
+            seq.Join(death.transform.DOScale(new Vector3(0.8f, 0.8f, 0.8f), 0.15f).SetEase(Ease.OutCubic));
+            seq.Join(death_sprite.DOFade(0.5f, 0.15f * 0.8f)); // fade in            
+        }
 
     }
 
@@ -132,7 +150,10 @@ public class CombatSystem : MonoBehaviour
             }
         }
 
-        if (allEnemiesDead) EndBattle(true); // Return player win
+        if (allEnemiesDead)
+        {
+            EndBattle(true);
+        } // Return player win
     }
 
     private void EndBattle(bool playerWon)

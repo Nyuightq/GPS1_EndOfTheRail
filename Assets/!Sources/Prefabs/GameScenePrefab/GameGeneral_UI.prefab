@@ -1402,6 +1402,7 @@ GameObject:
   - component: {fileID: 5513028327205827210}
   - component: {fileID: 8933856852491763290}
   - component: {fileID: 1953043638162979740}
+  - component: {fileID: 7218568245381743620}
   - component: {fileID: 8911030689567367474}
   m_Layer: 5
   m_Name: CombatPanel
@@ -1470,6 +1471,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &7218568245381743620
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1149097582951933425}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!114 &8911030689567367474
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1482,7 +1495,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e6ae57f05704bb43bd026dcfe2e90dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rewardPanelRef: {fileID: 0}
+  rewardPanelRef: {fileID: 2388850013978184368}
   player: {fileID: 0}
   components: []
   enemies: []
@@ -8396,9 +8409,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee6057e593a8c1d4ab37a16bfa9414f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dayProgressSlider: {fileID: 847031800443666983}
+  dayCycle: {fileID: 0}
   dayCounterText: {fileID: 447596770717549862}
-  currentDay: 0
 --- !u!1 &5182647114237312019
 GameObject:
   m_ObjectHideFlags: 0
@@ -10169,7 +10181,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.3882353}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

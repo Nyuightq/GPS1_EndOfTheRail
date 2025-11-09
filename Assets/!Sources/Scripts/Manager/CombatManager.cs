@@ -1,12 +1,17 @@
 using UnityEngine;
 using System.Collections.Generic;
+using DG.Tweening;
 
 public class CombatManager : MonoBehaviour
 {
     public static CombatManager Instance { get; private set; }
+    private static float slideDuration = 0.5f;
 
     [Header("Combat UI")]
     [SerializeField] private GameObject combatUIPanel;
+    private RectTransform _panelRect;
+    private Vector2 _panelOriginalPos;
+    private CanvasGroup _panelCanvasGroup;
 
     [Header("Player & Enemy Prefabs")]
     [SerializeField] private GameObject playerPrefab;
@@ -24,11 +29,11 @@ public class CombatManager : MonoBehaviour
     // Event for TrainFreezeController
     public static event System.Action OnCombatClosed;
 
-        public enum CombatType
-        {
-            Standard,
-            Encounter
-        }
+    public enum CombatType
+    {
+        Standard,
+        Encounter
+    }
 
 
     private void Awake()
@@ -41,7 +46,12 @@ public class CombatManager : MonoBehaviour
         Instance = this;
 
         if (combatUIPanel != null)
+        {
             combatUIPanel.SetActive(false);
+            _panelRect = combatUIPanel.GetComponent<RectTransform>();
+            _panelOriginalPos = _panelRect.anchoredPosition;
+            _panelCanvasGroup = combatUIPanel.GetComponent<CanvasGroup>();   
+        }
     }
 
     public void StartCombat(CombatType combatType = CombatType.Standard)
@@ -54,9 +64,9 @@ public class CombatManager : MonoBehaviour
 
         Debug.Log("Combat started against enemies!");
 
-        if (combatUIPanel != null)
-            combatUIPanel.SetActive(true);
-
+        // if (combatUIPanel != null)
+        //     combatUIPanel.SetActive(true);
+        ShowCombatUI();
         // ===========================
         // Instantiate combat entities
         // ===========================
@@ -116,7 +126,7 @@ public class CombatManager : MonoBehaviour
     {
         List<CombatEnemyEntity> enemies = new List<CombatEnemyEntity>();
         int enemyCount = Random.Range(2, 5);
-        Vector3[] enemySpawnPositions = GetEnemySpawnPositionsCircle(enemyCount, 24f);
+        Vector3[] enemySpawnPositions = GetEnemySpawnPositionsCircle(enemyCount, 36f);
 
         for (int i = 0; i < enemyCount; i++)
         {
@@ -128,7 +138,7 @@ public class CombatManager : MonoBehaviour
 
         return enemies;
     }
-    
+
     private Vector3[] GetComponentSpawnPositionsCircle(int count, float radius)
     {
         Vector3[] positions = new Vector3[count];
@@ -173,8 +183,9 @@ public class CombatManager : MonoBehaviour
     public void EndCombat(bool playerWon, int remainHp)
     {
         GameStateManager.Instance.playerStatus.UpdateCurrentHp(remainHp);
-        if (combatUIPanel != null)
-            combatUIPanel.SetActive(false);
+        // if (combatUIPanel != null)
+        //     combatUIPanel.SetActive(false);
+        HideCombatUI();
 
         combatSystem.onBattleEnd -= EndCombat;
         Debug.Log("Combat ended.");
@@ -193,4 +204,54 @@ public class CombatManager : MonoBehaviour
         }
     }
 
+    // =========================
+    // Combat Panel UI DoTween
+    // =========================
+    public void ShowCombatUI()
+    {
+        if (combatUIPanel == null || _panelRect == null)
+            return;
+
+        combatUIPanel.SetActive(true);
+        _panelRect.DOKill();
+        _panelCanvasGroup.DOKill();
+
+        // Start from off-screen (below)
+        _panelRect.anchoredPosition = new Vector2(_panelOriginalPos.x, _panelOriginalPos.y - 40f);
+        _panelCanvasGroup.alpha = 0f;
+
+        // Slide up smoothly to its original position
+         Sequence seq = DOTween.Sequence();
+
+        seq.Join(_panelRect
+            .DOAnchorPosY(_panelOriginalPos.y, slideDuration)
+            .SetEase(Ease.OutBack));
+
+        seq.Join(_panelCanvasGroup
+            .DOFade(1f, slideDuration * 0.4f)
+            .SetEase(Ease.OutQuad));
+    }
+
+    public void HideCombatUI()
+    {
+        if (combatUIPanel == null || _panelRect == null)
+            return;
+
+        _panelRect.DOKill();
+        _panelCanvasGroup.DOKill();
+
+        Sequence seq = DOTween.Sequence();
+
+        seq.Join(_panelRect
+            .DOAnchorPosY(_panelOriginalPos.y - 300f, slideDuration)
+            .SetEase(Ease.InBack));
+
+        seq.Join(_panelCanvasGroup
+            .DOFade(0f, slideDuration * 0.4f)
+            .SetEase(Ease.InQuad));
+        seq.OnComplete(() =>
+        {
+            combatUIPanel.SetActive(false);
+        });
+    }
 }

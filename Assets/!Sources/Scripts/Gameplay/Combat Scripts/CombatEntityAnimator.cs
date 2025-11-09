@@ -6,10 +6,19 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using DG.Tweening;
 
 [RequireComponent(typeof(CombatEntity))]
 public class CombatEntityAnimator : MonoBehaviour
 {
+    private enum AnimPhase
+    {
+        Idle,
+        Windup,
+        Attack,
+        Recovery
+    }
+
     [Header("References")]
     private CombatEntity _entity;
     [SerializeField] private Image imageRenderer;
@@ -17,9 +26,7 @@ public class CombatEntityAnimator : MonoBehaviour
     [Header("Animation Data")]
     public CombatAnimationClip animationClip;
 
-    // private float timer;
     private List<CombatAnimationClip.FrameData> currentFrames;
-    // private int currentIndex;
     private AnimPhase _phase = AnimPhase.Idle;
 
     private bool _attackTriggered = false;
@@ -33,12 +40,18 @@ public class CombatEntityAnimator : MonoBehaviour
 
         // 🔹 Subscribe to event that occur when attack interval bar already cast and return to 0.0 sec.
         _entity.OnAttackReady += TriggerAttackSequence;
+        _entity.OnTakeDamage += TriggerOnHit;
+        _entity.OnDeath += TriggerOnDeath;
     }
 
     private void OnDestroy()
     {
         if (_entity != null)
+        {
             _entity.OnAttackReady -= TriggerAttackSequence;
+            _entity.OnTakeDamage -= TriggerOnHit;
+            _entity.OnDeath -= TriggerOnDeath;
+        }
     }
 
     private void Update()
@@ -136,13 +149,42 @@ public class CombatEntityAnimator : MonoBehaviour
     }
 
     // --------------------------------------------------------------
-    // Enum
+    // (EXTRA) Onhit doTween animation
     // --------------------------------------------------------------
-    private enum AnimPhase
+    private void TriggerOnHit(CombatEntity e, int damageValue)
     {
-        Idle,
-        Windup,
-        Attack,
-        Recovery
+        imageRenderer.rectTransform.DOKill();
+        imageRenderer.DOKill();
+
+        imageRenderer.rectTransform.anchoredPosition = Vector2.zero;
+        imageRenderer.color = Color.white;
+
+        float speedMult = 1f / OnSpeedToggle.SpeedMultiplier;
+
+        Sequence hitSeq = DOTween.Sequence();
+
+        hitSeq.Join(
+            imageRenderer.rectTransform
+                .DOShakeAnchorPos(0.15f * speedMult, new Vector2(3f, 0f), 10, 90f, false, true)
+                .SetEase(Ease.OutQuint)
+        );
+
+        hitSeq.Join(
+            imageRenderer
+                .DOColor(Color.red, 0.1f * speedMult)
+                .SetLoops(2, LoopType.Yoyo)
+                .SetEase(Ease.Linear)
+        );
+
+        hitSeq.OnComplete(() =>
+        {
+            imageRenderer.rectTransform.anchoredPosition = Vector2.zero;
+        });
+    }
+
+    private void TriggerOnDeath(CombatEntity e)
+    {
+        SetPhase(AnimPhase.Idle, animationClip.idleSprites);
+        PlayFrame_TimeDriven(0f, animationClip.IdleDuration);
     }
 }

@@ -17,7 +17,11 @@ public class UI_CombatEntity : MonoBehaviour
     [SerializeField] private GameObject damageTextPrefab; // a TextMeshProUGUI prefab
     [SerializeField] private Transform damageTextParent;  // UI anchor (usually same Canvas)
 
-
+    public void HideStatusBar()
+    {
+        healthBar?.gameObject.SetActive(false);
+        attackIntervalBar?.gameObject.SetActive(false);
+    }
     
     public void UpdateHealthBar(float currentValue, float maxValue)
     {
