@@ -47,7 +47,8 @@ public class OnButtonClick : MonoBehaviour
 
     public void OnStartButton()
     {
-        PlaySFX(startClip);
+        SoundManager.Instance.PlaySFX("SFX_StartNewGame");
+        Debug.Log($"SFX_StartNewGame");
 
         StartCoroutine(WaitThenStart());
     }
@@ -65,7 +66,8 @@ public class OnButtonClick : MonoBehaviour
     {
         if (isSideSliderOpen && optionsClicked == true)
         {
-            PlaySFX(optionsOutClip);
+            SoundManager.Instance.PlaySFX("SFX_ButtonOnClick_2");
+            Debug.Log($"SFX_ButtonOnClick_2");
             
             sideSliderAnimator.Play("CloseSideSliderAnim", 0, 0f);
 
@@ -80,7 +82,8 @@ public class OnButtonClick : MonoBehaviour
 
         if (!isSideSliderOpen)
         {
-            PlaySFX(optionsInClip);
+            SoundManager.Instance.PlaySFX("SFX_PanelSlideIn");
+            Debug.Log($"SFX_PanelSlideIn");
             
             sideSliderAnimator.Play("SideSliderAnim", 0, 0f);
 
@@ -119,7 +122,8 @@ public class OnButtonClick : MonoBehaviour
         {
             sideSliderAnimator.Play("CloseSideSliderAnim", 0, 0f);
 
-            PlaySFX(creditsOutClip);
+            SoundManager.Instance.PlaySFX("SFX_PanelSlideOut_2");
+            Debug.Log($"SFX_PanelSlideOut_2");
 
             creditsClicked = false;
             isSideSliderOpen = false;
@@ -132,7 +136,8 @@ public class OnButtonClick : MonoBehaviour
 
         if (!isSideSliderOpen)
         {
-            PlaySFX(creditsInClip);
+            SoundManager.Instance.PlaySFX("SFX_PanelSlideIn");
+            Debug.Log($"SFX_PanelSlideIn");
             
             sideSliderAnimator.Play("SideSliderAnim", 0, 0f);
 
@@ -167,7 +172,8 @@ public class OnButtonClick : MonoBehaviour
 
     public void OnExitButton()
     {
-        PlaySFX(exitClip);
+        SoundManager.Instance.PlaySFX("SFX_Exit_2");
+        Debug.Log($"SFX_Exit_2");
 
         StartCoroutine(WaitThenExit());
     }

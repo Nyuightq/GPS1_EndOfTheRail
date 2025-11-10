@@ -44,6 +44,7 @@ public class BiomeSwampTile : EventTile
             {
                 Debug.Log("BiomeSwampTile entered at NIGHT — no movement bonus applied.");
             }
+            SoundManager.Instance.PlaySFX("SFX_TrainMovement_Swamp");
         }
 
         // Train speed still reduced (visual slow-down but faster tile progress)

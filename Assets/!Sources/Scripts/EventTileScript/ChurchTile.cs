@@ -31,6 +31,9 @@ public class ChurchTile : EventTile
 
         Debug.Log("Player entered Church Tile");
 
+        SoundManager.Instance.PlaySFX("SFX_EventWindowPopup");
+        Debug.Log("SFX_EventWindowPopup");
+
         // Find and cache EventTilemap
         if (eventTilemap == null)
         {
@@ -61,6 +64,9 @@ public class ChurchTile : EventTile
 
     public override void OnPlayerExit(GameObject player)
     {
+        SoundManager.Instance.PlaySFX("SFX_ButtonOnCancel");
+        Debug.Log("SFX_ButtonOnCancel");
+
         Debug.Log("Player exited Church Tile");
     }
 }

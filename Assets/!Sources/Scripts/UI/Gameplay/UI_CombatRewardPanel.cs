@@ -17,7 +17,9 @@ public class UI_CombatRewardPanel : MonoBehaviour
 
     private void OnEnable()
     {
-
+        // Pending
+        //SoundManager.Instance.PlaySFX("");
+        //Debug.Log($""); 
     }
 
     private void OnDisable()

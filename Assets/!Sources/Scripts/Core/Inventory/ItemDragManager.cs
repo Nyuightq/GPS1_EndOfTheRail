@@ -130,47 +130,60 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
     }
     #endregion
 
-    public void AttachToInventory()
+public void AttachToInventory()
+{
+    if (itemScript.state == Item.itemState.unequipped)
     {
-        if (itemScript.state == Item.itemState.unequipped)
+        foreach (GameObject shapeCell in itemScript.shape)
         {
-            foreach (GameObject shapeCell in itemScript.shape)
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(inventoryGridScript.inventoryRect, shapeCell.transform.position, null, out Vector2 localPos);
+
+            Vector2 cellPos = inventoryGridScript.GetCellAtPos(localPos);
+            InvCellData localGridCellPos = inventoryGridScript.inventoryGrid[(int)cellPos.x, (int)cellPos.y];
+
+            if (inventoryGridScript.InGrid(cellPos) && localGridCellPos.item == null && localGridCellPos.active)
             {
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(inventoryGridScript.inventoryRect, shapeCell.transform.position, null, out Vector2 localPos);
-
-                Vector2 cellPos = inventoryGridScript.GetCellAtPos(localPos);
-                InvCellData localGridCellPos = inventoryGridScript.inventoryGrid[(int)cellPos.x, (int)cellPos.y];
-
-                if (inventoryGridScript.InGrid(cellPos) && localGridCellPos.item == null && localGridCellPos.active)
-                {
-                    //Debug.Log(cellPos);
-                }
-                else
-                {
-                    return;
-                }
-
+                //Debug.Log(cellPos);
             }
-            Debug.Log("Item Attached!!!");
-
-            int itemWidth = itemScript.itemShape.GetLength(0);
-            int itemHeight = itemScript.itemShape.GetLength(1);
-
-            Vector2 screenTopLeft = RectTransformUtility.WorldToScreenPoint(null, rectTransform.TransformPoint(new Vector2(-itemWidth * 16 / 2f, itemHeight * 16 / 2f) + new Vector2(8f, -8f)));
-
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(inventoryGridScript.inventoryRect, screenTopLeft, null, out Vector2 topLeftCell);
-            topLeftCellPos = inventoryGridScript.GetCellAtPos(topLeftCell);
-
-            Vector2 itemCellPos = new Vector2(topLeftCellPos.x + itemWidth / 2f - 0.5f, topLeftCellPos.y + itemHeight / 2f - 0.5f);
-            Vector2 actualItemCellPos = inventoryGridScript.GetLocalPosGrid(itemCellPos);
-
-            Debug.Log(topLeftCell);
-            Debug.Log(topLeftCellPos);
-
-            inventoryGridScript.MarkCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, gameObject);
-
-            rectTransform.anchoredPosition = actualItemCellPos;
-            itemScript.state = Item.itemState.equipped;
+            else
+            {
+                return;
+            }
         }
+        
+        Debug.Log("Item Attached!!!");
+
+        int itemWidth = itemScript.itemShape.GetLength(0);
+        int itemHeight = itemScript.itemShape.GetLength(1);
+
+        Vector2 screenTopLeft = RectTransformUtility.WorldToScreenPoint(null, rectTransform.TransformPoint(new Vector2(-itemWidth * 16 / 2f, itemHeight * 16 / 2f) + new Vector2(8f, -8f)));
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(inventoryGridScript.inventoryRect, screenTopLeft, null, out Vector2 topLeftCell);
+        topLeftCellPos = inventoryGridScript.GetCellAtPos(topLeftCell);
+
+        Vector2 itemCellPos = new Vector2(topLeftCellPos.x + itemWidth / 2f - 0.5f, topLeftCellPos.y + itemHeight / 2f - 0.5f);
+        Vector2 actualItemCellPos = inventoryGridScript.GetLocalPosGrid(itemCellPos);
+
+        Debug.Log(topLeftCell);
+        Debug.Log(topLeftCellPos);
+
+        // ADD THIS: Change parent to inventory BEFORE marking cells
+        if (rectTransform.parent != inventoryGridScript.inventoryRect)
+        {
+            // Store world position
+            Vector3 worldPos = rectTransform.position;
+            
+            // Change parent
+            rectTransform.SetParent(inventoryGridScript.inventoryRect);
+            
+            // Restore world position temporarily
+            rectTransform.position = worldPos;
+        }
+
+        inventoryGridScript.MarkCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, gameObject);
+
+        rectTransform.anchoredPosition = actualItemCellPos;
+        itemScript.state = Item.itemState.equipped;
     }
+}
 }

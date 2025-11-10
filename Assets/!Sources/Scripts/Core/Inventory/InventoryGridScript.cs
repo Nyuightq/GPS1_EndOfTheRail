@@ -603,4 +603,13 @@ public class InventoryGridScript : MonoBehaviour
         previewCells.Clear();
     }
     #endregion
+
+    /// <summary>
+    /// Public getter for item spawn prefab
+    /// Used by reward system to spawn items
+    /// </summary>
+    public GameObject ItemSpawnPrefab 
+    { 
+        get { return itemSpawn; } 
+    }
 }

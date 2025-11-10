@@ -5,21 +5,22 @@ using UnityEngine;
 public class TrainMovement : MonoBehaviour
 {
     [Header("regular movement")]
-    [SerializeField] private float moveSpeed = 3.0f; //it was 2.0f
+    [SerializeField] private float moveSpeed = 3.0f;
     [Header("lerp movement option")]
     [SerializeField] private bool lerpMovement = false;
     public RestPointManager restPointManager;
-    [SerializeField] private float lerpAmount = 4.0f; //it was 0.1f
+    [SerializeField] private float lerpAmount = 4.0f;
 
     public GameObject gridManager;
     public GameObject dayCycleManager;
 
     private RailGridScript gridScript;
     private DayCycleScript dayCycleScript;
+    private TrainAnimationController animController; // NEW: Animation controller
 
     private TileBase previousBiomeTile = null;
     private Tilemap biomeTilemap;
-    private Tilemap eventTilemap; // NEW: Cache the event tilemap
+    private Tilemap eventTilemap;
 
     private bool moving = false;
     private Vector2 direction;
@@ -31,7 +32,6 @@ public class TrainMovement : MonoBehaviour
     private bool speedModified = false;
     private bool lerpTemporarilyDisabled = false;
 
-    // NEW: Track if we've already triggered event tile for current position
     private Vector3Int? lastEventTilePos = null;
     private bool wasOnRestPoint = false;
 
@@ -45,6 +45,13 @@ public class TrainMovement : MonoBehaviour
         else
             Debug.Log("Found RestPointManager: " + restPointManager.name);
 
+        // NEW: Get animation controller
+        animController = GetComponent<TrainAnimationController>();
+        if (animController == null)
+        {
+            Debug.LogWarning("TrainAnimationController not found! Adding component...");
+            animController = gameObject.AddComponent<TrainAnimationController>();
+        }
     }
 
     public void ApplySpeedModifier(float reduction)
@@ -94,7 +101,6 @@ public class TrainMovement : MonoBehaviour
         dayCycleScript = dayCycleManager.GetComponent<DayCycleScript>();
         biomeTilemap = gridManager.GetComponentInChildren<Tilemap>();
         
-        // NEW: Find EventTilemap specifically
         GameObject eventTilemapObj = GameObject.Find("EventTilemap");
         if (eventTilemapObj != null)
         {
@@ -108,6 +114,13 @@ public class TrainMovement : MonoBehaviour
         
         tilePos = Vector3Int.FloorToInt(transform.position);
         transform.position = gridScript.snapToGrid(transform.position);
+
+        // NEW: Initialize animation direction
+        if (animController != null && gridScript.railAtPos(tilePos))
+        {
+            RailData currentRail = gridScript.railDataMap[tilePos];
+            animController.UpdateDirection(currentRail.directionOut);
+        }
     }
 
     private Vector3Int Vec2ToInt(Vector2 v)
@@ -117,17 +130,16 @@ public class TrainMovement : MonoBehaviour
 
     void Update()
     {
-
+        if (restPointManager == null)
+        {
+            restPointManager = FindFirstObjectByType<RestPointManager>();
             if (restPointManager == null)
             {
-                restPointManager = FindFirstObjectByType<RestPointManager>();
-                if (restPointManager == null)
-                {
-                    Debug.LogError("RestPointManager is NULL! Please assign it in the inspector.");
-                    return;
-                }
+                Debug.LogError("RestPointManager is NULL! Please assign it in the inspector.");
+                return;
             }
-        // Stop all updates when the game is paused
+        }
+
         if (Mathf.Approximately(Time.timeScale, 0f) && moving)
         {
             return;
@@ -155,6 +167,12 @@ public class TrainMovement : MonoBehaviour
                     targetTile = tilePos + Vec2ToInt(chosenDir);
                     prevRail = currentRail;
                     moving = true;
+
+                    // NEW: Update animation direction when starting to move
+                    if (animController != null)
+                    {
+                        animController.UpdateDirection(chosenDir);
+                    }
                 }
             }
         }
@@ -166,8 +184,6 @@ public class TrainMovement : MonoBehaviour
 
                 if (lerpMovement)
                 {
-                    //transform.position = Vector3.Lerp(transform.position, targetTilePos, lerpAmount);
-                    //transform.position = Vector3.Lerp(transform.position, targetTilePos, lerpAmount * OnSpeedToggle.SpeedMultiplier);
                     transform.position = Vector3.Lerp(transform.position, targetTilePos, lerpAmount * Time.deltaTime * 50f * OnSpeedToggle.SpeedMultiplier);
 
                     float x = Util.Approach(transform.position.x, targetTilePos.x, 0.001f);
@@ -176,8 +192,6 @@ public class TrainMovement : MonoBehaviour
                 }
                 else
                 {
-                    //float x = Util.Approach(transform.position.x, targetTilePos.x, moveSpeed * Time.deltaTime);
-                    //float y = Util.Approach(transform.position.y, targetTilePos.y, moveSpeed * Time.deltaTime);
                     float x = Util.Approach(transform.position.x, targetTilePos.x, moveSpeed * Time.deltaTime * OnSpeedToggle.SpeedMultiplier);
                     float y = Util.Approach(transform.position.y, targetTilePos.y, moveSpeed * Time.deltaTime * OnSpeedToggle.SpeedMultiplier);
 
@@ -189,6 +203,8 @@ public class TrainMovement : MonoBehaviour
             {
                 if (moving)
                 {
+                    SoundManager.Instance.PlaySFX("SFX_TrainMovement");
+                    
                     dayCycleScript.addTilesMoved(1);
 
                     CrystalDeteriorates deteriorator = GetComponent<CrystalDeteriorates>();
@@ -201,7 +217,6 @@ public class TrainMovement : MonoBehaviour
                 transform.position = gridScript.snapToGrid(targetTile);
                 tilePos = Vector3Int.FloorToInt(gridManager.GetComponent<Grid>().WorldToCell(targetTile));
 
-                // NEW: Check for event tile at CURRENT position (we just arrived)
                 if (eventTilemap != null)
                 {
                     TileBase eventTile = eventTilemap.GetTile(tilePos);
@@ -210,17 +225,13 @@ public class TrainMovement : MonoBehaviour
                         if (!lastEventTilePos.HasValue || lastEventTilePos.Value != tilePos)
                         {
                             lastEventTilePos = tilePos;
-                            
-                            // Force snap to exact center before triggering event
                             transform.position = eventTilemap.GetCellCenterWorld(tilePos);
-                            
                             Debug.Log($"Train arrived at event tile {tilePos} - stopping in middle");
                             eTile.OnPlayerEnter(gameObject);
                         }
                     }
                 }
 
-                // Check for biome tile enter/exit
                 if (biomeTilemap != null)
                 {
                     TileBase currentBiomeTile = biomeTilemap.GetTile(tilePos);
@@ -243,10 +254,8 @@ public class TrainMovement : MonoBehaviour
                     }
                 }
 
-                // Check if collided to Rest point
                 moving = false;
 
-                // Check if we LEFT a rest point (we were on one, now we're not)
                 bool isCurrentlyOnRestPoint = gridScript.IsRestTile(tilePos);
 
                 if (wasOnRestPoint && !isCurrentlyOnRestPoint && restPointManager != null)
@@ -257,11 +266,10 @@ public class TrainMovement : MonoBehaviour
 
                 wasOnRestPoint = isCurrentlyOnRestPoint;
 
-                // Check if collided to Rest point
                 if (gridScript.IsRestTile(tilePos))
                 {
                     Debug.Log("Reached Rest Point - Entering Plan Phase");
-                    
+
                     if (restPointManager == null)
                     {
                         Debug.LogError("RestPointManager is NULL! Please assign it in the inspector.");
@@ -271,17 +279,15 @@ public class TrainMovement : MonoBehaviour
                         Debug.Log("Calling restPointManager.OnRestPointEntered()");
                         restPointManager.OnRestPointEntered(this);
                     }
-                    
+
                     GameStateManager.SetPhase(Phase.Plan);
                     gridScript.refreshRoute();
                     enabled = false;
                 }
-
             }
         }
     }
 
-    // NEW: Check if there's an event tile at a specific position
     private bool HasEventTileAtPosition(Vector3Int position)
     {
         if (eventTilemap != null)
