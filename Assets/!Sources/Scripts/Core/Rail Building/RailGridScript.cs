@@ -134,7 +134,7 @@ public class RailGridScript : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && validatePath(startPoint))
+        if (Input.GetKeyDown(KeyCode.Space) && validatePath(startPoint) && GameStateManager.CurrentPhase != Phase.Travel)
         {
             if (_trainRef == null) // Initial first train
             {
