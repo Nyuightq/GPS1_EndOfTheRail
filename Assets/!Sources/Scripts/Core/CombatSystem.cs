@@ -155,18 +155,29 @@ public class CombatSystem : UI_BaseEventPanel
         } // Return player win
     }
 
+    private int TotalScrapsFromEnemies()
+    {
+        int total = 0;
+        foreach (CombatEnemyEntity enemy in enemies)
+        {
+            total += enemy.RewardScrapsCount;
+        }
+        return total;
+    }
+
     private void EndBattle(bool playerWon)
     {
         Debug.Log("[CombatManager] Battle End. PlayerWon: " + playerWon);
         isBattling = false;
         int remainHp = player.CurrentHp;
+        int rewardAmount = TotalScrapsFromEnemies();
 
         if (playerWon)
         {
-            GiveReward(100, () =>
+            GiveReward(rewardAmount, () =>
             {
                 PlayerStatusManager playerStatus = GameStateManager.Instance.playerStatus;
-                playerStatus.RewardScraps(100);
+                playerStatus.RewardScraps(rewardAmount);
 
                 CleanupBattle(remainHp, playerWon);
             });

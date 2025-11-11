@@ -45,26 +45,35 @@ public class EnemyProgressionData : ScriptableObject
         return entityName;
     }
     
-    public CombatData GetCombatStats(int dayNumber)
+    public int GetRandomScrapsReward(int dayAmount)
     {
-        if (data.Count == 0) return null;
+        if (data.Count != 0) return GetDayData(dayAmount).GetRandomScrapsReward;
+        return 0;
+    }
 
-        // Sort days ascending
+    public CombatData GetCombatStats(int dayAmount)
+    {
+        if (data.Count != 0) return GetDayData(dayAmount).CombatStats;
+        return null; // fallback (shouldn't reach here)
+    }
+    
+    private EnemyEncounterDayData GetDayData(int dayNumber)
+    {
+                // Sort days ascending
         data.Sort((a, b) => a.dayNumber.CompareTo(b.dayNumber));
 
         // If dayNumber is smaller than smallest day, pick first
-        if (dayNumber <= data[0].dayNumber) return data[0].CombatStats;
+        if (dayNumber <= data[0].dayNumber) return data[0];
 
         // If dayNumber is larger than largest day, pick last
-        if (dayNumber >= data[data.Count - 1].dayNumber) return data[data.Count - 1].CombatStats;
+        if (dayNumber >= data[data.Count - 1].dayNumber) return data[data.Count - 1];
 
         // Otherwise, find the largest day <= dayNumber
         for (int i = data.Count - 1; i >= 0; i--)
         {
             if (data[i].dayNumber <= dayNumber)
-                return data[i].CombatStats;
+                return data[i];
         }
-
-        return null; // fallback (shouldn't reach here)
+        return null;
     }
 }

@@ -23,7 +23,7 @@ public class CombatEnemyEntity : CombatEntity
         entityName = _enemyProgressionData.GetName();
         CombatData data = _enemyProgressionData.GetCombatStats(dayAmount);
 
-        _rewardScrapsCount = _enemyProgressionData.GetRandomScraps(dayAmount);
+        _rewardScrapsCount = _enemyProgressionData.GetRandomScrapsReward(dayAmount);
 
         _maxHp = data.maxHp;
         _hp = data.maxHp;
