@@ -39,10 +39,12 @@ public class CombatEntity : MonoBehaviour
     public int MaxHp => _maxHp;
     public int AttackDamage => _attackDamage;
     public int AttackSpeed => _attackSpeed;
+    public int AttackDamageVariance => _attackDamageVariance;
     public int Evasion => _evasion;
     public int Defense => _defense;
     public float RemainingAttackTimer => _attackTimer;
     public float AttackTakenTime => _attackTakenTime;
+    public bool IsComponent => _isComponent;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     protected virtual void Start()

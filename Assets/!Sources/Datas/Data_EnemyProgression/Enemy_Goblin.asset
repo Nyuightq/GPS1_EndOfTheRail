@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1ce05fca39194245b2eb9f18071f128, type: 3}
+  m_Name: Enemy_Goblin
+  m_EditorClassIdentifier: 
+  entityName: Treeman
+  data:
+  - dayNumber: 1
+    combatStats:
+      maxHp: 12
+      attackDamage: 1
+      attackSpeed: 2
+      attackVariance: 2
+      defense: 0
+  - dayNumber: 2
+    combatStats:
+      maxHp: 14
+      attackDamage: 1
+      attackSpeed: 2
+      attackVariance: 3
+      defense: 0
+  - dayNumber: 3
+    combatStats:
+      maxHp: 18
+      attackDamage: 2
+      attackSpeed: 2
+      attackVariance: 3
+      defense: 0
+  - dayNumber: 4
+    combatStats:
+      maxHp: 18
+      attackDamage: 2
+      attackSpeed: 3
+      attackVariance: 3
+      defense: 0
+  - dayNumber: 5
+    combatStats:
+      maxHp: 20
+      attackDamage: 2
+      attackSpeed: 3
+      attackVariance: 4
+      defense: 0

@@ -165,7 +165,7 @@ public class CombatEntityAnimator : MonoBehaviour
 
         hitSeq.Join(
             imageRenderer.rectTransform
-                .DOShakeAnchorPos(0.15f * speedMult, new Vector2(3f, 0f), 10, 90f, false, true)
+                .DOShakeAnchorPos(0.15f * speedMult, new Vector2(4f, 0f), 10, 90f, false, true)
                 .SetEase(Ease.OutQuint)
         );
 
@@ -179,11 +179,13 @@ public class CombatEntityAnimator : MonoBehaviour
         hitSeq.OnComplete(() =>
         {
             imageRenderer.rectTransform.anchoredPosition = Vector2.zero;
+            imageRenderer.color = Color.white;
         });
     }
 
     private void TriggerOnDeath(CombatEntity e)
     {
+        if (animationClip == null) return;
         SetPhase(AnimPhase.Idle, animationClip.idleSprites);
         PlayFrame_TimeDriven(0f, animationClip.IdleDuration);
     }

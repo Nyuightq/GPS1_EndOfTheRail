@@ -5,24 +5,16 @@ using DG.Tweening;
 public class CombatManager : MonoBehaviour
 {
     public static CombatManager Instance { get; private set; }
-    private static float slideDuration = 0.5f;
-
-    [Header("Combat UI")]
-    [SerializeField] private GameObject combatUIPanel;
-    private RectTransform _panelRect;
-    private Vector2 _panelOriginalPos;
-    private CanvasGroup _panelCanvasGroup;
-
     [Header("Player & Enemy Prefabs")]
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private List<GameObject> enemyPrefabs;
     [SerializeField] private GameObject defaultComponentPrefab;
     [SerializeField] private Transform playerSpawnPoint;
     [SerializeField] private Transform enemySpawnParent;
-
     [Header("System")]
     [SerializeField] private CombatSystem combatSystem;
-
+    [SerializeField] private EnemyNumberEncounterData encounterQuantityData;
+    [SerializeField] private DayCycleScript dayCycleSystem;
     [Header("Combat Stats")]
     public int totalCombatsFaced = 0;
     public int totalEncountersFaced = 0;
@@ -44,14 +36,6 @@ public class CombatManager : MonoBehaviour
             return;
         }
         Instance = this;
-
-        if (combatUIPanel != null)
-        {
-            combatUIPanel.SetActive(false);
-            _panelRect = combatUIPanel.GetComponent<RectTransform>();
-            _panelOriginalPos = _panelRect.anchoredPosition;
-            _panelCanvasGroup = combatUIPanel.GetComponent<CanvasGroup>();   
-        }
     }
 
     public void StartCombat(CombatType combatType = CombatType.Standard)
@@ -62,11 +46,10 @@ public class CombatManager : MonoBehaviour
         else
             totalEncountersFaced++;
 
-        Debug.Log("Combat started against enemies!");
 
         // if (combatUIPanel != null)
         //     combatUIPanel.SetActive(true);
-        ShowCombatUI();
+        combatSystem.ShowEventPanel();
         // ===========================
         // Instantiate combat entities
         // ===========================
@@ -125,7 +108,8 @@ public class CombatManager : MonoBehaviour
     private List<CombatEnemyEntity> GenerateEnemies()
     {
         List<CombatEnemyEntity> enemies = new List<CombatEnemyEntity>();
-        int enemyCount = Random.Range(2, 5);
+        int dayAmount = dayCycleSystem.GetDay();
+        int enemyCount = encounterQuantityData.GetRandomEnemyCount(dayAmount);
         Vector3[] enemySpawnPositions = GetEnemySpawnPositionsCircle(enemyCount, 36f);
 
         for (int i = 0; i < enemyCount; i++)
@@ -133,6 +117,7 @@ public class CombatManager : MonoBehaviour
             GameObject enemyObj = Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Count)], enemySpawnParent);
             enemyObj.transform.localPosition = enemySpawnPositions[i];
             CombatEnemyEntity enemyEntity = enemyObj.GetComponent<CombatEnemyEntity>();
+            enemyEntity.InitializeCombatData(dayAmount);
             enemies.Add(enemyEntity);
         }
 
@@ -183,12 +168,8 @@ public class CombatManager : MonoBehaviour
     public void EndCombat(bool playerWon, int remainHp)
     {
         GameStateManager.Instance.playerStatus.UpdateCurrentHp(remainHp);
-        // if (combatUIPanel != null)
-        //     combatUIPanel.SetActive(false);
-        HideCombatUI();
-
+        combatSystem.HideEventPanel();
         combatSystem.onBattleEnd -= EndCombat;
-        Debug.Log("Combat ended.");
 
         // Notify TrainFreezeController to resume movement
         OnCombatClosed?.Invoke();
@@ -202,56 +183,5 @@ public class CombatManager : MonoBehaviour
             Instance = null; // OK because this is inside CombatManager
             Debug.Log("[CombatManager] Instance destroyed for replay.");
         }
-    }
-
-    // =========================
-    // Combat Panel UI DoTween
-    // =========================
-    public void ShowCombatUI()
-    {
-        if (combatUIPanel == null || _panelRect == null)
-            return;
-
-        combatUIPanel.SetActive(true);
-        _panelRect.DOKill();
-        _panelCanvasGroup.DOKill();
-
-        // Start from off-screen (below)
-        _panelRect.anchoredPosition = new Vector2(_panelOriginalPos.x, _panelOriginalPos.y - 40f);
-        _panelCanvasGroup.alpha = 0f;
-
-        // Slide up smoothly to its original position
-         Sequence seq = DOTween.Sequence();
-
-        seq.Join(_panelRect
-            .DOAnchorPosY(_panelOriginalPos.y, slideDuration)
-            .SetEase(Ease.OutBack));
-
-        seq.Join(_panelCanvasGroup
-            .DOFade(1f, slideDuration * 0.4f)
-            .SetEase(Ease.OutQuad));
-    }
-
-    public void HideCombatUI()
-    {
-        if (combatUIPanel == null || _panelRect == null)
-            return;
-
-        _panelRect.DOKill();
-        _panelCanvasGroup.DOKill();
-
-        Sequence seq = DOTween.Sequence();
-
-        seq.Join(_panelRect
-            .DOAnchorPosY(_panelOriginalPos.y - 300f, slideDuration)
-            .SetEase(Ease.InBack));
-
-        seq.Join(_panelCanvasGroup
-            .DOFade(0f, slideDuration * 0.4f)
-            .SetEase(Ease.InQuad));
-        seq.OnComplete(() =>
-        {
-            combatUIPanel.SetActive(false);
-        });
     }
 }

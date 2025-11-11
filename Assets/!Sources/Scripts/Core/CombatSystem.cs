@@ -10,7 +10,7 @@ using UnityEngine.UI;
 using System;
 using DG.Tweening;
 using Microsoft.Unity.VisualStudio.Editor;
-public class CombatSystem : MonoBehaviour
+public class CombatSystem : UI_BaseEventPanel
 {
     [SerializeField] private UI_CombatRewardPanel rewardPanelRef;
     public CombatPlayerEntity player;
@@ -108,7 +108,6 @@ public class CombatSystem : MonoBehaviour
         death.OnAttackReady -= HandleAttack;
         death.OnDeath -= HandleDeath;
         ValidateEndCondition();
-        tooltip.Hide();
 
         // Fetch death entity's UI_Component
         UI_CombatEntityTooltipTrigger death_TooltipTrigger = death.GetComponent<UI_CombatEntityTooltipTrigger>();

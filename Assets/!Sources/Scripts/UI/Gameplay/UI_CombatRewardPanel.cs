@@ -8,29 +8,19 @@ using UnityEngine.UI;
 using System;
 using TMPro;
 
-public class UI_CombatRewardPanel : MonoBehaviour
+public class UI_CombatRewardPanel : UI_BaseEventPanel
 {
     [SerializeField] private TextMeshProUGUI rewardText;
     [SerializeField] private Button nextButton;
 
     private Action onRewardComplete;
 
-    private void OnEnable()
-    {
-
-    }
-
-    private void OnDisable()
-    {
-
-    }
-    
     public void Setup(int amount, Action onComplete)
     {
         onRewardComplete = onComplete;
         rewardText.text = "+ " + amount.ToString() + " scraps!";
 
-        gameObject.SetActive(true);
+        ShowEventPanel();
 
         nextButton.onClick.RemoveAllListeners();
         nextButton.onClick.AddListener(OnNextButtonClicked);
@@ -38,7 +28,8 @@ public class UI_CombatRewardPanel : MonoBehaviour
 
     private void OnNextButtonClicked()
     {
-        gameObject.SetActive(false);
+        HideEventPanel();
+        nextButton.onClick.RemoveAllListeners();
         onRewardComplete?.Invoke();
     }
 }

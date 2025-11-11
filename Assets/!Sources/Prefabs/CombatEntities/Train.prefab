@@ -232,6 +232,7 @@ GameObject:
   - component: {fileID: 399736260875646813}
   - component: {fileID: 8169654616164514103}
   - component: {fileID: 1457619186781366947}
+  - component: {fileID: 5653991685156574577}
   m_Layer: 0
   m_Name: Train
   m_TagString: Untagged
@@ -276,10 +277,10 @@ MonoBehaviour:
   _maxHp: 100
   _hp: 0
   _evasion: 0
-  _defense: 2
-  _attackSpeed: 6
-  _attackDamage: 4
-  _attackDamageVariance: 2
+  _defense: 0
+  _attackSpeed: 0
+  _attackDamage: 0
+  _attackDamageVariance: 0
 --- !u!114 &1457619186781366947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -292,6 +293,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fda8bf5629d71b2428f8b48e74536fc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5653991685156574577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5098948779927698787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 646ff2cf77a3e1544a795865e562a7f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  imageRenderer: {fileID: 7322395899977969950}
+  animationClip: {fileID: 0}
 --- !u!1 &5250462847497589265
 GameObject:
   m_ObjectHideFlags: 0

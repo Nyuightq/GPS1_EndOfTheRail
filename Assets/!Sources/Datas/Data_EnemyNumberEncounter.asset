@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ff7f737e9252be40b82f8a0d8f54a3d, type: 3}
+  m_Name: Data_EnemyNumberEncounter
+  m_EditorClassIdentifier: 
+  data:
+  - dayNumber: 1
+    encounterWeights:
+    - enemyCount: 1
+      weight: 5
+    - enemyCount: 2
+      weight: 4
+    - enemyCount: 3
+      weight: 1
+  - dayNumber: 2
+    encounterWeights:
+    - enemyCount: 1
+      weight: 3
+    - enemyCount: 2
+      weight: 6
+    - enemyCount: 3
+      weight: 1
+  - dayNumber: 3
+    encounterWeights:
+    - enemyCount: 1
+      weight: 2
+    - enemyCount: 2
+      weight: 4
+    - enemyCount: 3
+      weight: 4
+  - dayNumber: 4
+    encounterWeights:
+    - enemyCount: 1
+      weight: 1
+    - enemyCount: 2
+      weight: 4
+    - enemyCount: 3
+      weight: 4
+    - enemyCount: 4
+      weight: 1

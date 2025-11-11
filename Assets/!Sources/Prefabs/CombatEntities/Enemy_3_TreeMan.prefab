@@ -645,6 +645,7 @@ MonoBehaviour:
   _attackSpeed: 1
   _attackDamage: 1
   _attackDamageVariance: 1
+  _enemyProgressionData: {fileID: 11400000, guid: b9ca93b59d984f445993925c7a90c233, type: 2}
 --- !u!114 &8385202794402913293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -669,7 +670,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 646ff2cf77a3e1544a795865e562a7f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entity: {fileID: 3515697015891253938}
   imageRenderer: {fileID: 4213233173429108572}
   animationClip: {fileID: 11400000, guid: 21d200faf2efd8343b56b15efa619425, type: 2}
 --- !u!1 &7170102788963754161
