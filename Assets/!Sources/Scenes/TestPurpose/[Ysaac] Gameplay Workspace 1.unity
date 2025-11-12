@@ -548,6 +548,10 @@ MonoBehaviour:
   followSmoothSpeed: 5
   followTarget: {fileID: 0}
   gridScript: {fileID: 0}
+  leftPaddingTiles: 2
+  rightPaddingTiles: 6
+  topPaddingTiles: 3
+  bottomPaddingTiles: 3
 --- !u!114 &519420034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -988,6 +992,59 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 9033457684471043684, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
   m_PrefabInstance: {fileID: 6892035427243502869}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1736022629
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1736022631}
+  - component: {fileID: 1736022632}
+  m_Layer: 0
+  m_Name: fucker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1736022631
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1736022629}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -5.1474314, y: -1.7018213, z: 0.0153243365}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1736022632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1736022629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 079d3dc6000166143bf918da6d871092, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  effects:
+  - rid: 6451219798964830281
+  references:
+    version: 2
+    RefIds:
+    - rid: 6451219798964830281
+      type: {class: HealEffect, ns: , asm: Assembly-CSharp}
+      data:
+        healAmount: 0.5
 --- !u!114 &1785435374 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2388850013978184368, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
@@ -1758,3 +1815,4 @@ SceneRoots:
   - {fileID: 6892035427243502869}
   - {fileID: 480314212}
   - {fileID: 1938301661}
+  - {fileID: 1736022631}
