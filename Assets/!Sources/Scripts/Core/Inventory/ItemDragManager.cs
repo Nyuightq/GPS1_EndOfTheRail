@@ -152,11 +152,21 @@ public void AttachToInventory()
 
             if (inventoryGridScript.InGrid(cellPos) && localGridCellPos.item == null && localGridCellPos.active)
             {
-                //Debug.Log(cellPos);
-            }
-            else
-            {
-                return;
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(inventoryGridScript.inventoryRect, shapeCell.transform.position, null, out Vector2 localPos);
+
+                Vector2 cellPos = inventoryGridScript.GetCellAtPos(localPos);
+                InvCellData localGridCellPos = null;
+                if(inventoryGridScript.InGrid(cellPos)) localGridCellPos = inventoryGridScript.inventoryGrid[(int)cellPos.x, (int)cellPos.y];
+
+                if (localGridCellPos != null && localGridCellPos.item == null && localGridCellPos.active)
+                {
+                    //Debug.Log(cellPos);
+                }
+                else
+                {
+                    return;
+                }
+
             }
         }
         

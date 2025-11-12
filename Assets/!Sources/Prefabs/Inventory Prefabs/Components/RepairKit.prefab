@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5726418534860162460}
   - component: {fileID: 5020431380732534652}
+  - component: {fileID: -987282316139213215}
   m_Layer: 0
   m_Name: RepairKit
   m_TagString: Untagged
@@ -45,3 +46,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   healAmount: 10
+--- !u!114 &-987282316139213215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1402620435838575468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f31126f9153dfed4e84e5cb28c12dbb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  condition: 4
+  conditionValueA:
+    rid: -2
+  conditionValueB:
+    rid: -2
+  healAmount: 10
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
