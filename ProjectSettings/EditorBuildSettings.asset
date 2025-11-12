@@ -8,7 +8,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/!Sources/Scenes/BootStrapScene.unity
     guid: a10b1e087178daa46bb010af19aff42e
-  - enabled: 1
+  - enabled: 0
     path: Assets/!Sources/Scenes/LatestUpdate Z.unity
     guid: 64005930cbad2894e8bf514f5f8a57ea
   - enabled: 1
@@ -20,9 +20,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/!Sources/Scenes/CutScene01.unity
     guid: ebac6a8ce83b0ff4296b990dc559cbe6
-  - enabled: 1
+  - enabled: 0
     path: Assets/!Sources/Scenes/SampleScene 1.unity
     guid: 1862c1bf5ba529e4099c528b4bac2823
+  - enabled: 1
+    path: Assets/!Sources/Scenes/GameplayLevel.unity
+    guid: 18f02a6a5158233498470d56e39d390f
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

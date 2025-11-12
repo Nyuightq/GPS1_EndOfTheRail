@@ -429,9 +429,9 @@ MonoBehaviour:
   cameraMovement: {fileID: 519420033}
   railGrid: {fileID: 0}
   gameplayCanvas: {fileID: 4407494520780377058}
-  holdTimeAtEnd: 0
-  moveDuration: 0
-  holdTimeAtStart: 0
+  holdTimeAtEnd: 0.6
+  moveDuration: 0.7
+  holdTimeAtStart: 0.5
   zoomedSize: 3.5
   zoomSpeed: 2
 --- !u!1 &689783406 stripped

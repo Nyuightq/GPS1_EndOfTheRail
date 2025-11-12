@@ -86,6 +86,6 @@ public class OnClickImage : MonoBehaviour
     {
         yield return new WaitForSeconds(0.5f);
 
-        SceneManager.LoadScene("SampleScene 1");
+        SceneManager.LoadScene("GameplayLevel");
     }
 }
