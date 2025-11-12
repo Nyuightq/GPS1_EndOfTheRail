@@ -51,11 +51,6 @@ public class CombatManager : MonoBehaviour
 
         Debug.Log("Combat started against enemies!");
 
-        if (combatUIPanel != null)
-            combatUIPanel.SetActive(true);
-
-        // if (combatUIPanel != null)
-        //     combatUIPanel.SetActive(true);
         combatSystem.ShowEventPanel();
         // ===========================
         // Instantiate combat entities

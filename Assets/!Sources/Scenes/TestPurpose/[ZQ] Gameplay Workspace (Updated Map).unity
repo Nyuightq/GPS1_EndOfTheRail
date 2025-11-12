@@ -9504,6 +9504,7 @@ GameObject:
   - component: {fileID: 1464322212774748499}
   - component: {fileID: 3947119388532249912}
   - component: {fileID: 9116283842445633445}
+  - component: {fileID: 9116283842445633446}
   m_Layer: 5
   m_Name: CombatRewardPanel
   m_TagString: Untagged
@@ -11128,6 +11129,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dayCycle: {fileID: 0}
+  progressSlider: {fileID: 0}
   dayCounterText: {fileID: 6454576704604792883}
 --- !u!1 &5162477377108701577
 GameObject:
@@ -12203,6 +12205,7 @@ GameObject:
   - component: {fileID: 2620535116337009487}
   - component: {fileID: 4953950123056682633}
   - component: {fileID: 2598359863893806119}
+  - component: {fileID: 5789104217979193573}
   m_Layer: 5
   m_Name: CombatPanel
   m_TagString: Untagged
@@ -12210,6 +12213,18 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
+--- !u!225 &5789104217979193573
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5789104217979193572}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!224 &5795043748724478506
 RectTransform:
   m_ObjectHideFlags: 0
@@ -12715,14 +12730,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a87f4ed93bc9bd40a96ffe0c1ecea04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tooltipTransform: {fileID: 6796989580999946428}
-  text_entityName: {fileID: 2861476904093724878}
-  text_entityHp: {fileID: 1246094485883172888}
-  text_entityAttackPower: {fileID: 2100049546433093093}
-  text_entityAttackSpeed: {fileID: 1095201940433323915}
-  text_entityDefense: {fileID: 6216507144558273604}
-  text_entityEvasion: {fileID: 0}
-  offset: {x: 20, y: -20}
+  tooltipRectTransform: {fileID: 0}
+  entityNameText: {fileID: 0}
+  infoText: {fileID: 0}
+  offset: {x: 20, y: -20, z: 0}
+  padding: 5
 --- !u!114 &6081037468346756914
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14550,8 +14562,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 559c7f23486b58c489021a833605700f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dayCycle: {fileID: 0}
-  progressSlider: {fileID: 6081037468346756914}
 --- !u!224 &7521671246955771270
 RectTransform:
   m_ObjectHideFlags: 0
@@ -15145,7 +15155,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f357c49c4a20104ca60bca7e21a0b5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  combatUIPanel: {fileID: 5789104217979193572}
   playerPrefab: {fileID: 5098948779927698787, guid: 72799084f92538a4799b7dab6335d503, type: 3}
   enemyPrefabs:
   - {fileID: 6709867778072561585, guid: 279cc029755cb1c44b14a7eacc24d47d, type: 3}
@@ -15155,6 +15164,8 @@ MonoBehaviour:
   playerSpawnPoint: {fileID: 1897792361201376272}
   enemySpawnParent: {fileID: 3589505844918729471}
   combatSystem: {fileID: 2598359863893806119}
+  encounterQuantityData: {fileID: 0}
+  dayCycleSystem: {fileID: 0}
   totalCombatsFaced: 0
   totalEncountersFaced: 0
 --- !u!1 &7914848732888141564
@@ -16840,6 +16851,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rewardText: {fileID: 7930544109073320211}
   nextButton: {fileID: 2020899007649136937}
+--- !u!225 &9116283842445633446
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3915423588293102460}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!82 &9136343950216101666
 AudioSource:
   m_ObjectHideFlags: 0

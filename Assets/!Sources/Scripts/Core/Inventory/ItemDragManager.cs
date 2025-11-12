@@ -148,25 +148,16 @@ public void AttachToInventory()
             RectTransformUtility.ScreenPointToLocalPointInRectangle(inventoryGridScript.inventoryRect, shapeCell.transform.position, null, out Vector2 localPos);
 
             Vector2 cellPos = inventoryGridScript.GetCellAtPos(localPos);
-            InvCellData localGridCellPos = inventoryGridScript.inventoryGrid[(int)cellPos.x, (int)cellPos.y];
+            InvCellData localGridCellPos = null;
+            if (inventoryGridScript.InGrid(cellPos)) localGridCellPos = inventoryGridScript.inventoryGrid[(int)cellPos.x, (int)cellPos.y];
 
-            if (inventoryGridScript.InGrid(cellPos) && localGridCellPos.item == null && localGridCellPos.active)
+            if (localGridCellPos != null && localGridCellPos.item == null && localGridCellPos.active)
             {
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(inventoryGridScript.inventoryRect, shapeCell.transform.position, null, out Vector2 localPos);
-
-                Vector2 cellPos = inventoryGridScript.GetCellAtPos(localPos);
-                InvCellData localGridCellPos = null;
-                if(inventoryGridScript.InGrid(cellPos)) localGridCellPos = inventoryGridScript.inventoryGrid[(int)cellPos.x, (int)cellPos.y];
-
-                if (localGridCellPos != null && localGridCellPos.item == null && localGridCellPos.active)
-                {
-                    //Debug.Log(cellPos);
-                }
-                else
-                {
-                    return;
-                }
-
+                //Debug.Log(cellPos);
+            }
+            else
+            {
+                return;
             }
         }
         
