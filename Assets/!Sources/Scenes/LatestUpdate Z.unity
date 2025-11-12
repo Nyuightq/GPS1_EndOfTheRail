@@ -28474,7 +28474,7 @@ GameObject:
   - component: {fileID: 1616196630}
   - component: {fileID: 1616196629}
   m_Layer: 0
-  m_Name: DayNightLIghtProgression
+  m_Name: DayNightLIght2D
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28791,6 +28791,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 509415783914132541, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: dayNightLight
+      value: 
+      objectReference: {fileID: 1616196629}
     - target: {fileID: 1001966004365486911, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -28803,6 +28807,10 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1731624081393086100, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2456040254038645909, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -28810,6 +28818,18 @@ PrefabInstance:
     - target: {fileID: 2456040254038645909, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: travelCheck
+      objectReference: {fileID: 0}
+    - target: {fileID: 3457548891679433051, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: dayCycle
+      value: 
+      objectReference: {fileID: 444064495}
+    - target: {fileID: 3457548891679433051, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: dayMaxValue
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 3457548891679433051, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: nightMaxValue
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 3976563074497435558, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_AnchorMax.x
@@ -28983,7 +29003,12 @@ PrefabInstance:
       propertyPath: 'scriptsToPause.Array.data[17]'
       value: 
       objectReference: {fileID: 1978963956}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1731624081393086100, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+    - {fileID: 4006713343387200187, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+    - {fileID: 5400758257818017908, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+    - {fileID: 8270536762877082956, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+    - {fileID: 2554448652322670426, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

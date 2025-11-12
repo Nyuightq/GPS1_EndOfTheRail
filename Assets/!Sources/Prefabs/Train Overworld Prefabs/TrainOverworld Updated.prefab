@@ -152,7 +152,7 @@ MonoBehaviour:
   m_ApplyToSortingLayers: 00000000991c4fa8afa06f13
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
-  m_LightOrder: 2
+  m_LightOrder: 1
   m_AlphaBlendOnOverlap: 0
   m_OverlapOperation: 0
   m_NormalMapDistance: 3
@@ -227,6 +227,7 @@ GameObject:
   m_Component:
   - component: {fileID: 926543073869935309}
   - component: {fileID: 2181377489751129838}
+  - component: {fileID: 2029755362109950576}
   - component: {fileID: 3232622184949731404}
   - component: {fileID: 3672123340709632326}
   - component: {fileID: 3916417397513139688}
@@ -312,6 +313,25 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2029755362109950576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5765065582379823760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a75b16432c24f4a42b7d5d58408d77d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dayCycle: {fileID: 0}
+  trainLight: {fileID: 3764133375245286793}
+  trainOrb: {fileID: 2705913085427239649}
+  dayIntensity: 0
+  nightIntensity: 1.2
+  orbDayAlpha: -0.25
+  orbNightAlpha: 1
 --- !u!114 &3232622184949731404
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -58,6 +58,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 415189f577c13c446a9f90cf4c9ba610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inputManagerPrefab: {fileID: 0}
 --- !u!114 &8456088590381804051
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -186,8 +187,8 @@ MonoBehaviour:
   tilesMoved: 0
   day: 0
   currentTime: 0
-  dayLength: 5
-  nightLength: 5
+  dayLength: 30
+  nightLength: 40
   dayLengthMod: 0
   nightPanel: {fileID: 0}
   eventTilemap: {fileID: 0}
