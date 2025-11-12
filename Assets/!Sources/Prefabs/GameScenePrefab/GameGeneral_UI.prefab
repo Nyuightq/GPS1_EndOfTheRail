@@ -4739,7 +4739,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1044395079288097143}
   - component: {fileID: 847031800443666983}
-  - component: {fileID: 4006713343387200187}
   m_Layer: 5
   m_Name: DayProgressSlider
   m_TagString: Untagged
@@ -4819,20 +4818,6 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &4006713343387200187
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3000832098435536406}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 559c7f23486b58c489021a833605700f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dayCycle: {fileID: 0}
-  progressSlider: {fileID: 847031800443666983}
 --- !u!1 &3025031613730210975
 GameObject:
   m_ObjectHideFlags: 0
@@ -7903,7 +7888,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3069171630272569238}
-  - component: {fileID: 1731624081393086100}
+  - component: {fileID: 3457548891679433051}
+  - component: {fileID: 509415783914132541}
   m_Layer: 0
   m_Name: GameplayDayProgressManager
   m_TagString: Untagged
@@ -7926,7 +7912,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8676130915209968645}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1731624081393086100
+--- !u!114 &3457548891679433051
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -7939,7 +7925,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dayCycle: {fileID: 0}
+  progressSlider: {fileID: 847031800443666983}
   dayCounterText: {fileID: 447596770717549862}
+--- !u!114 &509415783914132541
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5165277309502818800}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1402c065742d104e97b1c8271812976, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dayCycle: {fileID: 0}
+  dayNightLight: {fileID: 0}
+  dayIntensity: 10
+  nightIntensity: 0.1
 --- !u!1 &5182647114237312019
 GameObject:
   m_ObjectHideFlags: 0

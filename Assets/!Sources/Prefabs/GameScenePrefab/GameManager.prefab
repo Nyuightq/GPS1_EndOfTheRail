@@ -288,8 +288,8 @@ MonoBehaviour:
   tilesMoved: 0
   day: 0
   currentTime: 0
-  dayLength: 5
-  nightLength: 5
+  dayLength: 30
+  nightLength: 40
   dayLengthMod: 0
   nightPanel: {fileID: 0}
   eventTilemap: {fileID: 0}
