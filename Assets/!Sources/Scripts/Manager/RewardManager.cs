@@ -1,45 +1,57 @@
+// NO Tweening
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DG.Tweening;
+using TMPro;
 
 public class RewardManager : MonoBehaviour
 {
     public static RewardManager Instance;
     public static System.Action OnRewardClosed;
 
+    [System.Serializable]
+    public class RewardSlot
+    {
+        public ItemSO itemSO;
+        public RectTransform anchorPoint;
+        public TextMeshProUGUI nameText;
+    }
+
     [Header("Reward Configuration")]
     [SerializeField] private List<ItemSO> availableRewards = new List<ItemSO>();
-    [SerializeField] private int numberOfRewards = 3;
+    [SerializeField] private List<RewardSlot> rewardSlots = new List<RewardSlot>(3);
 
     [Header("Reward UI")]
     [SerializeField] private GameObject rewardUIPanel;
-    [SerializeField] private RectTransform rewardContainer; // Container for reward items (like inventoryRect)
-
-    [Header("Reward Spawn Settings")]
-    [SerializeField] private Vector2 spawnCentreOffset = Vector2.zero;
-    [SerializeField] private float spawnMarginX = 50f; // Spacing between items
+    [SerializeField] private RectTransform rewardContainer;
 
     [Header("Tween Settings")]
-    [SerializeField] private float tweenDuration = 0.5f;
-    [SerializeField] private Ease tweenEase = Ease.OutBack;
+    [SerializeField] private float tweenDuration = 0.3f;
 
-    private List<ItemSO> selectedRewards = new List<ItemSO>();
-    private List<RewardItemData> spawnedRewardItems = new List<RewardItemData>();
     private InventoryGridScript inventoryGrid;
     private GameObject itemSpawnPrefab;
-    private Coroutine monitorCoroutine;
+    private List<RewardItemData> rewardItems = new List<RewardItemData>();
 
     private class RewardItemData
     {
         public GameObject itemObject;
-        public Vector2 originalAnchoredPosition;
-        public ItemDragManager dragManager;
+        public RectTransform rectTransform;
+        public Item itemScript;
+        public Vector2 initialAnchoredPosition;
+        public RectTransform anchorPoint;
+        public bool wasPlacedInInventory;
+        public Coroutine moveRoutine;
 
-        public RewardItemData(GameObject item, Vector2 originalPos)
+        public RewardItemData(GameObject obj, Vector2 initialPos, RectTransform anchor)
         {
-            itemObject = item;
-            originalAnchoredPosition = originalPos;
+            itemObject = obj;
+            rectTransform = obj.GetComponent<RectTransform>();
+            itemScript = obj.GetComponent<Item>();
+            initialAnchoredPosition = initialPos;
+            anchorPoint = anchor;
+            wasPlacedInInventory = false;
+            moveRoutine = null;
         }
     }
 
@@ -57,7 +69,6 @@ public class RewardManager : MonoBehaviour
 
     private void Start()
     {
-        // Find inventory grid reference
         inventoryGrid = FindFirstObjectByType<InventoryGridScript>();
         
         if (inventoryGrid != null)
@@ -69,308 +80,317 @@ public class RewardManager : MonoBehaviour
             Debug.LogError("RewardManager: InventoryGridScript not found!");
         }
 
-        // Hide UI on start
+        if (rewardSlots.Count != 3)
+        {
+            Debug.LogWarning("RewardManager: Should have exactly 3 reward slots configured!");
+        }
+
         if (rewardUIPanel != null)
         {
             rewardUIPanel.SetActive(false);
         }
     }
 
-    /// <summary>
-    /// Shows the reward UI with randomized items (matches your existing API)
-    /// </summary>
     public void OpenRewardUI(GameObject player = null)
     {
         ShowRewards();
     }
 
-    /// <summary>
-    /// Shows the reward UI with randomized items
-    /// </summary>
     public void ShowRewards()
     {
         if (rewardUIPanel == null || rewardContainer == null)
         {
-            Debug.LogError("RewardManager: UI Panel or Reward Container not properly configured!");
+            Debug.LogError("RewardManager: UI Panel or Reward Container not configured!");
             return;
         }
 
         if (itemSpawnPrefab == null)
         {
-            Debug.LogError("RewardManager: Item spawn prefab not found from InventoryGridScript!");
+            Debug.LogError("RewardManager: Item spawn prefab not found!");
             return;
         }
 
-        // Clear previous rewards
+        if (rewardSlots.Count == 0)
+        {
+            Debug.LogError("RewardManager: No reward slots configured!");
+            return;
+        }
+
         ClearRewards();
 
-        // Randomize and select rewards
-        selectedRewards = GetRandomRewards(numberOfRewards);
+        List<ItemSO> randomizedRewards = GetRandomRewards(rewardSlots.Count);
 
-        // Spawn rewards using EXACT same pattern as InventoryGridScript.SpawnItems()
-        SpawnRewardItems(itemSpawnPrefab, selectedRewards, spawnCentreOffset, spawnMarginX);
+        for (int i = 0; i < rewardSlots.Count && i < randomizedRewards.Count; i++)
+        {
+            rewardSlots[i].itemSO = randomizedRewards[i];
+            
+            if (rewardSlots[i].nameText != null)
+            {
+                rewardSlots[i].nameText.text = randomizedRewards[i].itemName;
+            }
+        }
 
-        // Show UI
+        SpawnRewardItemsAtAnchors(randomizedRewards);
+
         rewardUIPanel.SetActive(true);
-
-        // Start monitoring drag states
-        monitorCoroutine = StartCoroutine(MonitorRewardItems());
     }
 
-    /// <summary>
-    /// Gets random rewards from the available rewards list
-    /// </summary>
+    private void SpawnRewardItemsAtAnchors(List<ItemSO> items)
+    {
+        for (int i = 0; i < items.Count && i < rewardSlots.Count; i++)
+        {
+            ItemSO itemData = items[i];
+            RectTransform anchorPoint = rewardSlots[i].anchorPoint;
+
+            if (anchorPoint == null)
+            {
+                Debug.LogError($"RewardManager: Anchor point {i} is null!");
+                continue;
+            }
+
+            // Instantiate under reward container
+            GameObject newItem = Instantiate(itemSpawnPrefab, rewardContainer);
+            
+            Item itemScript = newItem.GetComponent<Item>();
+            if (itemScript != null)
+            {
+                itemScript.itemData = itemData;
+            }
+
+            RectTransform itemRect = newItem.GetComponent<RectTransform>();
+
+            // Position at anchor point
+            itemRect.anchoredPosition = anchorPoint.anchoredPosition;
+
+            // Store reward data
+            RewardItemData rewardData = new RewardItemData(
+                newItem, 
+                anchorPoint.anchoredPosition, 
+                anchorPoint
+            );
+            rewardItems.Add(rewardData);
+
+            Debug.Log($"Spawned {itemData.itemName} at anchor position {anchorPoint.anchoredPosition}");
+        }
+    }
+
     private List<ItemSO> GetRandomRewards(int count)
     {
         List<ItemSO> rewards = new List<ItemSO>();
         List<ItemSO> tempList = new List<ItemSO>(availableRewards);
 
-        // Ensure we don't try to get more rewards than available
+        if (tempList.Count == 0)
+        {
+            Debug.LogError("RewardManager: No available rewards configured!");
+            return rewards;
+        }
+
         count = Mathf.Min(count, tempList.Count);
 
         for (int i = 0; i < count; i++)
         {
             int randomIndex = Random.Range(0, tempList.Count);
             rewards.Add(tempList[randomIndex]);
-            tempList.RemoveAt(randomIndex); // Remove to avoid duplicates
+            tempList.RemoveAt(randomIndex);
         }
 
         return rewards;
     }
 
     /// <summary>
-    /// Spawns reward items using EXACT same method as InventoryGridScript.SpawnItems()
+    /// Called from ItemDragManager.LeftRelease() - REQUIRED FOR SNAP-BACK TO WORK
+    /// Add this line to ItemDragManager.LeftRelease() after AttachToInventory():
+    /// 
+    /// if (RewardManager.Instance != null) 
+    ///     RewardManager.Instance.OnItemReleased(gameObject);
     /// </summary>
-    private void SpawnRewardItems(GameObject itemPrefab, List<ItemSO> itemList, Vector2 pos, float spawnMarginX)
+    public void OnItemReleased(GameObject item)
     {
-        float cellSize = GameManager.cellSize;
-        float offsetX = pos.x;
-        float totalWidth = spawnMarginX * (itemList.Count - 1);
-        foreach (ItemSO reward in itemList) totalWidth += reward.itemWidth * cellSize;
-
-        for (int i = 0; i < itemList.Count; i++)
-        {
-            // EXACT SAME as InventoryGridScript - instantiate under rewardContainer (like inventoryRect)
-            GameObject newItem = Instantiate(itemPrefab, rewardContainer);
-            Item itemScript = newItem.GetComponent<Item>();
-            itemScript.itemData = itemList[i];
-
-            RectTransform newItemRect = newItem.GetComponent<RectTransform>();
-
-            // EXACT SAME positioning as InventoryGridScript
-            Vector2 itemPosition = new Vector2(offsetX - totalWidth * 0.5f, pos.y);
-            newItemRect.anchoredPosition = itemPosition;
-            offsetX += itemList[i].itemWidth * cellSize + spawnMarginX;
-
-            // Store reward data for tracking
-            RewardItemData rewardData = new RewardItemData(newItem, itemPosition);
-
-            // Get ItemDragManager reference
-            ItemDragManager dragManager = newItem.GetComponent<ItemDragManager>();
-            if (dragManager != null)
-            {
-                rewardData.dragManager = dragManager;
-            }
-
-            spawnedRewardItems.Add(rewardData);
-        }
-    }
-
-    /// <summary>
-    /// Coroutine to monitor drag states and handle rewards
-    /// </summary>
-    private IEnumerator MonitorRewardItems()
-    {
-        while (spawnedRewardItems.Count > 0 && rewardUIPanel.activeSelf)
-        {
-            for (int i = spawnedRewardItems.Count - 1; i >= 0; i--)
-            {
-                RewardItemData rewardData = spawnedRewardItems[i];
-                
-                if (rewardData.itemObject == null)
-                {
-                    // Item was destroyed
-                    spawnedRewardItems.RemoveAt(i);
-                    continue;
-                }
-
-                Item itemScript = rewardData.itemObject.GetComponent<Item>();
-                if (itemScript == null) continue;
-
-                // Check if item was successfully equipped (placed in inventory)
-                if (itemScript.state == Item.itemState.equipped)
-                {
-                    // Remove from tracking FIRST
-                    spawnedRewardItems.RemoveAt(i);
-                    
-                    // Then close UI
-                    yield return new WaitForSeconds(0.1f);
-                    CloseRewardUI();
-                    yield break;
-                }
-            }
-
-            yield return null; // Wait one frame
-        }
-    }
-
-    /// <summary>
-    /// Tweens item back to original position if not placed in inventory
-    /// </summary>
-    private void TweenItemBackToPosition(RewardItemData rewardData)
-    {
-        if (rewardData.itemObject == null) return;
-
-        RectTransform itemRect = rewardData.itemObject.GetComponent<RectTransform>();
-        
-        // Check if item is still child of reward container
-        if (itemRect.parent != rewardContainer)
-        {
-            // Store current world position
-            Vector3 currentWorldPos = itemRect.position;
-            
-            // Change parent back to reward container
-            itemRect.SetParent(rewardContainer);
-            
-            // Restore world position temporarily
-            itemRect.position = currentWorldPos;
-        }
-
-        // Tween back to original position
-        itemRect.DOAnchorPos(rewardData.originalAnchoredPosition, tweenDuration)
-            .SetEase(tweenEase);
-    }
-
-    /// <summary>
-    /// Alternative approach: Call this from ItemDragManager.LeftRelease() for immediate response
-    /// Add this to your ItemDragManager.LeftRelease() method:
-    /// if (RewardManager.Instance != null) RewardManager.Instance.OnItemDragReleased(gameObject);
-    /// </summary>
-    public void OnItemDragReleased(GameObject item)
-    {
-        RewardItemData rewardData = spawnedRewardItems.Find(r => r.itemObject == item);
+        RewardItemData rewardData = rewardItems.Find(r => r.itemObject == item);
         
         if (rewardData == null)
             return;
 
-        Item itemScript = item.GetComponent<Item>();
-        
-        if (itemScript != null)
+        // Stop any ongoing tween
+        StopMoveRoutineIfAny(rewardData);
+
+        if (rewardData.itemScript.state == Item.itemState.equipped)
         {
-            if (itemScript.state == Item.itemState.equipped)
-            {
-                // Successfully placed in inventory - close panel
-                Debug.Log("Item placed in inventory! Closing reward panel.");
-                CloseRewardUI();
-            }
-            else
-            {
-                // Not placed, tween back
-                Debug.Log("Item not placed, tweening back to reward spot.");
-                TweenItemBackToPosition(rewardData);
-            }
+            // Successfully placed in inventory
+            Debug.Log("Item placed in inventory! Closing reward panel.");
+            rewardData.wasPlacedInInventory = true;
+            
+            // Remove from tracking
+            rewardItems.Remove(rewardData);
+            
+            // Close panel
+            CloseRewardUI();
+        }
+        else
+        {
+            // Not placed - snap back to anchor
+            Debug.Log("Item not placed, snapping back to anchor point.");
+            SnapBackToAnchor(rewardData, tweenDuration);
         }
     }
 
     /// <summary>
-    /// Clears all spawned reward items without destroying equipped ones
+    /// Snaps item back to anchor position with smooth tweening
     /// </summary>
-    private void ClearRewards()
+    private void SnapBackToAnchor(RewardItemData rewardData, float duration)
     {
-        // Stop monitoring coroutine if running
-        if (monitorCoroutine != null)
+        if (rewardData.itemObject == null)
+            return;
+
+        // Ensure item is child of reward container
+        if (rewardData.rectTransform.parent != rewardContainer)
         {
-            StopCoroutine(monitorCoroutine);
-            monitorCoroutine = null;
+            Vector3 currentWorldPos = rewardData.rectTransform.position;
+            rewardData.rectTransform.SetParent(rewardContainer);
+            rewardData.rectTransform.position = currentWorldPos;
+            
+            Debug.Log("Item parent restored to reward container");
         }
 
-        // Only destroy items that are still in reward panel (not equipped)
-        foreach (RewardItemData rewardData in spawnedRewardItems)
+        // Start tween movement back to anchor
+        StopMoveRoutineIfAny(rewardData);
+        rewardData.moveRoutine = StartCoroutine(
+            MoveToAnchorRoutine(rewardData, rewardData.initialAnchoredPosition, duration)
+        );
+    }
+
+    private void StopMoveRoutineIfAny(RewardItemData rewardData)
+    {
+        if (rewardData.moveRoutine != null)
+        {
+            StopCoroutine(rewardData.moveRoutine);
+            rewardData.moveRoutine = null;
+        }
+    }
+
+    /// <summary>
+    /// Coroutine for smooth tweening movement (like reference code)
+    /// </summary>
+    private IEnumerator MoveToAnchorRoutine(RewardItemData rewardData, Vector2 destination, float duration)
+    {
+        if (duration > 0.0f)
+        {
+            float startTime = Time.time;
+            Vector2 startPos = rewardData.rectTransform.anchoredPosition;
+            float tweenCoeff = 1.0f / duration;
+
+            float dt = 0.0f;
+            while (dt < 1.0f)
+            {
+                dt = (Time.time - startTime) * tweenCoeff;
+                float t = EaseOutBack(dt);
+                rewardData.rectTransform.anchoredPosition = Vector2.Lerp(startPos, destination, t);
+                yield return null;
+            }
+        }
+
+        // Ensure final position is exact
+        rewardData.rectTransform.anchoredPosition = destination;
+        
+        Debug.Log($"Item snapped back to position {destination}");
+        
+        rewardData.moveRoutine = null;
+    }
+
+    /// <summary>
+    /// Ease out back function (similar to DOTween's OutBack)
+    /// Creates overshoot effect like in reference code's EaseOutQuad
+    /// </summary>
+    private float EaseOutBack(float t)
+    {
+        const float c1 = 1.70158f;
+        const float c3 = c1 + 1f;
+        return 1f + c3 * Mathf.Pow(t - 1f, 3f) + c1 * Mathf.Pow(t - 1f, 2f);
+    }
+
+    /// <summary>
+    /// Alternative: Simple ease out quad (from reference code)
+    /// </summary>
+    private float EaseOutQuad(float t)
+    {
+        return 1.0f - (1.0f - t) * (1.0f - t);
+    }
+
+    private void ClearRewards()
+    {
+        foreach (RewardItemData rewardData in rewardItems)
         {
             if (rewardData.itemObject != null)
             {
-                Item itemScript = rewardData.itemObject.GetComponent<Item>();
+                StopMoveRoutineIfAny(rewardData);
                 
-                // Only destroy if NOT equipped (still in reward panel)
-                if (itemScript == null || itemScript.state != Item.itemState.equipped)
+                // Only destroy if NOT equipped
+                if (rewardData.itemScript == null || rewardData.itemScript.state != Item.itemState.equipped)
                 {
                     Destroy(rewardData.itemObject);
                 }
             }
         }
 
-        spawnedRewardItems.Clear();
-        selectedRewards.Clear();
-        
-        // Kill all active tweens to prevent errors
-        DOTween.Kill(transform);
+        rewardItems.Clear();
+
+        foreach (RewardSlot slot in rewardSlots)
+        {
+            slot.itemSO = null;
+            if (slot.nameText != null)
+            {
+                slot.nameText.text = "";
+            }
+        }
     }
 
-    /// <summary>
-    /// Closes the reward UI - called by decline button or when item is placed
-    /// </summary>
-public void CloseRewardUI()
-{
-    Debug.Log("CloseRewardUI called");
-    
-    // Stop monitoring coroutine FIRST
-    if (monitorCoroutine != null)
+    public void CloseRewardUI()
     {
-        StopCoroutine(monitorCoroutine);
-        monitorCoroutine = null;
-    }
-    
-    // Only destroy items still in reward container
-    for (int i = spawnedRewardItems.Count - 1; i >= 0; i--)
-    {
-        RewardItemData rewardData = spawnedRewardItems[i];
+        Debug.Log("CloseRewardUI called");
         
-        if (rewardData.itemObject != null)
+        for (int i = rewardItems.Count - 1; i >= 0; i--)
         {
-            // Check if parent is still reward container
-            bool isStillInRewardPanel = rewardData.itemObject.transform.parent == rewardContainer;
+            RewardItemData rewardData = rewardItems[i];
             
-            if (isStillInRewardPanel)
+            if (rewardData.itemObject != null && !rewardData.wasPlacedInInventory)
             {
-                Debug.Log($"Destroying unequipped reward item: {rewardData.itemObject.name}");
-                Destroy(rewardData.itemObject);
+                StopMoveRoutineIfAny(rewardData);
+                
+                bool isStillInRewardPanel = rewardData.itemObject.transform.parent == rewardContainer;
+                
+                if (isStillInRewardPanel)
+                {
+                    Debug.Log($"Destroying unequipped reward: {rewardData.itemObject.name}");
+                    Destroy(rewardData.itemObject);
+                }
             }
-            else
+            
+            rewardItems.RemoveAt(i);
+        }
+        
+        foreach (RewardSlot slot in rewardSlots)
+        {
+            slot.itemSO = null;
+            if (slot.nameText != null)
             {
-                Debug.Log($"Preserving equipped item (parent changed): {rewardData.itemObject.name}");
+                slot.nameText.text = "";
             }
         }
         
-        spawnedRewardItems.RemoveAt(i);
-    }
-    
-    selectedRewards.Clear();
-    
-    // Kill all active tweens
-    DOTween.Kill(transform);
-    
-    // Hide panel
-    if (rewardUIPanel != null)
-    {
-        rewardUIPanel.SetActive(false);
+        if (rewardUIPanel != null)
+        {
+            rewardUIPanel.SetActive(false);
+        }
+
+        OnRewardClosed?.Invoke();
     }
 
-    OnRewardClosed?.Invoke();
-}
-
-    /// <summary>
-    /// Called by the Decline button in UI
-    /// Hook this up in the inspector: Button -> OnClick() -> RewardManager.OnDeclineButtonClicked()
-    /// </summary>
     public void OnDeclineButtonClicked()
     {
         Debug.Log("Decline button clicked!");
         CloseRewardUI();
     }
 
-    /// <summary>
-    /// Destroys the RewardManager instance (called from cleanup)
-    /// </summary>
     public void DestroyInstance()
     {
         if (Instance == this)
@@ -378,5 +398,14 @@ public void CloseRewardUI()
             Instance = null;
         }
         Destroy(gameObject);
+    }
+
+    private void OnDestroy()
+    {
+        // Stop all running coroutines
+        foreach (RewardItemData rewardData in rewardItems)
+        {
+            StopMoveRoutineIfAny(rewardData);
+        }
     }
 }
