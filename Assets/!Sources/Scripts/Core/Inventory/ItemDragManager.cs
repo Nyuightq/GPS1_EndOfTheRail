@@ -104,14 +104,23 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
         }
     }
 
-    private void LeftRelease()
+// Only showing the updated LeftRelease() method
+// Add this to your existing ItemDragManager.cs
+
+private void LeftRelease()
+{
+    if (mouseOnItem)
     {
-        if (mouseOnItem)
+        dragging = false;
+        AttachToInventory();
+        
+        // ADD THIS LINE - Critical for snap-back functionality
+        if (RewardManager.Instance != null) 
         {
-            dragging = false;
-            AttachToInventory();
+            RewardManager.Instance.OnItemReleased(gameObject);
         }
     }
+}
 
     private void RightClick()
     {
