@@ -1,0 +1,191 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6402722844265983560
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1686780300493267439}
+  - component: {fileID: 1227413715407136962}
+  m_Layer: 0
+  m_Name: SoundManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1686780300493267439
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6402722844265983560}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1227413715407136962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6402722844265983560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6bcb50095b897640a549ef894ecbbd7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  musicSource: {fileID: 0}
+  sfxSource: {fileID: 0}
+  soundEffects:
+  - name: SFX_RailBuilding_Success
+    clip: {fileID: 8300000, guid: beaf205b6012a2048a89b1ff73161ad9, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_RailBuilding_LinkEnded
+    clip: {fileID: 8300000, guid: 642c835d78e9aaa4d8a4dae0bb385928, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_RailOnDelete_Success
+    clip: {fileID: 8300000, guid: 03e290422ab7a6a48b18eff2899e97b3, type: 3}
+    volume: 0.1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_RailOnReset_Failed
+    clip: {fileID: 8300000, guid: 022fd29e0c301b841b2bffe3193b1b5e, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_RailOnReset_Success
+    clip: {fileID: 8300000, guid: 3d5d829ff40eca348a718483db94a4f7, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_UI_PlanPhase_SlideIn
+    clip: {fileID: 8300000, guid: 98b5c30d74c6cb64182d8c1eca9022ad, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_ValidateRoute_Failed
+    clip: {fileID: 8300000, guid: efa6f9842bea57f47b7b414cd8e08a43, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_ValidateRoute_Success
+    clip: {fileID: 8300000, guid: 3e9b48b279122164c89987710ea5972c, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_Travel_OnSwitchDay
+    clip: {fileID: 8300000, guid: de7a705879169a7439ff424209044d9b, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_Travel_OnSwitchNight
+    clip: {fileID: 8300000, guid: 4283decbf3d61394fb6111e5f56085fd, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_ButtonOnCancel
+    clip: {fileID: 8300000, guid: 614f0fae9ed3a654fb017cd5cfb8ce63, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_ButtonOnClick_2
+    clip: {fileID: 8300000, guid: e08e49168529cce4d927b0be39c75858, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_EventWindowPopup
+    clip: {fileID: 8300000, guid: a1cbc3bbbc678d240a4fa4e1133d3782, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_EngineerEnter
+    clip: {fileID: 8300000, guid: 2aa8b198c839f1148b74c40d7043c745, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_TrainMovement
+    clip: {fileID: 8300000, guid: 77eb7702d0bca8d488ec0ee7ff876ad4, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_TrainMovement_Disrupt
+    clip: {fileID: 8300000, guid: 83fde6d4c77add242a303cabba1da8f2, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_TrainMovement_Pilgrim
+    clip: {fileID: 8300000, guid: 68fa970a47db1e8419e9a4d4a915e4ff, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_TrainMovement_Swamp
+    clip: {fileID: 8300000, guid: 8f4153e5ad91e5048b745a1f244a20d8, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_Encounter
+    clip: {fileID: 8300000, guid: b4f70cc0b36ce8547a37bc31ed83c20b, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_Exit_2
+    clip: {fileID: 8300000, guid: ae47652f3236cfe42b538ebdc691715a, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_StartNewGame
+    clip: {fileID: 8300000, guid: 222da41ebc31d834498b2e4e63e7c772, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_PanelSlideIn
+    clip: {fileID: 8300000, guid: fe89dc2125a13a24b977b90c2bf517ce, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_PanelSlideOut_2
+    clip: {fileID: 8300000, guid: 95a259de639e70f40bcef3738622b229, type: 3}
+    volume: 1
+    pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  musicTracks: []
+  masterVolume: 1
+  musicVolume: 1
+  sfxVolume: 1

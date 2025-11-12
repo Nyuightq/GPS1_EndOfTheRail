@@ -17,6 +17,9 @@ public class UI_CombatRewardPanel : UI_BaseEventPanel
 
     public void Setup(int amount, Action onComplete)
     {
+        // Pending
+        //SoundManager.Instance.PlaySFX("");
+        //Debug.Log($""); 
         onRewardComplete = onComplete;
         rewardText.text = "+ " + amount.ToString() + " scraps!";
 

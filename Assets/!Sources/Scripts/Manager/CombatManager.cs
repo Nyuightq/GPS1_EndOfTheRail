@@ -46,6 +46,13 @@ public class CombatManager : MonoBehaviour
         else
             totalEncountersFaced++;
 
+        SoundManager.Instance.PlaySFX("SFX_Encounter");
+        Debug.Log($"SFX_Encounter");
+
+        Debug.Log("Combat started against enemies!");
+
+        if (combatUIPanel != null)
+            combatUIPanel.SetActive(true);
 
         // if (combatUIPanel != null)
         //     combatUIPanel.SetActive(true);
@@ -57,6 +64,8 @@ public class CombatManager : MonoBehaviour
         GameObject playerObj = Instantiate(playerPrefab, playerSpawnPoint.position, Quaternion.identity, playerSpawnPoint);
         CombatPlayerEntity playerEntity = playerObj.GetComponent<CombatPlayerEntity>();
         playerEntity.InitialHealth(GameStateManager.Instance.playerStatus.Hp, GameStateManager.Instance.playerStatus.MaxHp);
+
+         ApplyInventoryDefenseBonus(playerEntity);
 
         // Generate Components
         List<CombatComponentEntity> components = GenerateComponents();
@@ -75,6 +84,66 @@ public class CombatManager : MonoBehaviour
                 $"Total Combats: {totalCombatsFaced}, Total Encounters: {totalEncountersFaced}");
     }
 
+    /// <summary>
+    /// Checks inventory and applies defense bonuses from Reinforce Platings
+    /// </summary>
+    private void ApplyInventoryDefenseBonus(CombatPlayerEntity player)
+    {
+        int totalDefense = 0;
+        int reinforcePlatingCount = 0;
+
+        // Get inventory instance
+        if (InventoryItemManager.Instance == null)
+        {
+            Debug.LogWarning("InventoryItemManager.Instance is null!");
+            return;
+        }
+
+        InventoryGridScript inventory = InventoryItemManager.Instance.GetComponent<InventoryGridScript>();
+        
+        if (inventory == null)
+        {
+            Debug.LogWarning("InventoryGridScript not found!");
+            return;
+        }
+
+        if (inventory.equippedItems == null || inventory.equippedItems.Count == 0)
+        {
+            Debug.Log(" No items equipped in inventory");
+            return;
+        }
+
+        // Loop through all equipped items
+        foreach (GameObject itemObj in inventory.equippedItems)
+        {
+            if (itemObj == null) continue;
+
+            Item item = itemObj.GetComponent<Item>();
+            if (item == null || item.itemEffect == null) continue;
+
+            // Check if this item is Reinforce Platings
+            ItemEffect_ReinforcePlatings reinforcePlating = item.itemEffect as ItemEffect_ReinforcePlatings;
+            
+            if (reinforcePlating != null)
+            {
+                reinforcePlatingCount++;
+                int bonus = reinforcePlating.GetDefenseBonus();
+                totalDefense += bonus;
+                Debug.Log($"🛡️ Found Reinforce Platings #{reinforcePlatingCount} → +{bonus} defense");
+            }
+        }
+
+        // Apply total defense to player
+        if (totalDefense > 0)
+        {
+            player.AddDefense(totalDefense);
+            Debug.Log($"Total Defense Applied: {totalDefense} (from {reinforcePlatingCount} Reinforce Plating(s))");
+        }
+        else
+        {
+            Debug.Log("No Reinforce Platings equipped - Defense remains at 0");
+        }
+    }
     private List<CombatComponentEntity> GenerateComponents()
     {
         List<CombatComponentData> componentDatas = InventoryItemManager.Instance.PrepareBattleComponents();

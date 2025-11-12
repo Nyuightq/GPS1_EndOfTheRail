@@ -37,6 +37,9 @@ public class RewardTile : EventTile
         if (freezeController != null)
             freezeController.FreezeTrain();
 
+        SoundManager.Instance.PlaySFX("SFX_EventWindowPopup");
+        Debug.Log($"SFX_EventWindowPopup");
+
         // Open UI
         RewardManager.Instance.OpenRewardUI(player);
 
@@ -47,6 +50,9 @@ public class RewardTile : EventTile
 
     public override void OnPlayerExit(GameObject player)
     {
+        SoundManager.Instance.PlaySFX("SFX_ButtonOnCancel");
+        Debug.Log($"SFX_ButtonOnCancel");
+
         Debug.Log("Player exited Reward Tile");
         RewardManager.Instance.CloseRewardUI();
     }

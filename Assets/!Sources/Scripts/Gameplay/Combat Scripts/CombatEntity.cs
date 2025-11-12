@@ -68,21 +68,27 @@ public class CombatEntity : MonoBehaviour
             _attackTimer = 0.0f;
             OnAttackReady?.Invoke(this);
         }
-        combatEntityUI?.UpdateAttackIntervalBar(_attackTimer *1.0f, _attackTakenTime *1.0f);
+        combatEntityUI?.UpdateAttackIntervalBar(_attackTimer * 1.0f, _attackTakenTime * 1.0f);
     }
 
+    // Update for defense usage
     public virtual void TakeDamage(int dmg)
     {
-        int damageTaken = Math.Max(1, dmg - _defense);
-        _hp -= damageTaken;
-        Debug.Log(entityName + " takes " + damageTaken + " damage. HP: " + _hp);
-        OnTakeDamage?.Invoke(this, damageTaken);
+        // =====================================================================
+        // Apply defense as flat damage reduction
+        int reducedDamage = Mathf.Max(1, dmg - _defense); // Minimum 1 damage
+        
+        _hp -= reducedDamage;
+        Debug.Log(entityName + " takes " + reducedDamage + " damage (blocked " + (_defense) + "). HP: " + _hp);
+        
+        OnTakeDamage?.Invoke(this, reducedDamage); // damageTaken
         combatEntityUI?.UpdateHealthBar(_hp * 1.0f, _maxHp * 1.0f);
-        combatEntityUI?.ShowDamageText(damageTaken);
+        combatEntityUI?.ShowDamageText(reducedDamage); // damageTaken
+        
         if (IsDead == true && hasDied == false)
         {
             hasDied = true;
-            OnDeath?.Invoke(this); // Trigger event once to CombatManager
+            OnDeath?.Invoke(this);
         }
     }
     
@@ -108,6 +114,33 @@ public class CombatEntity : MonoBehaviour
         _attackSpeed = newSpeed;
 
         Debug.Log($"{entityName} stats updated: HP={_maxHp}, DMG={_attackDamage}, SPD={_attackSpeed}");
+    }
+    
+    /// <summary>
+    /// Adds defense bonus (used by items like Reinforce Platings)
+    /// </summary>
+    public void AddDefense(int amount)
+    {
+        _defense += amount;
+        Debug.Log($"{entityName} defense increased by {amount}. Total defense: {_defense}");
+    }
+
+    /// <summary>
+    /// Removes defense bonus (called when items are unequipped during combat)
+    /// </summary>
+    public void RemoveDefense(int amount)
+    {
+        _defense = Mathf.Max(0, _defense - amount);
+        Debug.Log($"{entityName} defense decreased by {amount}. Total defense: {_defense}");
+    }
+
+    /// <summary>
+    /// Resets defense to base value (optional - use if you want base defense)
+    /// </summary>
+    public void ResetDefense()
+    {
+        _defense = 0;
+        Debug.Log($"{entityName} defense reset to {_defense}");
     }
 
 }
