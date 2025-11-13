@@ -11,6 +11,12 @@ public class TEsting : MonoBehaviour
 
     private void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            foreach (Effect effect in effects)
+            {
+                effect.apply();
+            }
+        }
     }
 }

@@ -117,11 +117,15 @@ public class EffectsInspector : Editor
             {
                 f.SetValue(obj, EditorGUILayout.Toggle(f.Name, (bool)value));
             }
+            else if (f.FieldType.IsEnum)
+            {
+                Enum currentEnum = (Enum)value;
+                Enum newEnum = EditorGUILayout.EnumPopup(f.Name, currentEnum);
+                f.SetValue(obj, newEnum);
+            }
             else if (typeof(Conditions[]).IsAssignableFrom(f.FieldType))
             {
-                // Draw nested Conditions array
-                Conditions[] arr = value as Conditions[];
-                if (arr == null) arr = new Conditions[0];
+                Conditions[] arr = value as Conditions[] ?? new Conditions[0];
                 arr = DrawConditionsArray(arr, f.Name);
                 f.SetValue(obj, arr);
             }
