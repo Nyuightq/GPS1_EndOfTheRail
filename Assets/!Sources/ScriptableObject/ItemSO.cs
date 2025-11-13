@@ -17,6 +17,7 @@ public class ItemSO : ScriptableObject
 {
     public Sprite itemSprite;
     public string itemName;
+    public bool mandatoryItem = false;
     public int itemWidth, itemHeight;
     public GameObject itemEffectPrefab;
 
