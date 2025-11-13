@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: 3dd3afcdd77cff1458f19895006faa98
+guid: 42e7330db151a6c4288cf7e8af78aaf0
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1208040086343421634
-    second: image_0
+      213: 6919941682892964384
+    second: SPR_Enemy_IdleTreeMan_0
+  - first:
+      213: -3580911877355534313
+    second: SPR_Enemy_IdleTreeMan_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,13 +49,13 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 16
-  spriteBorder: {x: 5, y: 5, z: 5, w: 5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
@@ -113,23 +116,45 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: rails_0
+      name: SPR_Enemy_IdleTreeMan_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 96
-        height: 16
+        width: 32
+        height: 32
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 4aa1fbfe0bc59f5f0800000000000000
-      internalID: -722444350209975644
+      spriteID: 772412e399db0fd409295f5684ed7efc
+      internalID: 28010362
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SPR_Enemy_IdleTreeMan_1
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1cbb681f6c247b24ba7bdb8796cbaea5
+      internalID: 424084413
       vertices: []
       indices: 
       edges: []
@@ -139,7 +164,7 @@ TextureImporter:
     physicsShape: []
     bones: []
     spriteID: 5e97eb03825dee720800000000000000
-    internalID: 1537655665
+    internalID: 0
     vertices: []
     indices: 
     edges: []
@@ -148,7 +173,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      rails_0: -722444350209975644
+      SPR_Enemy_IdleTreeMan_0: 28010362
+      SPR_Enemy_IdleTreeMan_1: 424084413
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

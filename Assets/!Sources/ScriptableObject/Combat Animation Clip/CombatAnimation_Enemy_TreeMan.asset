@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: CombatAnimation_Enemy_TreeMan
   m_EditorClassIdentifier: 
   idleSprites:
-  - sprite: {fileID: -102677052, guid: b8b06c8e2ef22a441b5dec6de5595183, type: 3}
-    duration: 0
+  - sprite: {fileID: 28010362, guid: 42e7330db151a6c4288cf7e8af78aaf0, type: 3}
+    duration: 0.3
+  - sprite: {fileID: 424084413, guid: 42e7330db151a6c4288cf7e8af78aaf0, type: 3}
+    duration: 0.3
   windupSprites:
   - sprite: {fileID: -1666763938, guid: b8b06c8e2ef22a441b5dec6de5595183, type: 3}
     duration: 0.15
