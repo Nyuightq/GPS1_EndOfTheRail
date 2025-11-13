@@ -21,6 +21,7 @@ public class CombatComponentEntity : CombatEntity
         _attackDamage = data.attackDamage;
         _attackSpeed = data.attackSpeed;
         _attackDamageVariance = data.attackVariance;
+        _attackSfxName = data.attackSfxName;
         // _defense = data.defense;
         // _evasion = data.evasion;
     }

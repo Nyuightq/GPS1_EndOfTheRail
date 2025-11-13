@@ -645,6 +645,7 @@ MonoBehaviour:
   _attackSpeed: 1
   _attackDamage: 1
   _attackDamageVariance: 1
+  _attackSfxName: SFX_Enemy_BiteAttack
   _enemyProgressionData: {fileID: 11400000, guid: b9ca93b59d984f445993925c7a90c233, type: 2}
 --- !u!114 &8385202794402913293
 MonoBehaviour:

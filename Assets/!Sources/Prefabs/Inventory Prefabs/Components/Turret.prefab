@@ -50,3 +50,4 @@ MonoBehaviour:
   attackSpeed: 3
   attackVariance: 1
   animationClip: {fileID: 11400000, guid: e9c80bc114e1b69458a7b00e25d129bd, type: 2}
+  attackSfxName: SFX_TurretAttack

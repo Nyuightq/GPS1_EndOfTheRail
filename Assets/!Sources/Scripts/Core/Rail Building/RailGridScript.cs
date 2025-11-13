@@ -134,7 +134,7 @@ public class RailGridScript : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && validatePath(startPoint) && GameStateManager.CurrentPhase != Phase.Travel)
+        if (Input.GetKeyDown(KeyCode.Space) && GameStateManager.CurrentPhase == Phase.Plan && validatePath(startPoint))
         {
             if (_trainRef == null) // Initial first train
             {
@@ -210,45 +210,46 @@ public class RailGridScript : MonoBehaviour
 
     public void travelCheck()
     {
-    if (validatePath(startPoint))
-    {
-        if (_trainRef == null) // Initial first train
+        Debug.Log("Travel Check()");
+        if (GameStateManager.CurrentPhase == Phase.Plan && validatePath(startPoint))
         {
-            foreach (var rail in railDataMap)
+            if (_trainRef == null) // Initial first train
             {
-                Vector3Int pos = rail.Key;
-                RailData data = rail.Value;
-                if (data.railType == RailData.railTypes.start)
+                foreach (var rail in railDataMap)
                 {
-                    Vector3 worldPos = snapToGrid(pos);
-                    _trainRef = Instantiate(train, worldPos, Quaternion.identity);
-                    TrainMovement tm = _trainRef.GetComponent<TrainMovement>();
-                    tm.gridManager = gameObject;
-                    tm.dayCycleManager = dayCycleManager;
-                    
-                    // ADD THIS: Find and assign RestPointManager
-                    RestPointManager rpm = FindFirstObjectByType<RestPointManager>();
-                    if (rpm != null)
+                    Vector3Int pos = rail.Key;
+                    RailData data = rail.Value;
+                    if (data.railType == RailData.railTypes.start)
                     {
-                        tm.restPointManager = rpm;
-                        Debug.Log("RestPointManager assigned to spawned train");
+                        Vector3 worldPos = snapToGrid(pos);
+                        _trainRef = Instantiate(train, worldPos, Quaternion.identity);
+                        TrainMovement tm = _trainRef.GetComponent<TrainMovement>();
+                        tm.gridManager = gameObject;
+                        tm.dayCycleManager = dayCycleManager;
+                        
+                        // ADD THIS: Find and assign RestPointManager
+                        RestPointManager rpm = FindFirstObjectByType<RestPointManager>();
+                        if (rpm != null)
+                        {
+                            tm.restPointManager = rpm;
+                            Debug.Log("RestPointManager assigned to spawned train");
+                        }
+                        else
+                        {
+                            Debug.LogError("RestPointManager not found in scene!");
+                        }
+                        
+                        break;
                     }
-                    else
-                    {
-                        Debug.LogError("RestPointManager not found in scene!");
-                    }
-                    
-                    break;
                 }
             }
-        }
-        else
-        {
-            _trainRef.GetComponent<TrainMovement>().enabled = true;
-        }
+            else
+            {
+                _trainRef.GetComponent<TrainMovement>().enabled = true;
+            }
 
-        GameStateManager.SetPhase(Phase.Travel);
-    }
+            GameStateManager.SetPhase(Phase.Travel);
+        }
     }
 
     public bool validatePath(Vector3Int startPoint)
@@ -267,21 +268,10 @@ public class RailGridScript : MonoBehaviour
             if (railAtPos(tile) && !railAtPosIsDisabled(tile))
             {
                 List<Vector3Int> lineList = railDataMap[tile].line.line;
-                Debug.Log("Last rail type: "
-                + railDataMap[lineList[^1]].directionIn + " "
-                + railDataMap[lineList[^1]].directionOut + " "
-                + railDataMap[lineList[^1]].line + " Next is [^2]"
-                + railDataMap[lineList[^2]].directionIn + " "
-                + railDataMap[lineList[^2]].directionOut + " "
-                + railDataMap[lineList[^2]].line + " "
-                + railDataMap[lineList[^2]]
-                );
                 if (lineList != null)
                 {
                     if (railDataMap[lineList[0]].railType == RailData.railTypes.start && (railDataMap[lineList[^1]].railType == RailData.railTypes.end || railDataMap[lineList[^1]].railType == RailData.railTypes.rest))
                     {
-                        Debug.Log("Go");
-
                         SoundManager.Instance.PlaySFX("SFX_ValidateRoute_Success");
 
                         railDataMap[lineList[0]].setDirection(new Vector2(lineList[1].x - lineList[0].x, lineList[1].y - lineList[0].y), RailData.directionType.Outgoing);

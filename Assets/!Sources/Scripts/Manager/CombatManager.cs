@@ -147,7 +147,7 @@ public class CombatManager : MonoBehaviour
 
         if (componentDatas != null)
         {
-            Vector3[] componentSpawnPositions = GetComponentSpawnPositionsCircle(componentDatas.Count, 32f);
+            Vector3[] componentSpawnPositions = GetComponentSpawnPositionsGrid(componentDatas.Count);
             Debug.Log("GenerateComponents Action: componentsData != null");
             for (int i = 0; i < componentDatas.Count; i++)
             {
@@ -188,25 +188,40 @@ public class CombatManager : MonoBehaviour
         return enemies;
     }
 
-    private Vector3[] GetComponentSpawnPositionsCircle(int count, float radius)
+    private Vector3[] GetComponentSpawnPositionsGrid(int count)
     {
+        count = Mathf.Clamp(count, 1, 6);
+
+        int columns = 2;
+        int rows = 3;
+
+        float cellWidth = 36f;
+        float cellHeight = 40f;
+
         Vector3[] positions = new Vector3[count];
 
-        float startAngle = 90f;
+        float[] xOffsets = { cellWidth / 2f, -cellWidth / 2f }; 
+        float[] yOffsets = { 0f, cellHeight, -cellHeight };
 
-        for (int i = 0; i < count; i++)
+        int index = 0;
+
+        for (int c = 0; c < columns && index < count; c++)
         {
-            float angle = startAngle /*+ (360f / count)* i */;
-            float rad = angle * Mathf.Deg2Rad;
+            float x = xOffsets[c];
 
-            float x = Mathf.Cos(rad) * radius;
-            float y = Mathf.Sin(rad) * radius;
-
-            positions[i] = new Vector3(x, y, 0f);
+            for (int r = 0; r < rows && index < count; r++)
+            {
+                float y = yOffsets[r];
+                positions[index++] = new Vector3(x, y, 0f);
+            }
         }
 
         return positions;
     }
+
+
+
+
 
     // Used in StartCombat, auto initialize position for enemies.
     private Vector3[] GetEnemySpawnPositionsCircle(int count, float radius)

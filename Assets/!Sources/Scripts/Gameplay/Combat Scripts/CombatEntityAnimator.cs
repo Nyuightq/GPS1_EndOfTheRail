@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using DG.Tweening;
+using System;
 
 [RequireComponent(typeof(CombatEntity))]
 public class CombatEntityAnimator : MonoBehaviour
@@ -30,6 +31,7 @@ public class CombatEntityAnimator : MonoBehaviour
     private AnimPhase _phase = AnimPhase.Idle;
 
     private bool _attackTriggered = false;
+    private bool _initial = true;
     private float _attackElapsed = 0f;
 
     private void Awake()
@@ -42,6 +44,7 @@ public class CombatEntityAnimator : MonoBehaviour
         _entity.OnAttackReady += TriggerAttackSequence;
         _entity.OnTakeDamage += TriggerOnHit;
         _entity.OnDeath += TriggerOnDeath;
+        _attackTriggered = true;
     }
 
     private void OnDestroy()
@@ -64,8 +67,6 @@ public class CombatEntityAnimator : MonoBehaviour
         // If attack triggered: Attack → Recovery → Idle
         if (_attackTriggered)
         {
-            // _attackElapsed += Time.deltaTime;
-
             float attackDuration = animationClip.AttackDuration;
             float recoveryDuration = animationClip.RecoveryDuration;
 
@@ -88,6 +89,12 @@ public class CombatEntityAnimator : MonoBehaviour
                 PlayFrame_TimeDriven(0f, animationClip.IdleDuration);
             }
 
+            if (_initial == true)
+            {
+                _attackTriggered = false;
+                _initial = false;
+            }
+
             return;
         }
 
@@ -102,7 +109,7 @@ public class CombatEntityAnimator : MonoBehaviour
         {
             // 💤 Idle (default)
             SetPhase(AnimPhase.Idle, animationClip.idleSprites);
-            float idleTime = (Time.time % animationClip.IdleDuration);
+            float idleTime = Time.time % animationClip.IdleDuration;
             PlayFrame_TimeDriven(idleTime, animationClip.IdleDuration);
         }
     }
@@ -117,8 +124,6 @@ public class CombatEntityAnimator : MonoBehaviour
 
         _phase = phaseName;
         currentFrames = new List<CombatAnimationClip.FrameData>(frames);
-        // currentIndex = 0;
-        // timer = 0f;
     }
 
     private void PlayFrame_TimeDriven(float elapsed, float totalDuration)
@@ -165,8 +170,8 @@ public class CombatEntityAnimator : MonoBehaviour
 
         hitSeq.Join(
             imageRenderer.rectTransform
-                .DOShakeAnchorPos(0.15f * speedMult, new Vector2(4f, 0f), 10, 90f, false, true)
-                .SetEase(Ease.OutQuint)
+                .DOShakeAnchorPos(0.2f * speedMult, new Vector2(4f, 0f), 10, 90f, false, true)
+                .SetEase(Ease.InOutBack)
         );
 
         hitSeq.Join(
@@ -188,5 +193,7 @@ public class CombatEntityAnimator : MonoBehaviour
         if (animationClip == null) return;
         SetPhase(AnimPhase.Idle, animationClip.idleSprites);
         PlayFrame_TimeDriven(0f, animationClip.IdleDuration);
+
+        SoundManager.Instance.PlaySFX("SFX_Enemy_OnDeath");
     }
 }

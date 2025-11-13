@@ -249,6 +249,8 @@ public class BuildRails : MonoBehaviour
 
                 gridScript.railDataMap[restTile].setDirection(dirFromRest, RailData.directionType.Incoming);
                 gridScript.railDataMap[prevTile].setDirection(dirToRest, RailData.directionType.Outgoing);
+
+                SoundManager.Instance.PlaySFX("SFX_RailBuilding_LinkEnded");
                 return;
             }
         }
@@ -307,8 +309,6 @@ public class BuildRails : MonoBehaviour
     {
         // Put SFX - RailOnDelete_Success here. (Only play this RailOnDelete sfx if there is rail being deleted, 
         // Don't repeat it instantly if this action deleted multiple rail at once.)
-        SoundManager.Instance.PlaySFX("SFX_RailOnDelete_Success");
-        Debug.Log("Play - RailOnDelete_Success");
 
         Vector3Int lastTile = tilePos;
 
@@ -318,6 +318,8 @@ public class BuildRails : MonoBehaviour
         RailLine currentLine = lastData.line;
 
         if (currentLine == null || currentLine.line.Count == 0) return;
+
+        SoundManager.Instance.PlaySFX("SFX_RailOnDelete_Success");
 
         // record IncomingDirection（ComingFromDirection）
         Vector3Int? previousRail = GetSingleConnectedRail(lastTile, true);

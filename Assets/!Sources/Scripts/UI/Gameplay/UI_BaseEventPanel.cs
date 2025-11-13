@@ -13,8 +13,8 @@ public class UI_BaseEventPanel : MonoBehaviour
 {
     //[SerializeField] private float slideDuration = 0.4f;
     private static float slideDuration = 0.4f;
-    private RectTransform _panelRect;
-    private Vector2 _panelOriginalPos;
+    protected RectTransform _panelRect;
+    protected Vector2 _panelOriginalPos;
     private CanvasGroup _panelCanvasGroup;
 
     private void Awake()
