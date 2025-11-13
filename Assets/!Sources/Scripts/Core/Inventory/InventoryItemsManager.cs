@@ -24,6 +24,7 @@ public class InventoryItemManager : MonoBehaviour
         foreach (GameObject item in _inventory.equippedItems)
         {
             Item thisItem = item.GetComponent<Item>();
+            if(thisItem.itemEffect != null)
             thisItem.itemEffect.OnUpdate();
         }
     }

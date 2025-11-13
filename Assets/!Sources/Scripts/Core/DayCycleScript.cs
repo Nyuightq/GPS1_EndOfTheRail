@@ -1,6 +1,6 @@
 // --------------------------------------------------------------
 // Creation Date: 2025-10-12
-// Author: Liew Zhi Qian
+// Author: -
 // Description: Handles day/night transitions, UI overlay, and night encounters
 // --------------------------------------------------------------
 using UnityEngine;
@@ -66,6 +66,8 @@ public class DayCycleScript : MonoBehaviour
                         nightPanel.SetActive(true);
 
                     Debug.Log("Night has begun!");
+                    
+                    SoundManager.Instance.PlaySFX("SFX_Travel_OnSwitchNight");
                    // replace SpawnNightEncounters();
                     StartCoroutine(SpawnEncountersWithDelay(0.05f)); // tweak delay as needed (0.05 - 0.2)
 
@@ -84,6 +86,8 @@ public class DayCycleScript : MonoBehaviour
 
                     ClearNightEncounters(); // 
                     Debug.Log("Day has begun!");
+
+                    SoundManager.Instance.PlaySFX("SFX_Travel_OnSwitchDay");
                 }
                 break;
         }
@@ -188,7 +192,7 @@ private void SpawnNightEncounters()
 }
 
 
-// helper to spawn globally (existing logic moved here)
+// helper to spawn globally
 private void SpawnEncountersOnTiles(RailGridScript grid)
 {
     int spawned = 0;

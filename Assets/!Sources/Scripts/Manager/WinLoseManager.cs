@@ -25,7 +25,7 @@ public class WinLoseManager : MonoBehaviour
     [Header("Scene Settings")]
     [SerializeField] private string resultSceneName = "ResultScene"; // Change this to your actual scene name
     [SerializeField] private float transitionDelay = 1f;
-    [SerializeField] private bool useEditorSceneLoading = true; // Enable for editor testing without Build Settings
+    // [SerializeField] private bool useEditorSceneLoading = true; // Enable for editor testing without Build Settings
 
     [Header("Game State")]
     public bool isGameOver = false;

@@ -15,6 +15,9 @@ public class EngineerTile : EventTile
     {
         Debug.Log($"Player entered Engineer Tile");
 
+        SoundManager.Instance.PlaySFX("SFX_EngineerEnter");
+        Debug.Log($"SFX_EngineerEnter");
+
         // Find and cache EventTilemap
         if (eventTilemap == null)
         {
@@ -43,6 +46,9 @@ public class EngineerTile : EventTile
 
     public override void OnPlayerExit(GameObject player)
     {
+        SoundManager.Instance.PlaySFX("SFX_ButtonOnCancel");
+        Debug.Log($"SFX_ButtonOnCancel");
+
         Debug.Log($"Player exited Engineer Tile");
     }
 }

@@ -36,7 +36,9 @@ public override void OnPlayerEnter(GameObject player)
     }
 
     train.ApplySpeedModifier(-speedBonus); // disables lerp internally
-    Debug.Log($"PilgrimRouteTile: Train speed increased by {speedBonus}");
+        Debug.Log($"PilgrimRouteTile: Train speed increased by {speedBonus}");
+    
+    SoundManager.Instance.PlaySFX("SFX_TrainMovement_Pilgrim");
 }
 
 

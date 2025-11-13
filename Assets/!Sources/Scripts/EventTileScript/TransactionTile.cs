@@ -54,12 +54,18 @@ public class TransactionTile : EventTile
         if (freezeController != null)
             freezeController.FreezeTrain();
 
+        SoundManager.Instance.PlaySFX("SFX_EventWindowPopup");
+        Debug.Log($"SFX_EventWindowPopup");
+
         // Open Transaction UI
         TransactionManager.Instance?.OpenTransactionUI(player);
     }
 
     public override void OnPlayerExit(GameObject player)
     {
+        SoundManager.Instance.PlaySFX("SFX_ButtonOnCancel");
+        Debug.Log($"SFX_ButtonOnCancel");
+
         Debug.Log("Player exited Transaction Tile");
     }
 }

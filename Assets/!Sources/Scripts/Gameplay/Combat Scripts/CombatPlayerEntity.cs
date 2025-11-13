@@ -17,6 +17,7 @@ public class CombatPlayerEntity : CombatEntity
     {
         _hp = currentHp;
         _maxHp = maxHp;
+        _defense = 0;
         // Update UI
         combatEntityUI?.UpdateHealthBar(_hp * 1.0f, _maxHp * 1.0f);
     }
@@ -46,4 +47,13 @@ public class CombatPlayerEntity : CombatEntity
         base.Attack(target);
         // Maybe implement generate bullet logic.
     }
+
+    public int Defense 
+{ 
+    get 
+    { 
+        Debug.Log($"🔍 Tooltip reading defense: {_defense} at {Time.time}");
+        return _defense; 
+    } 
+}
 }
