@@ -35,20 +35,36 @@ public class EnemyProgressionDataEditor : Editor
             SerializedProperty dayData = dataProp.GetArrayElementAtIndex(i);
             SerializedProperty dayNumber = dayData.FindPropertyRelative("dayNumber");
             SerializedProperty combatStats = dayData.FindPropertyRelative("combatStats");
+            SerializedProperty scrapsReward = dayData.FindPropertyRelative("scrapsReward");
+
+            SerializedProperty baseCount = scrapsReward.FindPropertyRelative("baseCount");
+            SerializedProperty variance = scrapsReward.FindPropertyRelative("variance");
 
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.BeginHorizontal();
+
             EditorGUILayout.LabelField($"Day {dayNumber.intValue}", EditorStyles.boldLabel);
+
             if (GUILayout.Button("X", GUILayout.Width(22)))
             {
                 dataProp.DeleteArrayElementAtIndex(i);
                 break;
             }
+
             EditorGUILayout.EndHorizontal();
 
+            // Day Number
             EditorGUILayout.PropertyField(dayNumber);
 
+            // Combat Stats
             EditorGUILayout.PropertyField(combatStats, new GUIContent("Combat Stats"), true);
+
+            // Scraps Reward Section
+            EditorGUILayout.Space(5);
+            EditorGUILayout.LabelField("Scraps Reward", EditorStyles.boldLabel);
+
+            EditorGUILayout.PropertyField(baseCount, new GUIContent("Base Count"));
+            EditorGUILayout.PropertyField(variance, new GUIContent("Variance"));
 
             EditorGUILayout.EndVertical();
         }
@@ -60,4 +76,5 @@ public class EnemyProgressionDataEditor : Editor
 
         serializedObject.ApplyModifiedProperties();
     }
+
 }

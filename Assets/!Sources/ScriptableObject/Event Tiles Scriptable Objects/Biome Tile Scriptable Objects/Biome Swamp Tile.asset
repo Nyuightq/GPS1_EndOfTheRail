@@ -35,5 +35,5 @@ MonoBehaviour:
   m_Flags: 1
   m_ColliderType: 1
   movementBonus: 2
-  speedReduction: 3
+  speedReduction: 0.05
   tileSprite: {fileID: 0}

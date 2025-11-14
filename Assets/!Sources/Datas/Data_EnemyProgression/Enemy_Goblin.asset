@@ -12,40 +12,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1ce05fca39194245b2eb9f18071f128, type: 3}
   m_Name: Enemy_Goblin
   m_EditorClassIdentifier: 
-  entityName: Treeman
+  entityName: Goblin
   data:
   - dayNumber: 1
     combatStats:
       maxHp: 12
-      attackDamage: 1
+      attackDamage: 2
       attackSpeed: 2
       attackVariance: 2
       defense: 0
+    scrapsReward:
+      baseCount: 10
+      variance: 2
   - dayNumber: 2
     combatStats:
-      maxHp: 14
-      attackDamage: 1
-      attackSpeed: 2
-      attackVariance: 3
+      maxHp: 20
+      attackDamage: 3
+      attackSpeed: 4
+      attackVariance: 2
       defense: 0
+    scrapsReward:
+      baseCount: 15
+      variance: 2
   - dayNumber: 3
     combatStats:
-      maxHp: 18
-      attackDamage: 2
-      attackSpeed: 2
+      maxHp: 27
+      attackDamage: 3
+      attackSpeed: 4
       attackVariance: 3
       defense: 0
-  - dayNumber: 4
-    combatStats:
-      maxHp: 18
-      attackDamage: 2
-      attackSpeed: 3
-      attackVariance: 3
-      defense: 0
-  - dayNumber: 5
-    combatStats:
-      maxHp: 20
-      attackDamage: 2
-      attackSpeed: 3
-      attackVariance: 4
-      defense: 0
+    scrapsReward:
+      baseCount: 18
+      variance: 2

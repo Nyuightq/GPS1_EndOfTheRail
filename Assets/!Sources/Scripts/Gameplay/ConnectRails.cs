@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
-using static UnityEditor.ShaderGraph.Internal.Texture2DShaderProperty;
 
 public class ConnectRails : MonoBehaviour
 {

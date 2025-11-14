@@ -16,36 +16,31 @@ MonoBehaviour:
   data:
   - dayNumber: 1
     combatStats:
-      maxHp: 12
-      attackDamage: 1
-      attackSpeed: 2
+      maxHp: 16
+      attackDamage: 3
+      attackSpeed: 1
       attackVariance: 2
       defense: 0
+    scrapsReward:
+      baseCount: 14
+      variance: 0
   - dayNumber: 2
     combatStats:
-      maxHp: 14
-      attackDamage: 1
-      attackSpeed: 2
+      maxHp: 20
+      attackDamage: 6
+      attackSpeed: 1
       attackVariance: 3
       defense: 0
+    scrapsReward:
+      baseCount: 16
+      variance: 0
   - dayNumber: 3
     combatStats:
-      maxHp: 18
-      attackDamage: 2
+      maxHp: 22
+      attackDamage: 8
       attackSpeed: 2
       attackVariance: 3
       defense: 0
-  - dayNumber: 4
-    combatStats:
-      maxHp: 18
-      attackDamage: 2
-      attackSpeed: 3
-      attackVariance: 3
-      defense: 0
-  - dayNumber: 5
-    combatStats:
-      maxHp: 20
-      attackDamage: 2
-      attackSpeed: 3
-      attackVariance: 4
-      defense: 0
+    scrapsReward:
+      baseCount: 30
+      variance: 0
