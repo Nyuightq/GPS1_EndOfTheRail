@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using DG.Tweening;
+using System;
 
 public class CombatManager : MonoBehaviour
 {
@@ -147,7 +148,7 @@ public class CombatManager : MonoBehaviour
 
         if (componentDatas != null)
         {
-            Vector3[] componentSpawnPositions = GetComponentSpawnPositionsCircle(componentDatas.Count, 32f);
+            Vector3[] componentSpawnPositions = GetComponentSpawnPositionsGrid(componentDatas.Count);
             Debug.Log("GenerateComponents Action: componentsData != null");
             for (int i = 0; i < componentDatas.Count; i++)
             {
@@ -178,7 +179,7 @@ public class CombatManager : MonoBehaviour
 
         for (int i = 0; i < enemyCount; i++)
         {
-            GameObject enemyObj = Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Count)], enemySpawnParent);
+            GameObject enemyObj = Instantiate(enemyPrefabs[UnityEngine.Random.Range(0, enemyPrefabs.Count)], enemySpawnParent);
             enemyObj.transform.localPosition = enemySpawnPositions[i];
             CombatEnemyEntity enemyEntity = enemyObj.GetComponent<CombatEnemyEntity>();
             enemyEntity.InitializeCombatData(dayAmount);
@@ -188,26 +189,64 @@ public class CombatManager : MonoBehaviour
         return enemies;
     }
 
-    private Vector3[] GetComponentSpawnPositionsCircle(int count, float radius)
+    private Vector3[] GetComponentSpawnPositionsGrid(int count)
     {
+        count = Mathf.Clamp(count, 1, 8);
+
+        // int columns = 2;
+        int rows = 3;
+
+        float xOffset = 36f;
+        float yOffset = 40f;
+
         Vector3[] positions = new Vector3[count];
 
-        float startAngle = 90f;
+        int index = 0;
 
-        for (int i = 0; i < count; i++)
+        if ( count <= 3 )
         {
-            float angle = startAngle /*+ (360f / count)* i */;
-            float rad = angle * Mathf.Deg2Rad;
+            float initialYOffset = (count - 1) * (-yOffset * 0.5f);
 
-            float x = Mathf.Cos(rad) * radius;
-            float y = Mathf.Sin(rad) * radius;
-
-            positions[i] = new Vector3(x, y, 0f);
+            for (int r = 0; r < rows && index < count; r++)
+            {
+                positions[index++] = new Vector3(0f, initialYOffset + r * yOffset, 0f);
+            }
         }
+        else if (count > 3 && count <= 6)
+        {
+            // Initial for calculation
+            bool isCountOdd = count % 2 == 1;
+            int leftCount = Math.Min(count / 2, 3);
+            int rightCount = Math.Min(count / 2 + (isCountOdd ? 1 : 0), 3);
+
+            float initialYOffset;
+            // Initial for calculation
+
+            // Right side
+            initialYOffset = (rightCount - 1) * (-yOffset * 0.5f);
+            for (int r = 0; r < rightCount && index < count; r++)
+            {
+                positions[index++] = new Vector3(xOffset * 0.5f, initialYOffset + r * yOffset, 0f);
+            }
+
+            // Left side
+            initialYOffset = (leftCount - 1) * (-yOffset * 0.5f);
+            for (int r = 0; r < leftCount && index < count; r++)
+            {
+                positions[index++] = new Vector3(-xOffset * 0.5f, initialYOffset + r * yOffset, 0f);
+            }
+        }
+
+        if (count > 6)
+        {
+            positions[index++] = new Vector3(0f, yOffset * 0.5f, 0f);
+            positions[index++] = new Vector3(0f, -yOffset * 0.5f, 0f);
+        }
+
 
         return positions;
     }
-
+    
     // Used in StartCombat, auto initialize position for enemies.
     private Vector3[] GetEnemySpawnPositionsCircle(int count, float radius)
     {

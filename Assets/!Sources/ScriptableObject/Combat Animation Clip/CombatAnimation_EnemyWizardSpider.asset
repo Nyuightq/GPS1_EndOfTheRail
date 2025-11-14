@@ -13,8 +13,14 @@ MonoBehaviour:
   m_Name: CombatAnimation_EnemyWizardSpider
   m_EditorClassIdentifier: 
   idleSprites:
-  - sprite: {fileID: -227466460, guid: 06f2218061a904946a7f896b3fcd43eb, type: 3}
-    duration: 0
+  - sprite: {fileID: 270354614, guid: 694d47bbcee36f848a62528f56b8e246, type: 3}
+    duration: 0.2
+  - sprite: {fileID: -1552837761, guid: 694d47bbcee36f848a62528f56b8e246, type: 3}
+    duration: 0.2
+  - sprite: {fileID: -2076076826, guid: 694d47bbcee36f848a62528f56b8e246, type: 3}
+    duration: 0.2
+  - sprite: {fileID: 1775960894, guid: 694d47bbcee36f848a62528f56b8e246, type: 3}
+    duration: 0.2
   windupSprites:
   - sprite: {fileID: -526927245, guid: 06f2218061a904946a7f896b3fcd43eb, type: 3}
     duration: 0.2

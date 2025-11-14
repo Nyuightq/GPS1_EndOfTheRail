@@ -17,6 +17,7 @@ public class CombatComponentData
     public int attackSpeed;
     public int attackVariance;
     public CombatAnimationClip animationClip;
+    public string attackSfxName;
 }
 
 // --------------------------------------------------------------
@@ -31,6 +32,7 @@ public class ItemEffectCombat : ItemEffect
     [SerializeField] private int attackSpeed;
     [SerializeField] private int attackVariance;
     [SerializeField] private CombatAnimationClip animationClip;
+    [SerializeField] private string attackSfxName;
 
     public CombatComponentData OnPrepareBattleComponent()
     {
@@ -39,7 +41,8 @@ public class ItemEffectCombat : ItemEffect
             attackDamage = attackDamage,
             attackSpeed = attackSpeed,
             attackVariance = attackVariance,
-            animationClip = animationClip
+            animationClip = animationClip,
+            attackSfxName = attackSfxName
         };
     }
 }

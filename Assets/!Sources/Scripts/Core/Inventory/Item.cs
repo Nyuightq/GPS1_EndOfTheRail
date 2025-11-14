@@ -29,6 +29,7 @@ public class Item : MonoBehaviour
 
     int cellSize = GameManager.cellSize;
 
+
     #region Unity LifeCycle
     private void OnEnable()
     {

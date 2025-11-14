@@ -3,20 +3,19 @@
 // Author: nyuig
 // Description: -
 // --------------------------------------------------------------
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using System;
 using DG.Tweening;
-using Microsoft.Unity.VisualStudio.Editor;
+using UnityEngine.UI;
+using TMPro;
+using System.Collections;
 public class CombatSystem : UI_BaseEventPanel
 {
     [SerializeField] private UI_CombatRewardPanel rewardPanelRef;
     public CombatPlayerEntity player;
     public List<CombatComponentEntity> components = new List<CombatComponentEntity>();
     public List<CombatEnemyEntity> enemies = new List<CombatEnemyEntity>();
-    private int rewardScraps;
     private float battleSpeed = 1.0f;
 
     private bool isBattling = false;
@@ -24,7 +23,18 @@ public class CombatSystem : UI_BaseEventPanel
    
     public delegate void GameEvent(bool value, int remainHp);
     public event GameEvent onBattleEnd;
+    // Healthbar UI Elements
+    [SerializeField] private Slider _trainHealthSlider;
+    private TextMeshProUGUI _trainHealthText;
+    // Healthbar UI Elements
 
+    private void Start()
+    {
+        if (_trainHealthSlider != null)
+        {
+            _trainHealthText = _trainHealthSlider.GetComponentInChildren<TextMeshProUGUI>();
+        }
+    }
 
     public void InitializeBattle(CombatPlayerEntity playerEntity, List<CombatEnemyEntity> enemyEntities, List<CombatComponentEntity> componentEntities)
     {
@@ -37,6 +47,7 @@ public class CombatSystem : UI_BaseEventPanel
         if (player != null)
         {
             player.OnDeath += HandleDeath;
+            player.OnTakeDamage += HandleTrainHealthUpdate;
         }
 
         foreach (var component in components)
@@ -49,15 +60,14 @@ public class CombatSystem : UI_BaseEventPanel
             enemy.OnAttackReady += HandleAttack;
             enemy.OnDeath += HandleDeath;
         }
-
-        Debug.Log("[CombatSystem] Battle initialized. Ready to start.");
+        
         StartBattle();
     }
 
     public void StartBattle()
     {
-        Debug.Log("[CombatManager] Battle Start");
         isBattling = true;
+        GameStateManager.SetPhase(Phase.Combat);
     }
 
     // Update is called once per frame
@@ -105,6 +115,7 @@ public class CombatSystem : UI_BaseEventPanel
 
     private void HandleDeath(CombatEntity death)
     {
+        death.OnTakeDamage -= HandleTrainHealthUpdate;
         death.OnAttackReady -= HandleAttack;
         death.OnDeath -= HandleDeath;
         ValidateEndCondition();
@@ -122,11 +133,23 @@ public class CombatSystem : UI_BaseEventPanel
         if (death.IsDead)
         {
             Sequence seq = DOTween.Sequence();
+            float speedMult = 1f / OnSpeedToggle.SpeedMultiplier;
 
-            seq.Join(death.transform.DOScale(new Vector3(0.8f, 0.8f, 0.8f), 0.15f).SetEase(Ease.OutCubic));
-            seq.Join(death_sprite.DOFade(0.5f, 0.15f * 0.8f)); // fade in            
+            seq.Join(death.transform.DOScale(new Vector3(0.6f, 0.6f, 0.6f), 0.3f * speedMult).SetEase(Ease.OutCubic));
+            seq.Join(death_sprite.DOFade(0.3f, 0.3f * speedMult)); // fade in            
         }
+    }
 
+    private void HandleTrainHealthUpdate(CombatEntity value, int damage)
+    {
+        _trainHealthText.text = player.CurrentHp.ToString() + "/" + player.MaxHp.ToString();
+        _trainHealthSlider.value = (float) player.CurrentHp / player.MaxHp;
+
+        SoundManager.Instance.PlaySFX("SFX_Train_TakeDamage");
+        _panelRect.anchoredPosition = _panelOriginalPos;
+        _panelRect
+                .DOShakeAnchorPos(0.2f, new Vector2(4f, 0f), 10, 90f, false, true)
+                .SetEase(Ease.InOutBack);
     }
 
     private void ValidateEndCondition()
@@ -169,6 +192,7 @@ public class CombatSystem : UI_BaseEventPanel
     {
         Debug.Log("[CombatManager] Battle End. PlayerWon: " + playerWon);
         isBattling = false;
+        GameStateManager.SetPhase(Phase.Travel);
         int remainHp = player.CurrentHp;
         int rewardAmount = TotalScrapsFromEnemies();
 
@@ -195,6 +219,13 @@ public class CombatSystem : UI_BaseEventPanel
             Destroy(player.gameObject);
         }
 
+        foreach (var component in components)
+        {
+            if (component != null)
+                Destroy(component.gameObject);
+        }
+        components.Clear();
+
         foreach (var enemy in enemies)
         {
             if (enemy != null)
@@ -209,7 +240,12 @@ public class CombatSystem : UI_BaseEventPanel
     private void GiveReward(int amount, Action onRewardComplete)
     {
         // Initialize the panel with the reward amount and callback
+        StartCoroutine(DelayReward(amount, onRewardComplete));
+    }
+
+    private IEnumerator DelayReward(int amount, Action onRewardComplete)
+    {
+        yield return new WaitForSeconds(0.35f);
         rewardPanelRef.Setup(amount, onRewardComplete);
     }
-    
 }

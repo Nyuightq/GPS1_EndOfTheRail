@@ -218,7 +218,7 @@ MonoBehaviour:
   _attackSpeed: 4
   _attackDamage: 4
   _attackDamageVariance: 1
-  _isComponent: 0
+  _attackSfxName: SFX_DefaultComponentAttack
 --- !u!1 &5250462847497589265
 GameObject:
   m_ObjectHideFlags: 0

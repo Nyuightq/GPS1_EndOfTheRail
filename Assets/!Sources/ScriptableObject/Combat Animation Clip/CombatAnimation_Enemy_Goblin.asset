@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: CombatAnimation_Enemy_Goblin
   m_EditorClassIdentifier: 
   idleSprites:
-  - sprite: {fileID: -301888259, guid: 8ca1c72588319fa4182a020995b09028, type: 3}
+  - sprite: {fileID: -202266554, guid: b14ee2e6a1852e049bde7b9c198115d8, type: 3}
     duration: 0.3
-  - sprite: {fileID: -1269449796, guid: 8ca1c72588319fa4182a020995b09028, type: 3}
+  - sprite: {fileID: 1709990124, guid: b14ee2e6a1852e049bde7b9c198115d8, type: 3}
     duration: 0.3
   windupSprites:
   - sprite: {fileID: -104157591, guid: 8ca1c72588319fa4182a020995b09028, type: 3}

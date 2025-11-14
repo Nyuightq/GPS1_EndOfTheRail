@@ -61,7 +61,7 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: SFX_RailOnDelete_Success
     clip: {fileID: 8300000, guid: 03e290422ab7a6a48b18eff2899e97b3, type: 3}
-    volume: 0.1
+    volume: 1
     pitch: 1.2
     loop: 0
     source: {fileID: 0}
@@ -183,6 +183,60 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 95a259de639e70f40bcef3738622b229, type: 3}
     volume: 1
     pitch: 1.2
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_CannonAttack
+    clip: {fileID: 8300000, guid: 68b3f435ee085cc478f9a860dda1bbb9, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_DefaultComponentAttack
+    clip: {fileID: 8300000, guid: 213ff5b0777c9ba4aa858ea0c6f82075, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_Enemy_BiteAttack
+    clip: {fileID: 8300000, guid: 1a6ca54bef415554c92f3c300e003d03, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_Enemy_OnDeath
+    clip: {fileID: 8300000, guid: 03947ad70f3c069419863f09b8b4acff, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_Enemy_SlashAttack
+    clip: {fileID: 8300000, guid: 493300de8c31ad142856b20df8baba2e, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_Enemy_TakeDamage
+    clip: {fileID: 8300000, guid: 77512b172d4d6514b85a4aa508b2d584, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_Enemy_ThrowAttack
+    clip: {fileID: 8300000, guid: 93e17af555cedfe46ad1d8daa3ada2b7, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_Train_TakeDamage
+    clip: {fileID: 8300000, guid: 9755eb7054d4be6449f337bfc30f9438, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_TurretAttack
+    clip: {fileID: 8300000, guid: e693ac8d57cbec949b4e35e08e7856a8, type: 3}
+    volume: 0.9
+    pitch: 1
     loop: 0
     source: {fileID: 0}
   musicTracks: []

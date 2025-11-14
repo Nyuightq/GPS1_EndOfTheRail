@@ -20,6 +20,7 @@ public class CombatEntity : MonoBehaviour
     [SerializeField] protected int _attackSpeed; // 1 speed = 0.26sec
     [SerializeField] protected int _attackDamage;
     [SerializeField] protected int _attackDamageVariance;
+    [SerializeField] protected string _attackSfxName = null;
     protected bool _isComponent = false;
     // Extra Properties
     public bool IsDead => _hp <= 0;
@@ -45,6 +46,7 @@ public class CombatEntity : MonoBehaviour
     public float RemainingAttackTimer => _attackTimer;
     public float AttackTakenTime => _attackTakenTime;
     public bool IsComponent => _isComponent;
+    public string AttackSfx => _attackSfxName;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     protected virtual void Start()
@@ -104,6 +106,7 @@ public class CombatEntity : MonoBehaviour
 
         int variance = UnityEngine.Random.Range(-_attackDamageVariance, _attackDamageVariance + 1);
         target.TakeDamage(Math.Max(1, _attackDamage + variance));
+        SoundManager.Instance.PlaySFX(AttackSfx);
     }
 
     public void SetStats(int newHp, int newDamage, int newSpeed)
