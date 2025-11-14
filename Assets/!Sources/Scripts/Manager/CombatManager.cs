@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using DG.Tweening;
+using System;
 
 public class CombatManager : MonoBehaviour
 {
@@ -178,7 +179,7 @@ public class CombatManager : MonoBehaviour
 
         for (int i = 0; i < enemyCount; i++)
         {
-            GameObject enemyObj = Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Count)], enemySpawnParent);
+            GameObject enemyObj = Instantiate(enemyPrefabs[UnityEngine.Random.Range(0, enemyPrefabs.Count)], enemySpawnParent);
             enemyObj.transform.localPosition = enemySpawnPositions[i];
             CombatEnemyEntity enemyEntity = enemyObj.GetComponent<CombatEnemyEntity>();
             enemyEntity.InitializeCombatData(dayAmount);
@@ -190,39 +191,62 @@ public class CombatManager : MonoBehaviour
 
     private Vector3[] GetComponentSpawnPositionsGrid(int count)
     {
-        count = Mathf.Clamp(count, 1, 6);
+        count = Mathf.Clamp(count, 1, 8);
 
-        int columns = 2;
+        // int columns = 2;
         int rows = 3;
 
-        float cellWidth = 36f;
-        float cellHeight = 40f;
+        float xOffset = 36f;
+        float yOffset = 40f;
 
         Vector3[] positions = new Vector3[count];
 
-        float[] xOffsets = { cellWidth / 2f, -cellWidth / 2f }; 
-        float[] yOffsets = { 0f, cellHeight, -cellHeight };
-
         int index = 0;
 
-        for (int c = 0; c < columns && index < count; c++)
+        if ( count <= 3 )
         {
-            float x = xOffsets[c];
+            float initialYOffset = (count - 1) * (-yOffset * 0.5f);
 
             for (int r = 0; r < rows && index < count; r++)
             {
-                float y = yOffsets[r];
-                positions[index++] = new Vector3(x, y, 0f);
+                positions[index++] = new Vector3(0f, initialYOffset + r * yOffset, 0f);
+            }
+        }
+        else if (count > 3 && count <= 6)
+        {
+            // Initial for calculation
+            bool isCountOdd = count % 2 == 1;
+            int leftCount = Math.Min(count / 2, 3);
+            int rightCount = Math.Min(count / 2 + (isCountOdd ? 1 : 0), 3);
+
+            float initialYOffset;
+            // Initial for calculation
+
+            // Right side
+            initialYOffset = (rightCount - 1) * (-yOffset * 0.5f);
+            for (int r = 0; r < rightCount && index < count; r++)
+            {
+                positions[index++] = new Vector3(xOffset * 0.5f, initialYOffset + r * yOffset, 0f);
+            }
+
+            // Left side
+            initialYOffset = (leftCount - 1) * (-yOffset * 0.5f);
+            for (int r = 0; r < leftCount && index < count; r++)
+            {
+                positions[index++] = new Vector3(-xOffset * 0.5f, initialYOffset + r * yOffset, 0f);
             }
         }
 
+        if (count > 6)
+        {
+            positions[index++] = new Vector3(0f, yOffset * 0.5f, 0f);
+            positions[index++] = new Vector3(0f, -yOffset * 0.5f, 0f);
+        }
+
+
         return positions;
     }
-
-
-
-
-
+    
     // Used in StartCombat, auto initialize position for enemies.
     private Vector3[] GetEnemySpawnPositionsCircle(int count, float radius)
     {

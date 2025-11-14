@@ -9,6 +9,7 @@ using System;
 using DG.Tweening;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 public class CombatSystem : UI_BaseEventPanel
 {
     [SerializeField] private UI_CombatRewardPanel rewardPanelRef;
@@ -132,9 +133,10 @@ public class CombatSystem : UI_BaseEventPanel
         if (death.IsDead)
         {
             Sequence seq = DOTween.Sequence();
+            float speedMult = 1f / OnSpeedToggle.SpeedMultiplier;
 
-            seq.Join(death.transform.DOScale(new Vector3(0.8f, 0.8f, 0.8f), 0.15f).SetEase(Ease.OutCubic));
-            seq.Join(death_sprite.DOFade(0.5f, 0.15f * 0.8f)); // fade in            
+            seq.Join(death.transform.DOScale(new Vector3(0.6f, 0.6f, 0.6f), 0.3f * speedMult).SetEase(Ease.OutCubic));
+            seq.Join(death_sprite.DOFade(0.3f, 0.3f * speedMult)); // fade in            
         }
     }
 
@@ -238,7 +240,12 @@ public class CombatSystem : UI_BaseEventPanel
     private void GiveReward(int amount, Action onRewardComplete)
     {
         // Initialize the panel with the reward amount and callback
+        StartCoroutine(DelayReward(amount, onRewardComplete));
+    }
+
+    private IEnumerator DelayReward(int amount, Action onRewardComplete)
+    {
+        yield return new WaitForSeconds(0.35f);
         rewardPanelRef.Setup(amount, onRewardComplete);
     }
-    
 }
