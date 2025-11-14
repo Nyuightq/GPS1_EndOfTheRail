@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Remarks: Go region Usage Examples for guide.
+// Remark: for future use, change to service locator (auto intantiate across different scene)
 
 [System.Serializable]
 public class Sound

@@ -21,9 +21,6 @@ public class DayCycleScript : MonoBehaviour
     [SerializeField] private int nightLength = 10;
     [SerializeField] private int dayLengthMod = 0;
 
-    [Header("UI Settings")]
-    [SerializeField] private GameObject nightPanel;
-
     [Header("Event Settings")]
     [SerializeField] private Tilemap eventTilemap;          //Assign EventTilemap
     [SerializeField] private EncounterTile encounterTileSO; //Assign EncounterTile ScriptableObject
@@ -48,8 +45,6 @@ public class DayCycleScript : MonoBehaviour
 
     private void Start()
     {
-        if (nightPanel != null)
-            nightPanel.SetActive(false);
     }
 
     private void Update()
@@ -62,32 +57,12 @@ public class DayCycleScript : MonoBehaviour
                     currentTime = TimeState.Night;
                     tilesMoved = 0;
 
-                    if (nightPanel != null)
-                        nightPanel.SetActive(true);
-
                     Debug.Log("Night has begun!");
                     
                     SoundManager.Instance.PlaySFX("SFX_Travel_OnSwitchNight");
                    // replace SpawnNightEncounters();
                     StartCoroutine(SpawnEncountersWithDelay(0.05f)); // tweak delay as needed (0.05 - 0.2)
 
-                }
-                break;
-
-            case TimeState.Night:
-                if (tilesMoved >= nightLength)
-                {
-                    currentTime = TimeState.Day;
-                    tilesMoved = 0;
-                    day += 1;
-
-                    if (nightPanel != null)
-                        nightPanel.SetActive(false);
-
-                    ClearNightEncounters(); // 
-                    Debug.Log("Day has begun!");
-
-                    SoundManager.Instance.PlaySFX("SFX_Travel_OnSwitchDay");
                 }
                 break;
         }

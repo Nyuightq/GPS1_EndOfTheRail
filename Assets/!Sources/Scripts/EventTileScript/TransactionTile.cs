@@ -14,58 +14,88 @@ public class TransactionTile : EventTile
         if (TransactionManager.Instance != null &&
             (TransactionManager.Instance.IsTransactionUIActive || TransactionManager.Instance.IsCooldownActive))
         {
-            Debug.Log("[TransactionTile] Ignored trigger because Transaction UI is open or cooldown active.");
+            Debug.Log("[TransactionTile] Ignored: Transaction UI is open or cooldown active.");
             return;
         }
 
-        // Standard debounce
+        // Standard debounce to prevent rapid re-triggers
         if (Time.time - lastTriggerTime < debounceDuration)
         {
-            Debug.Log("[TransactionTile] Ignored duplicate trigger (debounce).");
+            Debug.Log("[TransactionTile] Ignored: Debounce active.");
             return;
         }
         lastTriggerTime = Time.time;
 
-        Debug.Log("Player entered Transaction Tile");
+        Debug.Log("[TransactionTile] Player entered Transaction Tile");
 
-        // Find and cache EventTilemap
+        // Find and cache EventTilemap if not already cached
         if (eventTilemap == null)
         {
             GameObject tilemapObj = GameObject.Find("EventTilemap");
             if (tilemapObj != null)
+            {
                 eventTilemap = tilemapObj.GetComponent<Tilemap>();
+            }
+            else
+            {
+                Debug.LogWarning("[TransactionTile] EventTilemap not found! Cannot snap player.");
+            }
         }
 
-        // Snap train to exact center of this tile
+        // Snap player to exact center of this tile
         if (eventTilemap != null)
         {
             Vector3Int tilePos = eventTilemap.WorldToCell(player.transform.position);
             Vector3 centerPos = eventTilemap.GetCellCenterWorld(tilePos);
             player.transform.position = centerPos;
 
-            Debug.Log($"[TransactionTile] Snapped train to center at {tilePos}");
+            Debug.Log($"[TransactionTile] Snapped player to tile center at {tilePos}");
         }
 
-        // Freeze the train AFTER snapping
+        // Freeze the train AFTER snapping position
         TrainFreezeController freezeController = player.GetComponent<TrainFreezeController>();
         if (freezeController == null)
+        {
             freezeController = Object.FindFirstObjectByType<TrainFreezeController>();
+        }
 
         if (freezeController != null)
+        {
             freezeController.FreezeTrain();
+            Debug.Log("[TransactionTile] Train frozen.");
+        }
+        else
+        {
+            Debug.LogWarning("[TransactionTile] TrainFreezeController not found!");
+        }
 
-        SoundManager.Instance.PlaySFX("SFX_EventWindowPopup");
-        Debug.Log($"SFX_EventWindowPopup");
+        // Play SFX if available
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlaySFX("SFX_EventWindowPopup");
+            Debug.Log("[TransactionTile] Played SFX_EventWindowPopup");
+        }
 
         // Open Transaction UI
-        TransactionManager.Instance?.OpenTransactionUI(player);
+        if (TransactionManager.Instance != null)
+        {
+            TransactionManager.Instance.OpenTransactionUI(player);
+        }
+        else
+        {
+            Debug.LogError("[TransactionTile] TransactionManager.Instance is null!");
+        }
     }
 
     public override void OnPlayerExit(GameObject player)
     {
-        SoundManager.Instance.PlaySFX("SFX_ButtonOnCancel");
-        Debug.Log($"SFX_ButtonOnCancel");
+        // Play exit SFX
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlaySFX("SFX_ButtonOnCancel");
+            Debug.Log("[TransactionTile] Played SFX_ButtonOnCancel");
+        }
 
-        Debug.Log("Player exited Transaction Tile");
+        Debug.Log("[TransactionTile] Player exited Transaction Tile");
     }
 }

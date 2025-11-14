@@ -24,6 +24,7 @@ public class TrainFreezeController : MonoBehaviour
         ChurchManager.OnChurchClosed += ResumeTrain;
         CombatManager.OnCombatClosed += ResumeTrain; 
         StoryManager.OnStoryClosed += ResumeTrain; 
+        EngineerManager.OnEngineerClosed += ResumeTrain;
     }
 
     private void OnDisable()
@@ -33,6 +34,7 @@ public class TrainFreezeController : MonoBehaviour
         ChurchManager.OnChurchClosed -= ResumeTrain;
         CombatManager.OnCombatClosed -= ResumeTrain; 
         StoryManager.OnStoryClosed -= ResumeTrain; 
+        EngineerManager.OnEngineerClosed -= ResumeTrain;
     }
 
     public void FreezeTrain()
@@ -45,7 +47,7 @@ public class TrainFreezeController : MonoBehaviour
         }
     }
 
-    private void ResumeTrain()
+    public void ResumeTrain()
     {
         if (trainMovement != null && isFrozen)
         {

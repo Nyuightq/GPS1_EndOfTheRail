@@ -1,8 +1,3 @@
-// --------------------------------------------------------------
-// Creation Date: 2025-10-17 21:41
-// Author: ZQlie
-// Description: -
-// --------------------------------------------------------------
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -10,15 +5,22 @@ using UnityEngine.Tilemaps;
 public class EngineerTile : EventTile
 {
     private static Tilemap eventTilemap;
+    private static float lastTriggerTime = -10f;
+    private const float debounceDuration = 0.25f; // Prevents rapid retriggering (Remark: Debounce doesnt work, still retriggers twice)
 
     public override void OnPlayerEnter(GameObject player)
     {
-        Debug.Log($"Player entered Engineer Tile");
+        // Debounce check — ignore if still cooling down
+        if (Time.time - lastTriggerTime < debounceDuration)
+            return;
+        lastTriggerTime = Time.time;
 
+        Debug.Log($"[EngineerTile] Player entered Engineer Tile");
+
+        // Play entry sound
         SoundManager.Instance.PlaySFX("SFX_EngineerEnter");
-        Debug.Log($"SFX_EngineerEnter");
 
-        // Find and cache EventTilemap
+        // Find and cache EventTilemap if not already set
         if (eventTilemap == null)
         {
             GameObject tilemapObj = GameObject.Find("EventTilemap");
@@ -26,29 +28,30 @@ public class EngineerTile : EventTile
                 eventTilemap = tilemapObj.GetComponent<Tilemap>();
         }
 
-        // Snap train to exact center of this tile IMMEDIATELY
+        // Snap train to exact center of tile
         if (eventTilemap != null)
         {
             Vector3Int tilePos = eventTilemap.WorldToCell(player.transform.position);
             Vector3 centerPos = eventTilemap.GetCellCenterWorld(tilePos);
             player.transform.position = centerPos;
-            
             Debug.Log($"[EngineerTile] Snapped train to center at {tilePos}");
         }
 
-        // Get reference to TrainFreezeController AFTER snapping to center
+        // Freeze train movement while UI is open
         TrainFreezeController freezeController = player.GetComponent<TrainFreezeController>();
         if (freezeController != null)
+        {
             freezeController.FreezeTrain();
+            Debug.Log("[EngineerTile] Train frozen.");
+        }
 
-        // Logic for engineer or link to manager
+        // Open Engineer UI through the EngineerManager
+        EngineerManager.Instance.OpenEngineerUI(player);
     }
 
     public override void OnPlayerExit(GameObject player)
     {
+        Debug.Log("[EngineerTile] Player exited Engineer Tile");
         SoundManager.Instance.PlaySFX("SFX_ButtonOnCancel");
-        Debug.Log($"SFX_ButtonOnCancel");
-
-        Debug.Log($"Player exited Engineer Tile");
     }
 }

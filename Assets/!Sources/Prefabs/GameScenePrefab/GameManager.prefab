@@ -39,6 +39,7 @@ Transform:
   - {fileID: 2544251806189487590}
   - {fileID: 948094549907036257}
   - {fileID: 947493624894140746}
+  - {fileID: 4398974902265850685}
   - {fileID: 9034521887748340807}
   - {fileID: 984356882037829544}
   - {fileID: 310074211290215139}
@@ -192,7 +193,6 @@ MonoBehaviour:
   dayLength: 30
   nightLength: 40
   dayLengthMod: 0
-  nightPanel: {fileID: 0}
   eventTilemap: {fileID: 0}
   encounterTileSO: {fileID: 11400000, guid: 88ad12f5cae3aad40a5fbd6ecaf0e783, type: 2}
   globalSpawnChance: 0
@@ -265,6 +265,51 @@ MonoBehaviour:
   messageText: {fileID: 0}
   yesButtonText: {fileID: 0}
   healAmount: 20
+--- !u!1 &1417293956878994796
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4398974902265850685}
+  - component: {fileID: 5534164070626002141}
+  m_Layer: 0
+  m_Name: EngineerManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4398974902265850685
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1417293956878994796}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -12.196385, y: -10.115321, z: 0.40117952}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1718111857734153875}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5534164070626002141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1417293956878994796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10f4bb3ce9637b446994352b60e84aa5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  engineerUIPanel: {fileID: 0}
 --- !u!1 &1662941285322990777
 GameObject:
   m_ObjectHideFlags: 0
@@ -358,6 +403,7 @@ MonoBehaviour:
   rewardUIPanel: {fileID: 0}
   rewardContainer: {fileID: 0}
   tweenDuration: 0.1
+  enforceSpawnBounds: 1
 --- !u!114 &6990666771657999095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -484,18 +530,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 963babcac9535514bb35648d9410596c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  availableItems: []
+  transactionSlots: []
   uiPanel: {fileID: 0}
   declineButton: {fileID: 0}
   transactionContainer: {fileID: 0}
   scrapText: {fileID: 0}
   feedbackText: {fileID: 0}
-  transactionItems: []
-  spawnPoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   tweenDuration: 0.5
-  tweenEase: 27
+  enforceSpawnBounds: 1
 --- !u!1 &5880675819864877464
 GameObject:
   m_ObjectHideFlags: 0

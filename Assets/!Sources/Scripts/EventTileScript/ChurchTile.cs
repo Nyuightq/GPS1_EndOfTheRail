@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+//Remark: No debounce occurence (Remark: Debounce doesnt work, still retriggers twice)
+
 [CreateAssetMenu(menuName = "Custom Tiles/ChurchTile")]
 public class ChurchTile : EventTile
 {

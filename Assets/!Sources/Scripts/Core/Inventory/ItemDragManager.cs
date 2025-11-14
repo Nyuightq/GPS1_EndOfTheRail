@@ -113,12 +113,18 @@ private void LeftRelease()
     {
         dragging = false;
         AttachToInventory();
+
+            // Notify RewardManager (if active)
+            if (RewardManager.Instance != null)
+            {
+                RewardManager.Instance.OnItemReleased(gameObject);
+            }
         
-        // ADD THIS LINE - Critical for snap-back functionality
-        if (RewardManager.Instance != null) 
-        {
-            RewardManager.Instance.OnItemReleased(gameObject);
-        }
+            // Notify TransactionManager (if active)
+            if (TransactionManager.Instance != null)
+            {
+                TransactionManager.Instance.OnItemReleased(gameObject);
+            }
     }
 }
 
