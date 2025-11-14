@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 public class OnButtonClick : MonoBehaviour
 {
     [SerializeField] private Animator sideSliderAnimator;
-
     
     [Header("UI References")]
     [SerializeField] private GameObject optionMenuText;
@@ -29,12 +28,16 @@ public class OnButtonClick : MonoBehaviour
     private bool isSideSliderOpen = false;
     private bool optionsClicked = false;
     private bool creditsClicked = false;
+    private bool startClicked = false;
+    private bool exitClicked = false;
 
     public void Start()
     {
         isSideSliderOpen = false;
         optionsClicked = false;
         creditsClicked = false;
+        startClicked = false;
+        exitClicked = false;
 
         optionMenuText.SetActive(false);
         shaderToggle.SetActive(false);
@@ -47,10 +50,29 @@ public class OnButtonClick : MonoBehaviour
 
     public void OnStartButton()
     {
+        startClicked = true;
+
         SoundManager.Instance.PlaySFX("SFX_StartNewGame");
         Debug.Log($"SFX_StartNewGame");
 
-        StartCoroutine(WaitThenStart());
+        if (startClicked == true)
+        {
+            SoundManager.Instance.PlaySFX("SFX_PanelSlideOut_2");
+            Debug.Log($"SFX_PanelSlideOut_2");
+
+            sideSliderAnimator.Play("CloseSideSliderAnim", 0, 0f);
+
+            optionsClicked = false;
+            isSideSliderOpen = false;
+            startClicked = false;
+            exitClicked = false;
+
+            StartCoroutine(optionContentsClose());
+            StartCoroutine(creditsContentsClose());
+            StartCoroutine(WaitThenStart());
+
+            return;
+        }
     }
 
     private IEnumerator WaitThenStart()
@@ -58,7 +80,6 @@ public class OnButtonClick : MonoBehaviour
         yield return new WaitForSeconds(1.25f);
 
         SceneManager.LoadScene("CutScene01");
-
         Debug.Log("Dramatic entrance!");
     }
     
@@ -66,13 +87,15 @@ public class OnButtonClick : MonoBehaviour
     {
         if (isSideSliderOpen && optionsClicked == true)
         {
-            SoundManager.Instance.PlaySFX("SFX_ButtonOnClick_2");
-            Debug.Log($"SFX_ButtonOnClick_2");
+            SoundManager.Instance.PlaySFX("SFX_PanelSlideOut_2");
+            Debug.Log($"SFX_PanelSlideOut_2");
             
             sideSliderAnimator.Play("CloseSideSliderAnim", 0, 0f);
 
             optionsClicked = false;
             isSideSliderOpen = false;
+            startClicked = false;
+            exitClicked = false;
 
             StartCoroutine(optionContentsClose());
             StartCoroutine(creditsContentsClose());
@@ -172,10 +195,29 @@ public class OnButtonClick : MonoBehaviour
 
     public void OnExitButton()
     {
+        exitClicked = true;
+        
         SoundManager.Instance.PlaySFX("SFX_Exit_2");
         Debug.Log($"SFX_Exit_2");
 
-        StartCoroutine(WaitThenExit());
+        if (exitClicked == true)
+        {
+            SoundManager.Instance.PlaySFX("SFX_PanelSlideOut_2");
+            Debug.Log($"SFX_PanelSlideOut_2");
+
+            sideSliderAnimator.Play("CloseSideSliderAnim", 0, 0f);
+
+            optionsClicked = false;
+            isSideSliderOpen = false;
+            startClicked = false;
+            exitClicked = false;
+
+            StartCoroutine(optionContentsClose());
+            StartCoroutine(creditsContentsClose());
+            StartCoroutine(WaitThenExit());
+
+            return;
+        }
     }
 
     private IEnumerator WaitThenExit()
@@ -183,7 +225,6 @@ public class OnButtonClick : MonoBehaviour
         yield return new WaitForSeconds(1.25f);
 
         Application.Quit();
-
         Debug.Log("Dramatic exit!");
     }
 
