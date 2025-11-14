@@ -3,9 +3,6 @@
 // Author: User
 // Description: -
 // --------------------------------------------------------------
-using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
@@ -31,16 +28,11 @@ public class BuildRails : MonoBehaviour
     private RailLine railLine;
     private bool canBuild = false;
     private bool isHolding = false;
+    private bool isDeleting = false;
+    private bool _isLeftHolding = false;
+    private bool _isRightHolding = false;
     private Vector3Int? _lastBuiltRail = null;
 
-    private void OnMouseHoldPerformed(InputAction.CallbackContext ctx)
-    {
-        isHolding = true;
-    }
-    private void OnMouseHoldCanceled(InputAction.CallbackContext ctx)
-    {
-        isHolding = false;
-    }
 
     #region Unity Life Cycle
     private void Awake()
@@ -55,11 +47,51 @@ public class BuildRails : MonoBehaviour
     private void OnEnable()
     {
         gridScript.OnRefreshRoute += RefreshBuildRail;
+
+        InputManager.OnLeftClick += ActiveOnBuild;
+        InputManager.OnLeftRelease += CancelOnBuild;
+        InputManager.OnRightClick += ActiveDelete;
+        InputManager.OnRightRelease += CancelDelete;
     }
 
     private void OnDisable()
     {
         gridScript.OnRefreshRoute -= RefreshBuildRail;
+
+        InputManager.OnLeftClick -= ActiveOnBuild;
+        InputManager.OnLeftRelease -= CancelOnBuild;
+        InputManager.OnRightClick -= ActiveDelete;
+        InputManager.OnRightRelease -= CancelDelete;
+        isDeleting = false;
+        isHolding = false;
+    }
+
+    private void ActiveOnBuild()
+    {
+        _isLeftHolding = true;
+        isHolding = true;
+        isDeleting = false;
+    }
+
+    private void CancelOnBuild()
+    {
+        _isLeftHolding = false;
+        isHolding = false;
+        if (_isRightHolding) isDeleting = true;
+    }
+
+    private void ActiveDelete()
+    {
+        _isRightHolding = true;
+        isHolding = false;
+        isDeleting = true;
+    }
+
+    private void CancelDelete()
+    {
+        _isRightHolding = false;
+        isDeleting = false;
+        if (_isLeftHolding) isHolding = true;
     }
 
     void Update()
@@ -70,20 +102,20 @@ public class BuildRails : MonoBehaviour
         // Variables Declaration 
         // =====================
         Vector3Int tilePos = ReadMousePointingSnapPoint();
-        bool onRail = gridScript.railAtPos(tilePos);
         if (_lastBuiltRail != null)
         {
             railLine = gridScript.railDataMap[(Vector3Int)_lastBuiltRail].line;
         }
 
         TileBase eventTile = eventTilemap.GetTile(tilePos);
-        bool isNonTraversable = eventTile != null /*eventTile is NonTraversableTile || eventTile is NonTraversableRuleTile*/ || gridScript.railAtPosIsDisabled(tilePos); // First condition of nonTraversable tile
-
-        if (Input.GetMouseButton(0)) isHolding = true; else isHolding = false;
-
-        bool emptyStart = !gridScript.hasConnection(gridScript.startPoint);
+        // === Can Build Check
+        bool onRail = gridScript.railAtPos(tilePos);
+        bool isNonTraversable = eventTile != null || gridScript.railAtPosIsDisabled(tilePos); // First condition of nonTraversable tile
         bool validConnection = IsValidConnection(tilePos);
         canBuild = !onRail && !isNonTraversable && validConnection;
+        // === Can Build Check
+        bool emptyStart = !gridScript.hasConnection(gridScript.startPoint);
+
         // =====================
         // Variables Declaration 
         // =====================
@@ -99,7 +131,7 @@ public class BuildRails : MonoBehaviour
                 railLine = new RailLine();
                 railLine.line.Add(gridScript.startPoint);
             }
-            if (emptyStart) Debug.Log("Empty Start");
+            //if (emptyStart) Debug.Log("Empty Start");
             RailData data = new RailData(tilePos);
 
             GameManager.spawnTile(tilePos, defaultTile, data);
@@ -110,7 +142,7 @@ public class BuildRails : MonoBehaviour
             gridScript.railDataMap[tilePos].setLine(railLine);
             railLine.line.Add(tilePos);
 
-            Debug.Log($"Tile {tilePos} assigned to line {railLine.GetHashCode()}");
+            //Debug.Log($"Tile {tilePos} assigned to line {railLine.GetHashCode()}");
 
             if (emptyStart)
             {
@@ -122,14 +154,14 @@ public class BuildRails : MonoBehaviour
             }
             _lastBuiltRail = tilePos;
 
-            Debug.Log($"Tile {tilePos} assigned to line {gridScript.railDataMap[tilePos].directionIn}, {gridScript.railDataMap[tilePos].directionOut}");
+            //Debug.Log($"Tile {tilePos} assigned to line {gridScript.railDataMap[tilePos].directionIn}, {gridScript.railDataMap[tilePos].directionOut}");
 
             //register rest point tile
             HandleRestTileConnection(tilePos);
             HandleEndTileConnection(tilePos);
         }
 
-        HandleDeleteInput(tilePos);
+        if (isDeleting) DeleteCertainRail(tilePos);
     }
     #endregion
     
@@ -281,7 +313,6 @@ public class BuildRails : MonoBehaviour
         bool isEmptyStart = !gridScript.hasConnection(gridScript.startPoint);
         if (isEmptyStart)
         {
-            Debug.Log("SFX_RailOnReset_Failed");
             SoundManager.Instance.PlaySFX("SFX_RailOnReset_Failed");
             // Play Sound > SFX_RailOnReset_Failed
             return;
@@ -294,15 +325,9 @@ public class BuildRails : MonoBehaviour
             Vector3Int firstRail = railLine.line[1];
             DeleteCertainRail(firstRail);
 
-            Debug.Log("SFX_RailOnReset_Success > " + firstRail);
             // Play Sound > SFX_RailOnReset_Success
             SoundManager.Instance.PlaySFX("SFX_RailOnReset_Success");
         }
-    }
-    private void HandleDeleteInput(Vector3Int tilePos)
-    {
-        if (!Input.GetMouseButton(1)) return;
-        DeleteCertainRail(tilePos);
     }
 
     private void DeleteCertainRail(Vector3Int tilePos)
@@ -324,7 +349,7 @@ public class BuildRails : MonoBehaviour
         // record IncomingDirection（ComingFromDirection）
         Vector3Int? previousRail = GetSingleConnectedRail(lastTile, true);
         Vector3Int? nextRail = GetSingleConnectedRail(lastTile, false);
-        Debug.Log("Origin " + lastTile + " PreviousRail: " + previousRail + " NextRail: " + nextRail);
+        // Debug.Log("Origin " + lastTile + " PreviousRail: " + previousRail + " NextRail: " + nextRail);
 
         // delete last Rail Tile
         GameManager.DestroyTile(lastTile);
@@ -350,13 +375,13 @@ public class BuildRails : MonoBehaviour
             }
         }
 
-        Debug.Log($"Deleted tile: {lastTile}");
+        //Debug.Log($"Deleted tile: {lastTile}");
 
         // Use ComingFromDirection to find previous tile connected to deleted tile
         if (previousRail.HasValue)
         {
             _lastBuiltRail = previousRail;
-            Debug.Log($"_lastBuiltRail set to previous connected tile: {_lastBuiltRail}");
+            //Debug.Log($"_lastBuiltRail set to previous connected tile: {_lastBuiltRail}");
         }
         else
         {

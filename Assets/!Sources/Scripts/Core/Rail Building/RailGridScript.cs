@@ -194,7 +194,7 @@ public class RailGridScript : MonoBehaviour
             if (railAtPos(tile) && !railAtPosIsDisabled(tile))
             {
                 List<Vector3Int> lineList = railDataMap[tile].line.line;
-                Debug.Log("Last rail type: " + railDataMap[lineList[^1]].railType);
+                // Debug.Log("Last rail type: " + railDataMap[lineList[^1]].railType);
                 if (lineList != null)
                 {
                     if (railDataMap[lineList[0]].railType == RailData.railTypes.start && (railDataMap[lineList[^1]].railType == RailData.railTypes.end || railDataMap[lineList[^1]].railType == RailData.railTypes.rest))
@@ -210,7 +210,7 @@ public class RailGridScript : MonoBehaviour
 
     public void travelCheck()
     {
-        Debug.Log("Travel Check()");
+        // Debug.Log("Travel Check()");
         if (GameStateManager.CurrentPhase == Phase.Plan && validatePath(startPoint))
         {
             if (_trainRef == null) // Initial first train
@@ -232,11 +232,11 @@ public class RailGridScript : MonoBehaviour
                         if (rpm != null)
                         {
                             tm.restPointManager = rpm;
-                            Debug.Log("RestPointManager assigned to spawned train");
+                            // Debug.Log("RestPointManager assigned to spawned train");
                         }
                         else
                         {
-                            Debug.LogError("RestPointManager not found in scene!");
+                            // Debug.LogError("RestPointManager not found in scene!");
                         }
                         
                         break;
@@ -335,7 +335,7 @@ public class RailGridScript : MonoBehaviour
     //used to find the coordinates of unique tiles (start,end)
     public Vector3Int findPoint(Dictionary<Vector3Int,RailData> railDataMap, RailData.railTypes railType)
     {
-        if(railDataMap.Count == 0) Debug.Log("nothing in yet");
+        // if(railDataMap.Count == 0) Debug.Log("nothing in yet");
 
         foreach (KeyValuePair<Vector3Int, RailData> rail in railDataMap)
         {
@@ -420,7 +420,6 @@ public class RailGridScript : MonoBehaviour
                     }
                     else if (tile != null)
                     {
-                        Debug.Log("Registered disabled rail: " + tilePos);
                         compiling_railDataMap[tilePos] = new RailData(tilePos, RailData.railTypes.disabled);
                     }
                 }
@@ -461,7 +460,7 @@ public class RailGridScript : MonoBehaviour
         }
 
         // Store this for later if you want to revert after night
-        Debug.Log($"Combat tile spawned at {randomPos}");
+        // Debug.Log($"Combat tile spawned at {randomPos}");
     }
 
     public bool IsRestTile(Vector3Int tilePos)
