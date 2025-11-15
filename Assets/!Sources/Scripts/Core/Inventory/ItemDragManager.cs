@@ -101,6 +101,7 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
                 inventoryGridScript.MarkCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, null);
                 itemScript.state = Item.itemState.unequipped;
             }
+            
         }
     }
 
@@ -125,7 +126,13 @@ private void LeftRelease()
             {
                 TransactionManager.Instance.OnItemReleased(gameObject);
             }
-    }
+
+            // Notify EngineerManager (if active)
+            if (EngineerManager.Instance != null)
+            {
+                EngineerManager.Instance.OnItemReleased(gameObject);
+            }
+        }
 }
 
     private void RightClick()

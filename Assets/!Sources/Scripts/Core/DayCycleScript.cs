@@ -29,6 +29,19 @@ public class DayCycleScript : MonoBehaviour
 
     [SerializeField] private Transform playerTrain;
 
+    [Header("UI Image Swap (Day / Night)")]
+    [SerializeField] private RectTransform uiImageA;
+    [SerializeField] private RectTransform uiImageB;
+
+    private Vector3 uiA_DayPos;
+    private Vector3 uiB_DayPos;
+
+    [Header("Debug: Total Tiles Moved Globally")]
+    [SerializeField] private int totalTilesMoved = 0;
+
+    public int TotalTilesMoved => totalTilesMoved;
+
+
     public enum TimeState { Day, Night }//changed to public (its for the day progress slider
     public bool IsDayTime => currentTime == TimeState.Day;
     [Header("Public getters for Day Progress Slider")]
@@ -39,12 +52,17 @@ public class DayCycleScript : MonoBehaviour
     public TimeState CurrentTime => currentTime;
 
     public void setTilesMoved(int val) { tilesMoved = val; }
-    public void addTilesMoved(int val) { tilesMoved += val; }
+    public void addTilesMoved(int val) { 
+        tilesMoved += val; 
+        totalTilesMoved += val;   // NEW global counter
+    }
     public int getTilesMoved() { return tilesMoved; }
 
 
     private void Start()
     {
+        if (uiImageA != null) uiA_DayPos = uiImageA.anchoredPosition;
+        if (uiImageB != null) uiB_DayPos = uiImageB.anchoredPosition;
     }
 
     private void Update()
@@ -62,10 +80,27 @@ public class DayCycleScript : MonoBehaviour
                     SoundManager.Instance.PlaySFX("SFX_Travel_OnSwitchNight");
                    // replace SpawnNightEncounters();
                     StartCoroutine(SpawnEncountersWithDelay(0.05f)); // tweak delay as needed (0.05 - 0.2)
+                    SwapUIPositions();
 
                 }
                 break;
         }
+
+        if (currentTime == TimeState.Night)
+        {
+            if (tilesMoved >= nightLength)
+            {
+                currentTime = TimeState.Day;
+                tilesMoved = 0;
+
+                Debug.Log("Day has begun!");
+
+                RestoreUIPositions();     // <--- add this
+                ClearNightEncounters();
+            }
+        }
+
+        Debug.Log($"[DayCycle] PhaseTiles = {tilesMoved}, TotalTiles = {totalTilesMoved}, State = {currentTime}");
     }
 
     private IEnumerator SpawnEncountersWithDelay(float delay)
@@ -214,4 +249,25 @@ private void SpawnEncountersOnTiles(RailGridScript grid)
 
         Debug.Log($"Cleared {cleared} EncounterTiles from EventTilemap.");
     }
+
+    /// <summary>
+    /// for swapping icon image for daynight slider
+    /// </summary>
+    private void SwapUIPositions()
+    {
+        if (uiImageA == null || uiImageB == null) return;
+
+        Vector3 temp = uiImageA.anchoredPosition;
+        uiImageA.anchoredPosition = uiImageB.anchoredPosition;
+        uiImageB.anchoredPosition = temp;
+    }
+
+    private void RestoreUIPositions()
+    {
+        if (uiImageA == null || uiImageB == null) return;
+
+        uiImageA.anchoredPosition = uiA_DayPos;
+        uiImageB.anchoredPosition = uiB_DayPos;
+    }
+
 }
