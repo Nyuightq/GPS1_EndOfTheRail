@@ -5,6 +5,10 @@ using UnityEngine.SceneManagement;
 
 public class OnClickImage : MonoBehaviour
 {
+    [Header("Animator")]
+    [SerializeField] private Animator transitionAnimator;
+    
+    [Header("UI References")]
     [SerializeField] private GameObject narrative1;
     [SerializeField] private GameObject narrative2;
     [SerializeField] private GameObject narrative3;
@@ -15,12 +19,18 @@ public class OnClickImage : MonoBehaviour
     [SerializeField] private GameObject narrative3Text;
     [SerializeField] private GameObject narrative4Text;
 
+    [SerializeField] private GameObject transitionGO;
+
+    [Header("Audio")]
     [SerializeField] private AudioSource clickAudio;
 
     private bool clickedAudio = false;
 
     public void Start()
     {
+        transitionAnimator.enabled = false;
+        StartCoroutine(TransitionIn());
+
         narrative1.SetActive(true);
         narrative1Text.SetActive(true);
 
@@ -33,6 +43,19 @@ public class OnClickImage : MonoBehaviour
         narrative4Text.SetActive(false);
 
         clickedAudio = false;
+    }
+
+    private IEnumerator TransitionIn()
+    {
+        transitionGO.SetActive(true);
+
+        yield return new WaitForSeconds(0.1f);
+
+        transitionAnimator.enabled = true;
+        transitionAnimator.Play("TransitionInAnim", 0, 0f);
+
+        yield return new WaitForSeconds(0.5f);
+        transitionGO.SetActive(false);
     }
 
     public void OnNarrative1()
@@ -73,13 +96,21 @@ public class OnClickImage : MonoBehaviour
 
     public void OnNarrative4()
     {
-        narrative4.SetActive(false);
-        narrative4Text.SetActive(false);
-
         clickedAudio = true;
         clickAudio.Play();
 
+        StartCoroutine(TransitionOut());
         StartCoroutine(WaitThenNext());
+    }
+
+    private IEnumerator TransitionOut()
+    {
+        transitionGO.SetActive(true);
+
+        yield return new WaitForSeconds(0.1f);
+
+        transitionAnimator.enabled = true;
+        transitionAnimator.Play("TransitionOutAnim", 0, 0f);
     }
 
     private IEnumerator WaitThenNext()

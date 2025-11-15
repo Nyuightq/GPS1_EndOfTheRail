@@ -1683,7 +1683,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buttonText: {fileID: 3278578854221167601}
   hoverAudio: {fileID: 6862294367514331683}
-  normalColor: {r: 0.8000001, g: 0.6784314, b: 0.454902, a: 1}
+  normalColor: {r: 0.9725491, g: 0.7843138, b: 0.38431376, a: 1}
   hoverColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!82 &6862294367514331683
 AudioSource:
