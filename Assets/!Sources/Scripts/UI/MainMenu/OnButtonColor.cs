@@ -8,8 +8,8 @@ public class OnButtonColor : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     [SerializeField] private TextMeshProUGUI buttonText;
     [SerializeField] private AudioSource hoverAudio;
 
-    [SerializeField] private Color normalColor = new Color(50f / 255f, 50f / 255f, 50f / 255f);
-    [SerializeField] private Color hoverColor = new Color(255f / 255f, 255f / 255f, 255f / 255f);
+    [SerializeField] private Color normalColor = new Color(251f / 255f, 197f / 255f, 97f / 255f); //Yellowish
+    [SerializeField] private Color hoverColor = new Color(255f / 255f, 255f / 255f, 255f / 255f); //White
 
     private bool audioPlayed = false;
 
