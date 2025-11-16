@@ -19,7 +19,7 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
 
     private RectTransform rectTransform;
 
-    private Vector2 topLeftCellPos;
+    public Vector2 topLeftCellPos { get; private set; }
     private Vector2 dragDir;
     private bool dragging, mouseOnItem;
 
@@ -92,7 +92,8 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
 
     private void LeftClick()
     {
-        if (mouseOnItem)
+        //Debug.Log(GameStateManager.CurrentPhase);
+        if (mouseOnItem && GameStateManager.CurrentPhase != Phase.Combat)
         {
             dragging = true;
 
@@ -100,6 +101,7 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
             {
                 inventoryGridScript.MarkCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, null);
                 itemScript.state = Item.itemState.unequipped;
+                itemScript.TriggerEffectUnequip();
             }
         }
     }
@@ -165,6 +167,22 @@ public void AttachToInventory()
             {
                 return;
             }
+
+            inventoryGridScript.MarkCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, gameObject);
+
+            rectTransform.anchoredPosition = actualItemCellPos;
+            equippedPos = actualItemCellPos;
+            itemScript.state = Item.itemState.equipped;
+            itemScript.TriggerEffectEquip();
+
+            foreach(GameObject thingy in inventoryGridScript.GetAdjacentComponents(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape,this.gameObject))
+            {
+                Debug.Log($"<color=red>{gameObject} near {thingy}</color>");
+            }    
+
+
+            firstEquip = false;
+            return true;
         }
         
         Debug.Log("Item Attached!!!");

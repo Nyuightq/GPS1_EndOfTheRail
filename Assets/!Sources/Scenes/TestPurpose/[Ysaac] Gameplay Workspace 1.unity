@@ -242,6 +242,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b544dcbce6e47bc40a29e507a978ee5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &382762172 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+  m_PrefabInstance: {fileID: 6892035427243502869}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 382762167}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97d59333c60823042862d50394771d06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &444064494 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 704849399958962883, guid: 054ad38d8249dec429272a81c6293258, type: 3}
@@ -877,17 +888,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   effects:
-  - rid: 6451219834465943628
+  - rid: 6451219851714232393
   references:
     version: 2
     RefIds:
-    - rid: 6451219834465943628
+    - rid: 6451219851714232393
       type: {class: HealEffect, ns: , asm: Assembly-CSharp}
       data:
+        trigger: 0
         conditions:
-        - rid: 6451219834465943629
-        healAmount: 0.5
-    - rid: 6451219834465943629
+        - rid: 6451219851714232394
+        inputType: 0
+        healAmount: 50
+        uses: 0
+    - rid: 6451219851714232394
       type: {class: LessThanCondition, ns: , asm: Assembly-CSharp}
       data:
         valueType: 1
@@ -1401,7 +1415,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: startingItems.Array.size
-      value: 3
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: 'startingItems.Array.data[0]'
@@ -1415,6 +1429,26 @@ PrefabInstance:
       propertyPath: 'startingItems.Array.data[2]'
       value: 
       objectReference: {fileID: 11400000, guid: e842aad5399021e44a017de95589eb76, type: 2}
+    - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: 'startingItems.Array.data[3]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 7f5e6c7fef8eb6349bb1e30b30066a2f, type: 2}
+    - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: 'startingItems.Array.data[4]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 7f5e6c7fef8eb6349bb1e30b30066a2f, type: 2}
+    - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: 'startingItems.Array.data[5]'
+      value: 
+      objectReference: {fileID: 11400000, guid: a147a81c1b63d4647bab7e37d625e0b3, type: 2}
+    - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: 'startingItems.Array.data[6]'
+      value: 
+      objectReference: {fileID: 11400000, guid: d78dfe7417211fd4786162b553ce7d20, type: 2}
+    - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: 'startingItems.Array.data[7]'
+      value: 
+      objectReference: {fileID: 11400000, guid: de151c82ef045eb4eac3cca1d519370a, type: 2}
     - target: {fileID: 8911030689567367474, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: rewardPanelRef
       value: 
@@ -1584,6 +1618,14 @@ PrefabInstance:
       propertyPath: _maxHp
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 4921764918400996863, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: _baseMaxHp
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4921764918400996863, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: _baseDefense
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4926789502135262990, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: acceptButton
       value: 
@@ -1637,9 +1679,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 808508310}
     - target: {fileID: 8579136974911738680, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: inventoryScript
+      value: 
+      objectReference: {fileID: 382762172}
+    - target: {fileID: 8579136974911738680, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: inputManagerPrefab
       value: 
       objectReference: {fileID: 1721018559}
+    - target: {fileID: 8579136974911738680, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: inventoryManagerPrefab
+      value: 
+      objectReference: {fileID: 382762167}
     - target: {fileID: 9063788304404793187, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: storyPanel
       value: 

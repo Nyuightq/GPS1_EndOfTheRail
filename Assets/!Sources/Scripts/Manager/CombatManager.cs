@@ -1,7 +1,7 @@
-using UnityEngine;
-using System.Collections.Generic;
 using DG.Tweening;
-using System;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
 
 public class CombatManager : MonoBehaviour
 {
@@ -61,7 +61,7 @@ public class CombatManager : MonoBehaviour
         CombatPlayerEntity playerEntity = playerObj.GetComponent<CombatPlayerEntity>();
         playerEntity.InitialHealth(GameStateManager.Instance.playerStatus.Hp, GameStateManager.Instance.playerStatus.MaxHp);
 
-         ApplyInventoryDefenseBonus(playerEntity);
+        ApplyInventoryDefenseBonus(playerEntity);
 
         // Generate Components
         List<CombatComponentEntity> components = GenerateComponents();
@@ -94,7 +94,7 @@ public class CombatManager : MonoBehaviour
             Debug.LogWarning("InventoryItemManager.Instance is null!");
             return;
         }
-
+        
         InventoryGridScript inventory = InventoryItemManager.Instance.GetComponent<InventoryGridScript>();
         
         if (inventory == null)
@@ -143,7 +143,7 @@ public class CombatManager : MonoBehaviour
     private List<CombatComponentEntity> GenerateComponents()
     {
         List<CombatComponentData> componentDatas = InventoryItemManager.Instance.PrepareBattleComponents();
-        Debug.Log("Test" + componentDatas);
+        Debug.Log("componentDatas count: " + componentDatas.Count);
         List<CombatComponentEntity> components = new List<CombatComponentEntity>();
 
         if (componentDatas != null)
