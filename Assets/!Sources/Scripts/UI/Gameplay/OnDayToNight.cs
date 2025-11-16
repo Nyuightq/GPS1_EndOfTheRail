@@ -47,4 +47,16 @@ public class OnDayToNight : MonoBehaviour
             dayNightLight.intensity = nightIntensity;
         }
     }
+
+    /// <summary>
+    /// Forces the lighting back to day intensity. Used when skipping night phase.
+    /// </summary>
+    public void ForceResetToDay()
+    {
+        if (dayNightLight != null)
+        {
+            dayNightLight.intensity = dayIntensity;
+            Debug.Log($"[OnDayToNight] Light intensity forced to day value: {dayIntensity}");
+        }
+    }
 }

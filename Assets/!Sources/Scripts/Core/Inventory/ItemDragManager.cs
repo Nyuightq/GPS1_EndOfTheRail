@@ -107,6 +107,16 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
                 itemScript.state = Item.itemState.unequipped;
                 itemScript.TriggerEffectUnequip();
             }
+
+            if (EngineerManager.Instance != null && EngineerManager.Instance.IsEngineerUIActive)
+            {
+                EngineerManager.Instance.OnItemDragStarted(gameObject);
+            }
+
+            if (EngineerManager.Instance != null && EngineerManager.Instance.IsEngineerUIActive)
+            {
+                EngineerManager.Instance.OnItemDragStarted(gameObject);
+            }
         }
     }
 

@@ -16,7 +16,7 @@ public class TrainMovement : MonoBehaviour
 
     private RailGridScript gridScript;
     private DayCycleScript dayCycleScript;
-    private TrainAnimationController animController; // NEW: Animation controller
+    private TrainAnimationController animController;
 
     private TileBase previousBiomeTile = null;
     private Tilemap biomeTilemap;
@@ -45,7 +45,6 @@ public class TrainMovement : MonoBehaviour
         else
             Debug.Log("Found RestPointManager: " + restPointManager.name);
 
-        // NEW: Get animation controller
         animController = GetComponent<TrainAnimationController>();
         if (animController == null)
         {
@@ -115,7 +114,6 @@ public class TrainMovement : MonoBehaviour
         tilePos = Vector3Int.FloorToInt(transform.position);
         transform.position = gridScript.snapToGrid(transform.position);
 
-        // NEW: Initialize animation direction
         if (animController != null && gridScript.railAtPos(tilePos))
         {
             RailData currentRail = gridScript.railDataMap[tilePos];
@@ -168,7 +166,6 @@ public class TrainMovement : MonoBehaviour
                     prevRail = currentRail;
                     moving = true;
 
-                    // NEW: Update animation direction when starting to move
                     if (animController != null)
                     {
                         animController.UpdateDirection(chosenDir);
@@ -205,7 +202,36 @@ public class TrainMovement : MonoBehaviour
                 {
                     SoundManager.Instance.PlaySFX("SFX_TrainMovement");
                     
-                    dayCycleScript.addTilesMoved(1);
+                    // Calculate tile movement cost based on biome
+                    int tilesToAdd = 1; // default
+                    
+                    if (biomeTilemap != null)
+                    {
+                        TileBase currentBiomeTile = biomeTilemap.GetTile(tilePos);
+                        
+                        // Pilgrim Route: 0 tiles (always, day or night)
+                        if (currentBiomeTile is PilgrimRouteTile)
+                        {
+                            tilesToAdd = 0;
+                            Debug.Log("On PilgrimRouteTile: tile movement = 0");
+                        }
+                        // Swamp: 2 tiles during day only, 1 tile during night
+                        else if (currentBiomeTile is BiomeSwampTile)
+                        {
+                            if (dayCycleScript.IsDayTime)
+                            {
+                                tilesToAdd = 2;
+                                Debug.Log("On BiomeSwampTile (DAY): tile movement = 2");
+                            }
+                            else
+                            {
+                                tilesToAdd = 1;
+                                Debug.Log("On BiomeSwampTile (NIGHT): tile movement = 1 (normal)");
+                            }
+                        }
+                    }
+                    
+                    dayCycleScript.addTilesMoved(tilesToAdd);
 
                     CrystalDeteriorates deteriorator = GetComponent<CrystalDeteriorates>();
                     if (deteriorator != null)

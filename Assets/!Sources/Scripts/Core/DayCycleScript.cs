@@ -22,15 +22,23 @@ public class DayCycleScript : MonoBehaviour
     [SerializeField] private int dayLengthMod = 0;
 
     [Header("Event Settings")]
-    [SerializeField] private Tilemap eventTilemap;          //Assign EventTilemap
-    [SerializeField] private EncounterTile encounterTileSO; //Assign EncounterTile ScriptableObject
+    [SerializeField] private Tilemap eventTilemap;
+    [SerializeField] private EncounterTile encounterTileSO;
     [SerializeField, Range(0f, 1f)] private float globalSpawnChance = 0.3f;
     public int GetDay() => day;
 
     [SerializeField] private Transform playerTrain;
 
-    public enum TimeState { Day, Night }//changed to public (its for the day progress slider
+    [Header("UI Image Swap (Day / Night)")]
+    [SerializeField] private RectTransform uiImageA;
+    [SerializeField] private RectTransform uiImageB;
+
+    private Vector3 uiA_DayPos;
+    private Vector3 uiB_DayPos;
+
+    public enum TimeState { Day, Night }
     public bool IsDayTime => currentTime == TimeState.Day;
+    
     [Header("Public getters for Day Progress Slider")]
     public int TilesMoved => tilesMoved;
     public int DayLength => dayLength;
@@ -38,13 +46,23 @@ public class DayCycleScript : MonoBehaviour
     public int NightLength => nightLength;
     public TimeState CurrentTime => currentTime;
 
-    public void setTilesMoved(int val) { tilesMoved = val; }
-    public void addTilesMoved(int val) { tilesMoved += val; }
+    public void setTilesMoved(int val) 
+    { 
+        tilesMoved = Mathf.Max(0, val); // Prevent negative values
+    }
+    
+    public void addTilesMoved(int val) 
+    { 
+        tilesMoved += val;
+        tilesMoved = Mathf.Max(0, tilesMoved); // Prevent negative values
+    }
+    
     public int getTilesMoved() { return tilesMoved; }
-
 
     private void Start()
     {
+        if (uiImageA != null) uiA_DayPos = uiImageA.anchoredPosition;
+        if (uiImageB != null) uiB_DayPos = uiImageB.anchoredPosition;
     }
 
     private void Update()
@@ -56,127 +74,111 @@ public class DayCycleScript : MonoBehaviour
                 {
                     currentTime = TimeState.Night;
                     tilesMoved = 0;
+                    day++; // Increment day counter
 
-                    Debug.Log("Night has begun!");
+                    Debug.Log($"Night has begun! Day {day} completed.");
                     
                     SoundManager.Instance.PlaySFX("SFX_Travel_OnSwitchNight");
-                   // replace SpawnNightEncounters();
-                    StartCoroutine(SpawnEncountersWithDelay(0.05f)); // tweak delay as needed (0.05 - 0.2)
+                    StartCoroutine(SpawnEncountersWithDelay(0.05f));
+                    SwapUIPositions();
+                }
+                break;
+                
+            case TimeState.Night:
+                if (tilesMoved >= nightLength)
+                {
+                    currentTime = TimeState.Day;
+                    tilesMoved = 0;
 
+                    Debug.Log($"Day has begun! Starting day {day + 1}.");
+                    
+                    ClearNightEncounters();
+                    RestoreUIPositions();
                 }
                 break;
         }
     }
 
     private IEnumerator SpawnEncountersWithDelay(float delay)
-{
-    yield return new WaitForSeconds(delay);
-    SpawnNightEncounters(); // call the improved method below
-}
-
-private void SpawnNightEncounters()
-{
-    if (eventTilemap == null || encounterTileSO == null)
     {
-        Debug.LogWarning("Event Tilemap or EncounterTile not assigned!");
-        return;
+        yield return new WaitForSeconds(delay);
+        SpawnNightEncounters();
     }
 
-    RailGridScript grid = FindFirstObjectByType<RailGridScript>();
-    if (grid == null || grid.railDataMap == null)
+    private void SpawnNightEncounters()
     {
-        Debug.LogWarning("No RailGridScript or rails found.");
-        return;
-    }
-
-    TrainMovement train = null;
-    if (playerTrain != null) train = playerTrain.GetComponent<TrainMovement>();
-    if (train == null) train = FindFirstObjectByType<TrainMovement>();
-
-    if (train == null)
-    {
-        Debug.LogWarning("Train not found - spawning globally (no ahead filter).");
-        SpawnEncountersOnTiles(grid);
-        return;
-    }
-
-    Vector3Int trainTile = train.GetTilePos();
-    Vector2 forward = train.GetForwardDirection();
-    if (forward == Vector2.zero) forward = Vector2.right;
-
-    const int stepsAhead = 8;
-    const int lateralRange = 1;
-
-    HashSet<Vector3Int> aheadTiles = new HashSet<Vector3Int>();
-
-    Vector3Int current = trainTile;
-    Vector2 normalizedForward = forward.normalized;
-
-    for (int i = 0; i < stepsAhead; i++)
-    {
-        Vector3Int next = current + new Vector3Int(Mathf.RoundToInt(normalizedForward.x), Mathf.RoundToInt(normalizedForward.y), 0);
-
-        // Stop if no rail ahead
-        if (!grid.railAtPos(next)) break;
-
-        aheadTiles.Add(next);
-
-        // Include side tiles, but only those *in front* of train
-        if (lateralRange > 0)
+        if (eventTilemap == null || encounterTileSO == null)
         {
-            List<Vector3Int> adj = grid.getAdjacentTiles(next);
-            foreach (var a in adj)
+            Debug.LogWarning("Event Tilemap or EncounterTile not assigned!");
+            return;
+        }
+
+        RailGridScript grid = FindFirstObjectByType<RailGridScript>();
+        if (grid == null || grid.railDataMap == null)
+        {
+            Debug.LogWarning("No RailGridScript or rails found.");
+            return;
+        }
+
+        TrainMovement train = null;
+        if (playerTrain != null) train = playerTrain.GetComponent<TrainMovement>();
+        if (train == null) train = FindFirstObjectByType<TrainMovement>();
+
+        if (train == null)
+        {
+            Debug.LogWarning("Train not found - spawning globally (no ahead filter).");
+            SpawnEncountersOnTiles(grid);
+            return;
+        }
+
+        Vector3Int trainTile = train.GetTilePos();
+        Vector2 forward = train.GetForwardDirection();
+        if (forward == Vector2.zero) forward = Vector2.right;
+
+        const int stepsAhead = 8;
+        const int lateralRange = 1;
+
+        HashSet<Vector3Int> aheadTiles = new HashSet<Vector3Int>();
+
+        Vector3Int current = trainTile;
+        Vector2 normalizedForward = forward.normalized;
+
+        for (int i = 0; i < stepsAhead; i++)
+        {
+            Vector3Int next = current + new Vector3Int(Mathf.RoundToInt(normalizedForward.x), Mathf.RoundToInt(normalizedForward.y), 0);
+
+            if (!grid.railAtPos(next)) break;
+
+            aheadTiles.Add(next);
+
+            if (lateralRange > 0)
             {
-                Vector2 dirToAdj = new Vector2(a.x - trainTile.x, a.y - trainTile.y);
-                if (Vector2.Dot(dirToAdj, normalizedForward) > 0.1f && grid.railAtPos(a))
-                    aheadTiles.Add(a);
+                List<Vector3Int> adj = grid.getAdjacentTiles(next);
+                foreach (var a in adj)
+                {
+                    Vector2 dirToAdj = new Vector2(a.x - trainTile.x, a.y - trainTile.y);
+                    if (Vector2.Dot(dirToAdj, normalizedForward) > 0.1f && grid.railAtPos(a))
+                        aheadTiles.Add(a);
+                }
             }
 
+            current = next;
         }
 
-        current = next;
-    }
-
-    if (aheadTiles.Count == 0)
-    {
-        Debug.LogWarning("No ahead tiles found; falling back to global spawn.");
-        SpawnEncountersOnTiles(grid);
-        return;
-    }
-
-    int spawned = 0;
-    foreach (var pos in aheadTiles)
-    {
-        if (!grid.railAtPos(pos)) continue;
-        RailData data = grid.railDataMap[pos];
-        if (data.railType != RailData.railTypes.normal) continue;
-
-        TileBase currentTile = eventTilemap.GetTile(pos);
-        if (currentTile is EventTile) continue;
-
-        float roll = Random.value;
-        float finalChance = encounterTileSO.spawnChance * globalSpawnChance;
-        if (roll <= finalChance)
+        if (aheadTiles.Count == 0)
         {
-            eventTilemap.SetTile(pos, encounterTileSO.tileVisual);
-            spawned++;
+            Debug.LogWarning("No ahead tiles found; falling back to global spawn.");
+            SpawnEncountersOnTiles(grid);
+            return;
         }
-    }
 
-    Debug.Log($"SpawnNightEncounters: spawned {spawned} encounters on {aheadTiles.Count} tiles ahead.");
-}
-
-
-// helper to spawn globally
-private void SpawnEncountersOnTiles(RailGridScript grid)
-{
-    int spawned = 0;
-    foreach (var kvp in grid.railDataMap)
-    {
-        Vector3Int pos = kvp.Key;
-        RailData data = kvp.Value;
-        if (data.railType == RailData.railTypes.normal)
+        int spawned = 0;
+        foreach (var pos in aheadTiles)
         {
+            if (!grid.railAtPos(pos)) continue;
+            RailData data = grid.railDataMap[pos];
+            if (data.railType != RailData.railTypes.normal) continue;
+
             TileBase currentTile = eventTilemap.GetTile(pos);
             if (currentTile is EventTile) continue;
 
@@ -188,13 +190,34 @@ private void SpawnEncountersOnTiles(RailGridScript grid)
                 spawned++;
             }
         }
+
+        Debug.Log($"SpawnNightEncounters: spawned {spawned} encounters on {aheadTiles.Count} tiles ahead.");
     }
-    Debug.Log($"SpawnEncountersOnTiles: Spawned {spawned} globally.");
-}
 
+    private void SpawnEncountersOnTiles(RailGridScript grid)
+    {
+        int spawned = 0;
+        foreach (var kvp in grid.railDataMap)
+        {
+            Vector3Int pos = kvp.Key;
+            RailData data = kvp.Value;
+            if (data.railType == RailData.railTypes.normal)
+            {
+                TileBase currentTile = eventTilemap.GetTile(pos);
+                if (currentTile is EventTile) continue;
 
+                float roll = Random.value;
+                float finalChance = encounterTileSO.spawnChance * globalSpawnChance;
+                if (roll <= finalChance)
+                {
+                    eventTilemap.SetTile(pos, encounterTileSO.tileVisual);
+                    spawned++;
+                }
+            }
+        }
+        Debug.Log($"SpawnEncountersOnTiles: Spawned {spawned} globally.");
+    }
 
-    // Clears only EncounterTiles when day returns
     private void ClearNightEncounters()
     {
         if (eventTilemap == null || encounterTileSO == null) return;
@@ -213,5 +236,22 @@ private void SpawnEncountersOnTiles(RailGridScript grid)
         }
 
         Debug.Log($"Cleared {cleared} EncounterTiles from EventTilemap.");
+    }
+    
+    private void SwapUIPositions()
+    {
+        if (uiImageA == null || uiImageB == null) return;
+
+        Vector3 temp = uiImageA.anchoredPosition;
+        uiImageA.anchoredPosition = uiImageB.anchoredPosition;
+        uiImageB.anchoredPosition = temp;
+    }
+
+    private void RestoreUIPositions()
+    {
+        if (uiImageA == null || uiImageB == null) return;
+
+        uiImageA.anchoredPosition = uiA_DayPos;
+        uiImageB.anchoredPosition = uiB_DayPos;
     }
 }
