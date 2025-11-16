@@ -39,4 +39,4 @@ MonoBehaviour:
         baseAttackDamage: 5
         baseAttackSpeed: 3
         baseAttackVariance: 2
-        animationClip: {fileID: 11400000, guid: e9c80bc114e1b69458a7b00e25d129bd, type: 2}
+        animationClip: {fileID: 11400000, guid: c4bb63be47326d8468413196d4a00ba2, type: 2}

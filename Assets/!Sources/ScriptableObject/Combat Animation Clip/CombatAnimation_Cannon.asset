@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 200ae588e1c03344a8e5e85e7c93cdb1, type: 3}
+  m_Name: CombatAnimation_Cannon
+  m_EditorClassIdentifier: 
+  idleSprites:
+  - sprite: {fileID: 239220639, guid: ba7451e34316df5459a97f8f6b45b52b, type: 3}
+    duration: 0
+  windupSprites:
+  - sprite: {fileID: 940110485, guid: ba7451e34316df5459a97f8f6b45b52b, type: 3}
+    duration: 0.1
+  - sprite: {fileID: 381886766, guid: ba7451e34316df5459a97f8f6b45b52b, type: 3}
+    duration: 0.1
+  attackSprites:
+  - sprite: {fileID: 1115713813, guid: ba7451e34316df5459a97f8f6b45b52b, type: 3}
+    duration: 0.1
+  recoverySprites:
+  - sprite: {fileID: -181095711, guid: ba7451e34316df5459a97f8f6b45b52b, type: 3}
+    duration: 0.1
+  - sprite: {fileID: 1894960429, guid: ba7451e34316df5459a97f8f6b45b52b, type: 3}
+    duration: 0.08
+  - sprite: {fileID: 1522814624, guid: ba7451e34316df5459a97f8f6b45b52b, type: 3}
+    duration: 0.1

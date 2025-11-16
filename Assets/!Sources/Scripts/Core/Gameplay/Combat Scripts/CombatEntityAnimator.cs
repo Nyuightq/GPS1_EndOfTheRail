@@ -47,6 +47,18 @@ public class CombatEntityAnimator : MonoBehaviour
         _attackTriggered = true;
     }
 
+    private void Start()
+    {
+        if (animationClip != null)
+        {
+            Sprite firstFrame = animationClip.idleSprites[0].sprite;
+            float spriteX = firstFrame.rect.width;
+            float spriteY = firstFrame.rect.height;
+            RectTransform imageRendererRect = imageRenderer.GetComponent<RectTransform>();
+            imageRendererRect.sizeDelta = new Vector2(spriteX, spriteY);
+        }
+    }
+
     private void OnDestroy()
     {
         if (_entity != null)
@@ -59,7 +71,7 @@ public class CombatEntityAnimator : MonoBehaviour
 
     private void Update()
     {
-        if (_entity == null || animationClip == null || _entity.IsDead)
+        if (_entity == null || animationClip == null || (_entity.IsDead && !_entity.IsComponent))
             return;
 
         float remainToAttack = _entity.AttackTakenTime - _entity.RemainingAttackTimer;

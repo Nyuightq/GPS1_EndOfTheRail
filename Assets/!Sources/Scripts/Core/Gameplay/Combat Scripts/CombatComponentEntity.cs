@@ -24,6 +24,13 @@ public class CombatComponentEntity : CombatEntity
         _attackSfxName = data.attackSfxName;
         // _defense = data.defense;
         // _evasion = data.evasion;
+
+        // Assign custom animation clip
+        CombatEntityAnimator animationScript = GetComponent<CombatEntityAnimator>();
+        if(animationScript != null)
+        {
+            animationScript.animationClip = data.animationClip;
+        }
     }
 
     public override void Attack(CombatEntity target)
