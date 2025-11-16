@@ -53,12 +53,18 @@ public class CombatSystem : UI_BaseEventPanel
         foreach (var component in components)
         {
             component.OnAttackReady += HandleAttack;
+            
+            float randomStart = UnityEngine.Random.Range(0f, component.AttackTakenTime);
+            component.UpdateCombat(randomStart);
         }
 
         foreach (var enemy in enemies)
         {
             enemy.OnAttackReady += HandleAttack;
             enemy.OnDeath += HandleDeath;
+
+            float randomStart = UnityEngine.Random.Range(0f, enemy.AttackTakenTime);
+            enemy.UpdateCombat(randomStart);
         }
         
         StartBattle();
