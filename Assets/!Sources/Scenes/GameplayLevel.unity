@@ -327,17 +327,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5209037541465649020, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
   m_PrefabInstance: {fileID: 2625489668075140867}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &541722112 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2347825903961846182, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
-  m_PrefabInstance: {fileID: 2625489668075140867}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &689783406 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2930985437301040920, guid: e35c40bf68e01c14295b53f64dab5a19, type: 3}
@@ -1740,9 +1729,17 @@ PrefabInstance:
       value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7971016624545220107, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
-      propertyPath: startingItems.Array.size
+      propertyPath: equippedItems.Array.size
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7971016624545220107, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
+      propertyPath: startingItems.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7971016624545220107, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
+      propertyPath: 'startingItems.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 5d5ed91e3b4b5e541a7dab091f198e02, type: 2}
     - target: {fileID: 8131501017442361271, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -1878,7 +1875,7 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 0
-  m_Camera: {fileID: 519420031}
+  m_Camera: {fileID: 0}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -1939,36 +1936,36 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: availableRewards.Array.size
-      value: 7
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: 'availableRewards.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: 8a718a49406916c4eb9407727baf225b, type: 2}
+      objectReference: {fileID: 11400000, guid: 93c80f1e8b624c247b45a87254dc271d, type: 2}
     - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: 'availableRewards.Array.data[1]'
       value: 
-      objectReference: {fileID: 11400000, guid: 5fcffcd7b65c7c2469571cde096e87d6, type: 2}
+      objectReference: {fileID: 11400000, guid: 7f5e6c7fef8eb6349bb1e30b30066a2f, type: 2}
     - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: 'availableRewards.Array.data[2]'
       value: 
-      objectReference: {fileID: 11400000, guid: 9929be2256382024aa5297e18e241f2a, type: 2}
+      objectReference: {fileID: 11400000, guid: 8e1b96c035b2b9343827835a3f2bd7d0, type: 2}
     - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: 'availableRewards.Array.data[3]'
       value: 
-      objectReference: {fileID: 11400000, guid: 6335a9f071b953f48b6c3df4916ffb35, type: 2}
+      objectReference: {fileID: 11400000, guid: f3de200ed1fea48419bf05080c643993, type: 2}
     - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: 'availableRewards.Array.data[4]'
       value: 
-      objectReference: {fileID: 11400000, guid: 2fd276623b41fc84b94ddfc01f209409, type: 2}
+      objectReference: {fileID: 11400000, guid: b210a5f8f71120044a4da9fc512b9cfb, type: 2}
     - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: 'availableRewards.Array.data[5]'
       value: 
-      objectReference: {fileID: 11400000, guid: 58cb4c6847032bd47a4435a7766626f9, type: 2}
+      objectReference: {fileID: 11400000, guid: 2c956f6cc3ca1a9469d9bf97231581b0, type: 2}
     - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: 'availableRewards.Array.data[6]'
       value: 
-      objectReference: {fileID: 11400000, guid: d044c032c2424e545937da643f79d6a6, type: 2}
+      objectReference: {fileID: 11400000, guid: 2c956f6cc3ca1a9469d9bf97231581b0, type: 2}
     - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: rewardSlots.Array.data[0].itemSO
       value: 
@@ -2416,7 +2413,11 @@ PrefabInstance:
     - target: {fileID: 4926789502135262990, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: healPromptButton
       value: 
-      objectReference: {fileID: 7372027825369416600}
+      objectReference: {fileID: 0}
+    - target: {fileID: 5534164070626002141, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: engineerUIPanel
+      value: 
+      objectReference: {fileID: 2117873094}
     - target: {fileID: 7285569548920745536, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: transitionGO
       value: 
