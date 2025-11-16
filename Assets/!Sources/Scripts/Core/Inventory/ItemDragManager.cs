@@ -1,38 +1,40 @@
 // --------------------------------------------------------------
 // Creation Date: 2025-10-20 05:54
 // Author: User
-// Description: -
+// Description: Cleaned up with proper encapsulation
 // --------------------------------------------------------------
-using Unity.VisualScripting;
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Image))]
 public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    [SerializeField] private float moveSpd;
-
     private Item itemScript;
     private InventoryGridScript inventoryGridScript;
-
     private RectTransform rectTransform;
 
-    public Vector2 topLeftCellPos { get; private set; }
-    private Vector2 dragDir;
-    private bool dragging, mouseOnItem;
+    // Public read-only properties for external access
+    public Vector2 TopLeftCellPos => topLeftCellPos;
+    public Vector2 EquippedPos => equippedPos;
+    public bool IsHovered => mouseOnItem;
 
-    //the last equipped position
+    // Events for tooltip system
+    public static event Action<Item> OnItemHoverEnter;
+    public static event Action OnItemHoverExit;
+
+    // Private backing fields
+    private Vector2 topLeftCellPos;
     private Vector2 equippedPos;
-    private bool firstEquip = true;
-
-    InputActionMap playerActionMap;
+    
+    private Vector2 dragDir;
+    private bool dragging;
+    private bool mouseOnItem;
 
     #region Unity LifeCycle
     private void OnEnable()
     {
-
         rectTransform = GetComponent<RectTransform>();
         itemScript = GetComponent<Item>();
         inventoryGridScript = FindFirstObjectByType<InventoryGridScript>().GetComponent<InventoryGridScript>();
@@ -53,39 +55,53 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
     {
         if(dragging)
         {
-            itemScript.spriteRectTransform.localScale = Vector3.Lerp(itemScript.spriteRectTransform.localScale, new Vector3(0.9f, 0.9f, 1f), 0.3f);
+            itemScript.spriteRectTransform.localScale = Vector3.Lerp(
+                itemScript.spriteRectTransform.localScale, 
+                new Vector3(0.9f, 0.9f, 1f), 
+                0.3f
+            );
         }
         else
         {
-            if(itemScript.spriteRectTransform.localScale != new Vector3(1f,1f,1f)) itemScript.spriteRectTransform.localScale = Vector3.Lerp(itemScript.spriteRectTransform.localScale, new Vector3(1f, 1f, 1f), 0.3f);
+            if(itemScript.spriteRectTransform.localScale != Vector3.one)
+            {
+                itemScript.spriteRectTransform.localScale = Vector3.Lerp(
+                    itemScript.spriteRectTransform.localScale, 
+                    Vector3.one, 
+                    0.3f
+                );
+            }
         }
 
-        //Debug.Log(dragging);
-
+        // Toggle shape visibility based on item state
         switch (itemScript.state)
         {
             case Item.itemState.equipped:
-                foreach (GameObject shapeCell in itemScript.shape) shapeCell.SetActive(false);
+                foreach (GameObject shapeCell in itemScript.shape) 
+                    shapeCell.SetActive(false);
                 break;
             case Item.itemState.unequipped:
-                foreach (GameObject shapeCell in itemScript.shape) shapeCell.SetActive(true);
+                foreach (GameObject shapeCell in itemScript.shape) 
+                    shapeCell.SetActive(true);
                 break;
         }
     }
     #endregion
 
-    #region holding/Dragging handlers
+    #region Pointer & Drag Handlers
     public void OnPointerEnter(PointerEventData pointerEventData)
     {
         mouseOnItem = true;
+        Debug.Log("POINTER ENTER - Item hovered!");
+        OnItemHoverEnter?.Invoke(itemScript); 
     }
 
-    public void OnPointerExit (PointerEventData pointerEventData)
+    public void OnPointerExit(PointerEventData pointerEventData)
     {
         mouseOnItem = false;
+        OnItemHoverExit?.Invoke(); 
     }
 
-    //handles being able to drag stuff
     public void OnDrag(PointerEventData eventData)
     {
         dragDir = eventData.position;
@@ -93,26 +109,28 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
         float moveY = Mathf.Lerp(rectTransform.position.y, dragDir.y, 0.2f);
         rectTransform.position = new Vector2(moveX, moveY);
     }
+    #endregion
 
+    #region Input Handlers
     private void LeftClick()
     {
-        //Debug.Log(GameStateManager.CurrentPhase);
         if (mouseOnItem && GameStateManager.CurrentPhase != Phase.Combat)
         {
             dragging = true;
 
-            if (topLeftCellPos != null && itemScript.state == Item.itemState.equipped)
+            // Unequip from inventory if currently equipped
+            if (itemScript.state == Item.itemState.equipped)
             {
-                inventoryGridScript.MarkCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, null);
+                inventoryGridScript.MarkCells(
+                    Vector2Int.FloorToInt(topLeftCellPos), 
+                    itemScript.itemShape, 
+                    null
+                );
                 itemScript.state = Item.itemState.unequipped;
                 itemScript.TriggerEffectUnequip();
             }
 
-            if (EngineerManager.Instance != null && EngineerManager.Instance.IsEngineerUIActive)
-            {
-                EngineerManager.Instance.OnItemDragStarted(gameObject);
-            }
-
+            // Notify EngineerManager if active
             if (EngineerManager.Instance != null && EngineerManager.Instance.IsEngineerUIActive)
             {
                 EngineerManager.Instance.OnItemDragStarted(gameObject);
@@ -120,124 +138,163 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
         }
     }
 
-// Only showing the updated LeftRelease() method
-// Add this to your existing ItemDragManager.cs
-
-private void LeftRelease()
-{
-    if (mouseOnItem)
+    private void LeftRelease()
     {
+        if (!mouseOnItem) return;
+
         dragging = false;
-        bool sucess = AttachToInventory();
 
-        //equipped pos defaults to 0 and 0 is largely impossible to get to at the start
-        if (!sucess && !firstEquip &&  itemScript.itemData.mandatoryItem)
+        // Check Engineer first (higher priority when active)
+        if (EngineerManager.Instance != null && EngineerManager.Instance.IsEngineerUIActive)
         {
-            // ADD THIS LINE - Critical for snap-back functionality
-            rectTransform.anchoredPosition = equippedPos;
+            EngineerManager.Instance.OnItemReleased(gameObject);
+            
+            // Remove temporary canvas components if they were added
+            RemoveTemporaryCanvas();
+        }
+        else
+        {
+            // Normal inventory attachment
             AttachToInventory();
-        }
 
-        // ADD THIS LINE - Critical for snap-back functionality
-        // Notify RewardManager (if active)
-        if (RewardManager.Instance != null)
-        {
-            RewardManager.Instance.OnItemReleased(gameObject);
-        }
-        
-        // Notify TransactionManager (if active)
-        if (TransactionManager.Instance != null)
-        {
-            TransactionManager.Instance.OnItemReleased(gameObject);
+            // Notify other managers (if active)
+            RewardManager.Instance?.OnItemReleased(gameObject);
+            TransactionManager.Instance?.OnItemReleased(gameObject);
         }
     }
-}
 
     private void RightClick()
     {
-        if (dragging)
+        if (!dragging) return;
+
+        Debug.Log("Attempting to rotate");
+
+        // Unequip before rotating
+        if (itemScript.state == Item.itemState.equipped)
         {
-            Debug.Log("Attempting to rotate");
-
-            if (topLeftCellPos != null && itemScript.state == Item.itemState.equipped)
-            {
-                inventoryGridScript.MarkCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, null);
-                itemScript.state = Item.itemState.unequipped;
-            }
-
-            itemScript.RotateShape(itemScript.itemShape);
+            inventoryGridScript.MarkCells(
+                Vector2Int.FloorToInt(topLeftCellPos), 
+                itemScript.itemShape, 
+                null
+            );
+            itemScript.state = Item.itemState.unequipped;
         }
+
+        itemScript.RotateShape(itemScript.itemShape);
     }
     #endregion
 
-public bool AttachToInventory()
-{
-    if (itemScript.state == Item.itemState.unequipped)
+    #region Inventory Attachment
+    public bool AttachToInventory()
     {
+        if (itemScript.state != Item.itemState.unequipped)
+            return false;
+
+        // Validate all shape cells can be placed
         foreach (GameObject shapeCell in itemScript.shape)
         {
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(inventoryGridScript.inventoryRect, shapeCell.transform.position, null, out Vector2 localPos);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                inventoryGridScript.inventoryRect, 
+                shapeCell.transform.position, 
+                null, 
+                out Vector2 localPos
+            );
 
             Vector2 cellPos = inventoryGridScript.GetCellAtPos(localPos);
-            InvCellData localGridCellPos = null;
-            if (inventoryGridScript.InGrid(cellPos)) localGridCellPos = inventoryGridScript.inventoryGrid[(int)cellPos.x, (int)cellPos.y];
-
-            if (localGridCellPos != null && localGridCellPos.item == null && localGridCellPos.active)
-            {
-                //Debug.Log(cellPos);
-            }
-            else
-            {
+            
+            if (!inventoryGridScript.InGrid(cellPos))
                 return false;
-            }
+
+            InvCellData gridCell = inventoryGridScript.inventoryGrid[(int)cellPos.x, (int)cellPos.y];
+            
+            if (gridCell == null || !gridCell.active || gridCell.item != null)
+                return false;
         }
-        
+
         Debug.Log("Item Attached!!!");
 
         int itemWidth = itemScript.itemShape.GetLength(0);
         int itemHeight = itemScript.itemShape.GetLength(1);
 
-        Vector2 screenTopLeft = RectTransformUtility.WorldToScreenPoint(null, rectTransform.TransformPoint(new Vector2(-itemWidth * 16 / 2f, itemHeight * 16 / 2f) + new Vector2(8f, -8f)));
+        // Calculate top-left cell position
+        Vector2 screenTopLeft = RectTransformUtility.WorldToScreenPoint(
+            null, 
+            rectTransform.TransformPoint(
+                new Vector2(-itemWidth * 16 / 2f, itemHeight * 16 / 2f) + new Vector2(8f, -8f)
+            )
+        );
 
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(inventoryGridScript.inventoryRect, screenTopLeft, null, out Vector2 topLeftCell);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            inventoryGridScript.inventoryRect, 
+            screenTopLeft, 
+            null, 
+            out Vector2 topLeftCell
+        );
+        
         topLeftCellPos = inventoryGridScript.GetCellAtPos(topLeftCell);
 
-        Vector2 itemCellPos = new Vector2(topLeftCellPos.x + itemWidth / 2f - 0.5f, topLeftCellPos.y + itemHeight / 2f - 0.5f);
+        // Calculate center position for the item
+        Vector2 itemCellPos = new Vector2(
+            topLeftCellPos.x + itemWidth / 2f - 0.5f, 
+            topLeftCellPos.y + itemHeight / 2f - 0.5f
+        );
         Vector2 actualItemCellPos = inventoryGridScript.GetLocalPosGrid(itemCellPos);
 
-        Debug.Log(topLeftCell);
-        Debug.Log(topLeftCellPos);
+        Debug.Log($"TopLeftCell: {topLeftCell}, TopLeftCellPos: {topLeftCellPos}");
 
-        // ADD THIS: Change parent to inventory BEFORE marking cells
+        // Ensure item is parented to inventory before marking cells
         if (rectTransform.parent != inventoryGridScript.inventoryRect)
         {
-            // Store world position
             Vector3 worldPos = rectTransform.position;
-            
-            // Change parent
             rectTransform.SetParent(inventoryGridScript.inventoryRect);
-            
-            // Restore world position temporarily
-            rectTransform.position = worldPos;
+            rectTransform.position = worldPos; // Maintain visual position temporarily
         }
 
-        inventoryGridScript.MarkCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, gameObject);
+        // Mark cells and set final position
+        inventoryGridScript.MarkCells(
+            Vector2Int.FloorToInt(topLeftCellPos), 
+            itemScript.itemShape, 
+            gameObject
+        );
 
         rectTransform.anchoredPosition = actualItemCellPos;
-        equippedPos = actualItemCellPos;
+        equippedPos = actualItemCellPos; // Store the equipped position
+        
         itemScript.state = Item.itemState.equipped;
         itemScript.TriggerEffectEquip();
 
-        foreach(GameObject thingy in inventoryGridScript.GetAdjacentComponents(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape,this.gameObject))
-            {
-                Debug.Log($"<color=red>{gameObject} near {thingy}</color>");
-            }    
-
-
-            firstEquip = false;
-            return true;
+        // Log adjacent components (debug)
+        foreach(GameObject adjacent in inventoryGridScript.GetAdjacentComponents(
+            Vector2Int.FloorToInt(topLeftCellPos), 
+            itemScript.itemShape, 
+            gameObject))
+        {
+            Debug.Log($"<color=red>{gameObject.name} near {adjacent.name}</color>");
         }
-        return false;
-    }
-}
 
+        return true;
+    }
+    #endregion
+
+    #region Helper Methods
+    /// <summary>
+    /// Removes the temporary canvas components added during engineer UI dragging
+    /// </summary>
+    private void RemoveTemporaryCanvas()
+    {
+        Canvas itemCanvas = GetComponent<Canvas>();
+        if (itemCanvas != null && itemCanvas.overrideSorting && itemCanvas.sortingOrder == 1000)
+        {
+            // Remove GraphicRaycaster first
+            UnityEngine.UI.GraphicRaycaster raycaster = GetComponent<UnityEngine.UI.GraphicRaycaster>();
+            if (raycaster != null)
+            {
+                Destroy(raycaster);
+            }
+            
+            // Then remove Canvas
+            Destroy(itemCanvas);
+        }
+    }
+    #endregion
+}

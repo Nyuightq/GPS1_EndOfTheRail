@@ -24,6 +24,8 @@ public class ItemSOEditor : Editor
 
         // Draw basic item fields
         item.itemName = EditorGUILayout.TextField("Item Name", item.itemName);
+          EditorGUILayout.LabelField("Item Description", EditorStyles.boldLabel);
+        item.itemDescription = EditorGUILayout.TextArea(item.itemDescription, GUILayout.Height(60));
         item.itemSprite = (Sprite)EditorGUILayout.ObjectField("Item Sprite", item.itemSprite, typeof(Sprite), false);
         item.mandatoryItem = EditorGUILayout.Toggle("Mandatory Item", item.mandatoryItem);
         item.itemEffectPrefab = (GameObject)EditorGUILayout.ObjectField("Item Effect", item.itemEffectPrefab, typeof(GameObject), false);

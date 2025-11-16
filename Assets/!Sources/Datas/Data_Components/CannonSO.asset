@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemSprite: {fileID: 21300000, guid: c4cf5474f8f00ca4e95f490d6029b496, type: 3}
   itemName: Cannon
+  itemDescription: Hello World
   mandatoryItem: 0
   itemWidth: 3
   itemHeight: 2

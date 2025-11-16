@@ -17,6 +17,9 @@ public class ItemSO : ScriptableObject
 {
     public Sprite itemSprite;
     public string itemName;
+    
+    [TextArea(3, 5)]
+    public string itemDescription; // ADDED THIS
     public bool mandatoryItem = false;
     public int itemWidth, itemHeight;
 

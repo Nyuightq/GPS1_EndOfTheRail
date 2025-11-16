@@ -3,6 +3,9 @@ using TMPro;
 using UnityEngine.UI;
 using System.Collections;
 
+/// <summary>
+/// EngineerManager - Simplified version using ItemDragManager's equippedPos
+/// </summary>
 public class EngineerManager : MonoBehaviour
 {
     public static EngineerManager Instance { get; private set; }
@@ -13,37 +16,40 @@ public class EngineerManager : MonoBehaviour
     {
         [Header("UI References")]
         public RectTransform slotAnchor;
-        public Image slotImage;
-        
+
         [Header("Runtime Data")]
         public ItemSO slottedItemSO;
         public GameObject slottedItemObject;
-        public Vector2 originalInventoryPosition;
+        
+        // Store reference to drag manager instead of duplicating position data
+        public ItemDragManager dragManager;
     }
 
     [Header("Engineer UI")]
     [SerializeField] private GameObject engineerUIPanel;
-    
+
     [Header("Merge Slots (2 input slots)")]
     [SerializeField] private MergeSlot slot1;
     [SerializeField] private MergeSlot slot2;
-    
+
     [Header("Result Display")]
     [SerializeField] private RectTransform resultAnchor;
     [SerializeField] private Image resultImage;
     [SerializeField] private TMP_Text resultText;
-    
+
     [Header("Buttons")]
     [SerializeField] private Button mergeButton;
     [SerializeField] private Button declineButton;
-    
+
     [Header("Feedback")]
     [SerializeField] private TMP_Text feedbackText;
-    
+
     [Header("Tween Settings")]
-    [SerializeField] private float tweenDuration = 0.3f;
+    [SerializeField] private float tweenDuration = 0.28f;
 
     private InventoryGridScript inventoryGrid;
+    private bool isProcessing = false;
+
     public bool IsEngineerUIActive { get; private set; }
 
     private void Awake()
@@ -62,37 +68,26 @@ public class EngineerManager : MonoBehaviour
     private void Start()
     {
         inventoryGrid = FindFirstObjectByType<InventoryGridScript>();
-        
+
         if (inventoryGrid == null)
         {
             Debug.LogError("EngineerManager: InventoryGridScript not found!");
         }
 
-        // Setup button listeners
         if (mergeButton != null)
         {
             mergeButton.onClick.RemoveAllListeners();
             mergeButton.onClick.AddListener(OnMergeButtonClicked);
+            mergeButton.interactable = false;
         }
-        
+
         if (declineButton != null)
         {
             declineButton.onClick.RemoveAllListeners();
             declineButton.onClick.AddListener(OnDeclineButtonClicked);
         }
 
-        // Initialize slots
-        if (slot1 != null)
-        {
-            slot1.slottedItemSO = null;
-            slot1.slottedItemObject = null;
-        }
-        
-        if (slot2 != null)
-        {
-            slot2.slottedItemSO = null;
-            slot2.slottedItemObject = null;
-        }
+        ClearSlots();
     }
 
     public void OpenEngineerUI(GameObject player = null)
@@ -104,39 +99,44 @@ public class EngineerManager : MonoBehaviour
         }
 
         ClearSlots();
+        isProcessing = false;
         engineerUIPanel.SetActive(true);
         IsEngineerUIActive = true;
-        
+
         if (feedbackText != null)
             feedbackText.text = "Drag two identical items to merge";
-            
+
         Debug.Log("[EngineerManager] Engineer UI opened");
     }
 
-    /// <summary>
-    /// Called when item starts being dragged - ensures item renders on top
-    /// </summary>
     public void OnItemDragStarted(GameObject item)
     {
         if (!IsEngineerUIActive)
             return;
 
-        RectTransform itemRect = item.GetComponent<RectTransform>();
-        
-        // Move to canvas root during drag so it appears on top of everything
-        // This matches the DraggableItem pattern from the reference
-        itemRect.SetParent(itemRect.root); 
-        itemRect.SetAsLastSibling(); // Render on top
-        
-        Debug.Log($"[EngineerManager] Item moved to root for dragging: {item.name}");
+        Canvas itemCanvas = item.GetComponent<Canvas>();
+
+        if (itemCanvas == null)
+        {
+            itemCanvas = item.AddComponent<Canvas>();
+            itemCanvas.overrideSorting = true;
+            itemCanvas.sortingOrder = 1000;
+
+            if (item.GetComponent<UnityEngine.UI.GraphicRaycaster>() == null)
+            {
+                item.AddComponent<UnityEngine.UI.GraphicRaycaster>();
+            }
+        }
+        else
+        {
+            itemCanvas.overrideSorting = true;
+            itemCanvas.sortingOrder = 1000;
+        }
     }
 
-    /// <summary>
-    /// Called by ItemDragManager when item is released
-    /// </summary>
     public void OnItemReleased(GameObject item)
     {
-        if (!IsEngineerUIActive)
+        if (!IsEngineerUIActive || isProcessing)
             return;
 
         Item itemScript = item.GetComponent<Item>();
@@ -144,49 +144,43 @@ public class EngineerManager : MonoBehaviour
             return;
 
         RectTransform itemRect = item.GetComponent<RectTransform>();
-        
-        // IMPORTANT: Convert world position to engineer panel's local space
+
+        // Convert world position to engineer panel's local space
         Vector3 worldPos = itemRect.position;
         Vector2 localPointInPanel;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            engineerUIPanel.GetComponent<RectTransform>(), 
-            RectTransformUtility.WorldToScreenPoint(null, worldPos), 
-            null, 
+            engineerUIPanel.GetComponent<RectTransform>(),
+            RectTransformUtility.WorldToScreenPoint(null, worldPos),
+            null,
             out localPointInPanel
         );
 
-        // Check which slot the item is over using panel-local coordinates
         MergeSlot targetSlot = GetSlotAtPosition(localPointInPanel);
 
         if (targetSlot != null)
         {
-            // Try to slot the item
             if (TrySlotItem(targetSlot, item, itemScript))
             {
-                Debug.Log($"✓ Item {itemScript.itemData.itemName} slotted successfully");
-                
-                // Check if merge is valid
+                Debug.Log($"✓ Item {itemScript.itemData.itemName} slotted into {GetSlotName(targetSlot)}");
                 CheckMergeValidity();
             }
             else
             {
-                // Slot occupied or invalid, snap back
-                SnapBackToInventory(item, itemScript);
+                SnapBackToInventory(item);
             }
         }
         else
         {
-            // Not over any slot, snap back to inventory
-            SnapBackToInventory(item, itemScript);
+            SnapBackToInventory(item);
         }
     }
 
     /// <summary>
-    /// Attempts to slot an item into a merge slot
+    /// Simplified slotting - just store the drag manager reference
+    /// The drag manager already knows its equipped position!
     /// </summary>
     private bool TrySlotItem(MergeSlot slot, GameObject itemObject, Item itemScript)
     {
-        // Check if slot is already occupied
         if (slot.slottedItemObject != null)
         {
             if (feedbackText != null)
@@ -194,200 +188,240 @@ public class EngineerManager : MonoBehaviour
             return false;
         }
 
-        // Store original inventory position before slotting
-        slot.originalInventoryPosition = itemObject.GetComponent<RectTransform>().anchoredPosition;
-
-        // Change parent to engineer panel
-        RectTransform itemRect = itemObject.GetComponent<RectTransform>();
-        Vector3 worldPos = itemRect.position;
-        itemRect.SetParent(engineerUIPanel.transform);
-        itemRect.position = worldPos;
-
-        // Clear item from inventory grid
-        if (inventoryGrid != null)
+        ItemDragManager dragManager = itemObject.GetComponent<ItemDragManager>();
+        if (dragManager == null)
         {
-            ClearItemFromInventory(itemObject, itemScript);
+            Debug.LogWarning($"ItemDragManager not found on {itemScript.itemData.itemName}!");
+            return false;
         }
 
-        // Snap to slot anchor
+        RectTransform itemRect = itemObject.GetComponent<RectTransform>();
+
+        // Clear from inventory grid (dragManager knows the topLeftCellPos)
+        if (inventoryGrid != null)
+        {
+            inventoryGrid.MarkCells(Vector2Int.FloorToInt(dragManager.TopLeftCellPos), itemScript.itemShape, null);
+        }
+
+        // Store the world position before reparenting
+        Vector3 worldPos = itemRect.position;
+        
+        // Reparent to engineer panel
+        itemRect.SetParent(engineerUIPanel.transform);
+        itemRect.position = worldPos; // Maintain visual position
+
+        // Animate to slot anchor
         StartCoroutine(MoveToSlotRoutine(itemRect, slot.slotAnchor.anchoredPosition, tweenDuration));
 
-        // Store slot data
+        // Store slot data - just keep reference to drag manager
         slot.slottedItemSO = itemScript.itemData;
         slot.slottedItemObject = itemObject;
-        itemScript.state = Item.itemState.unequipped;
+        slot.dragManager = dragManager; // Store the drag manager reference
+
+        Debug.Log($"[EngineerManager] Slotted item. DragManager has equippedPos: {dragManager.EquippedPos}, topLeftCell: {dragManager.TopLeftCellPos}");
 
         return true;
     }
 
-    /// <summary>
-    /// Gets the slot at given position (if any)
-    /// </summary>
     private MergeSlot GetSlotAtPosition(Vector2 position)
     {
-        // Check slot 1
         if (slot1?.slotAnchor != null && IsPositionInSlot(position, slot1.slotAnchor))
-        {
             return slot1;
-        }
 
-        // Check slot 2
         if (slot2?.slotAnchor != null && IsPositionInSlot(position, slot2.slotAnchor))
-        {
             return slot2;
-        }
 
         return null;
     }
 
-    /// <summary>
-    /// Checks if position is within slot bounds
-    /// </summary>
     private bool IsPositionInSlot(Vector2 position, RectTransform slotRect)
     {
-        float threshold = 50f; // Adjust based on slot size
+        float threshold = 50f;
         float distance = Vector2.Distance(position, slotRect.anchoredPosition);
         return distance < threshold;
     }
 
-    /// <summary>
-    /// Checks if both slots have valid matching items
-    /// </summary>
     private void CheckMergeValidity()
     {
         if (slot1.slottedItemSO == null || slot2.slottedItemSO == null)
         {
-            // Not both slots filled
-            if (feedbackText != null)
-                feedbackText.text = "Place two identical items to merge";
+            if (mergeButton != null) mergeButton.interactable = false;
+            if (feedbackText != null) feedbackText.text = "Place two identical items to merge";
             return;
         }
 
-        // Check if items are identical
         bool isMergeValid = slot1.slottedItemSO.itemName == slot2.slottedItemSO.itemName;
 
         if (isMergeValid)
         {
             Debug.Log($"[EngineerManager] IsMergeValid = true (Items: {slot1.slottedItemSO.itemName})");
-            
-            if (feedbackText != null)
-                feedbackText.text = $"Ready to merge: {slot1.slottedItemSO.itemName}";
-                
-            if (mergeButton != null)
-                mergeButton.interactable = true;
+            if (feedbackText != null) feedbackText.text = $"Ready to merge: {slot1.slottedItemSO.itemName}";
+            if (mergeButton != null) mergeButton.interactable = true;
         }
         else
         {
-            Debug.Log($"[EngineerManager] IsMergeValid = false (Items don't match: {slot1.slottedItemSO.itemName} != {slot2.slottedItemSO.itemName})");
-            
-            if (feedbackText != null)
-                feedbackText.text = "Items don't match! Returning second item...";
-                
-            if (mergeButton != null)
-                mergeButton.interactable = false;
+            Debug.Log($"[EngineerManager] IsMergeValid = false (Items don't match)");
+            if (feedbackText != null) feedbackText.text = "Items don't match! Returning second item...";
+            if (mergeButton != null) mergeButton.interactable = false;
 
-            // Return the second item to inventory
-            StartCoroutine(ReturnItemToInventoryDelayed(slot2, 0.5f));
+            StartCoroutine(ReturnItemToInventoryDelayed(slot2, 0.45f));
         }
     }
 
-    /// <summary>
-    /// Snaps item back to its original inventory position
-    /// </summary>
-    private void SnapBackToInventory(GameObject itemObject, Item itemScript)
+    private void SnapBackToInventory(GameObject itemObject)
     {
-        if (itemObject == null || itemScript == null)
-            return;
+        if (itemObject == null) return;
+
+        Item itemScript = itemObject.GetComponent<Item>();
+        if (itemScript == null) return;
 
         Debug.Log($"Snapping {itemScript.itemData.itemName} back to inventory");
 
-        RectTransform itemRect = itemObject.GetComponent<RectTransform>();
-        
-        // Find the slot this item belongs to (if any)
-        MergeSlot ownerSlot = null;
-        if (slot1?.slottedItemObject == itemObject)
-            ownerSlot = slot1;
-        else if (slot2?.slottedItemObject == itemObject)
-            ownerSlot = slot2;
+        MergeSlot owner = null;
+        if (slot1?.slottedItemObject == itemObject) owner = slot1;
+        else if (slot2?.slottedItemObject == itemObject) owner = slot2;
 
-        if (ownerSlot != null)
+        if (owner != null)
         {
-            // Return to stored inventory position
-            Vector3 worldPos = itemRect.position;
-            itemRect.SetParent(inventoryGrid.inventoryRect);
-            itemRect.position = worldPos;
-
-            StartCoroutine(MoveToSlotRoutine(itemRect, ownerSlot.originalInventoryPosition, tweenDuration, () =>
-            {
-                // Re-attach to inventory after tweening
-                ItemDragManager dragManager = itemObject.GetComponent<ItemDragManager>();
-                if (dragManager != null)
-                {
-                    dragManager.AttachToInventory();
-                }
-            }));
-
+            ItemDragManager dragManager = owner.dragManager;
+            
             // Clear slot
-            ownerSlot.slottedItemSO = null;
-            ownerSlot.slottedItemObject = null;
+            owner.slottedItemSO = null;
+            owner.slottedItemObject = null;
+            owner.dragManager = null;
+
+            // Return using the drag manager's stored position
+            StartCoroutine(RestoreItemCoroutine(itemObject, dragManager));
         }
         else
         {
-            // Item wasn't slotted yet, just re-attach to inventory
-            ItemDragManager dragManager = itemObject.GetComponent<ItemDragManager>();
-            if (dragManager != null)
-            {
-                dragManager.AttachToInventory();
-            }
+            // Fallback: just call AttachToInventory
+            ItemDragManager dm = itemObject.GetComponent<ItemDragManager>();
+            if (dm != null) dm.AttachToInventory();
         }
 
-        if (feedbackText != null)
-            feedbackText.text = "Item returned to inventory";
+        if (feedbackText != null) feedbackText.text = "Item returned to inventory";
     }
 
-    /// <summary>
-    /// Coroutine to return item to inventory after delay
-    /// </summary>
     private IEnumerator ReturnItemToInventoryDelayed(MergeSlot slot, float delay)
     {
         yield return new WaitForSeconds(delay);
 
         if (slot?.slottedItemObject != null)
         {
-            Item itemScript = slot.slottedItemObject.GetComponent<Item>();
-            SnapBackToInventory(slot.slottedItemObject, itemScript);
+            GameObject go = slot.slottedItemObject;
+            ItemDragManager dragManager = slot.dragManager;
+
+            // Clear slot immediately
+            slot.slottedItemSO = null;
+            slot.slottedItemObject = null;
+            slot.dragManager = null;
+
+            StartCoroutine(RestoreItemCoroutine(go, dragManager));
         }
     }
 
-    /// <summary>
-    /// Clears item from inventory grid
-    /// </summary>
-    private void ClearItemFromInventory(GameObject itemObject, Item itemScript)
+    private IEnumerator ReturnAllItemsAndClose()
     {
-        if (inventoryGrid == null || itemScript == null)
-            return;
+        GameObject itemA = slot1?.slottedItemObject;
+        ItemDragManager dragA = slot1?.dragManager;
 
-        InvCellData[,] grid = inventoryGrid.inventoryGrid;
-        bool foundItem = false;
+        GameObject itemB = slot2?.slottedItemObject;
+        ItemDragManager dragB = slot2?.dragManager;
 
-        for (int x = 0; x < grid.GetLength(0) && !foundItem; x++)
+        if (itemA != null)
         {
-            for (int y = 0; y < grid.GetLength(1) && !foundItem; y++)
-            {
-                if (grid[x, y].item == itemObject)
-                {
-                    Vector2Int topLeft = new Vector2Int(x, y);
-                    inventoryGrid.MarkCells(topLeft, itemScript.itemShape, null);
-                    Debug.Log($"Cleared item from inventory grid at {topLeft}");
-                    foundItem = true;
-                }
-            }
+            slot1.slottedItemSO = null;
+            slot1.slottedItemObject = null;
+            slot1.dragManager = null;
+            StartCoroutine(RestoreItemCoroutine(itemA, dragA));
         }
+
+        if (itemB != null)
+        {
+            slot2.slottedItemSO = null;
+            slot2.slottedItemObject = null;
+            slot2.dragManager = null;
+            StartCoroutine(RestoreItemCoroutine(itemB, dragB));
+        }
+
+        yield return new WaitForSeconds(tweenDuration + 0.12f);
+
+        CloseEngineerUI();
     }
 
     /// <summary>
-    /// Tween movement coroutine
+    /// SIMPLIFIED restoration using equippedPos from ItemDragManager
     /// </summary>
+    private IEnumerator RestoreItemCoroutine(GameObject itemObject, ItemDragManager dragManager)
+    {
+        if (itemObject == null || dragManager == null) 
+        {
+            Debug.LogError("RestoreItemCoroutine: null object or dragManager");
+            yield break;
+        }
+
+        Item itemScript = itemObject.GetComponent<Item>();
+        RectTransform itemRect = itemObject.GetComponent<RectTransform>();
+
+        if (inventoryGrid == null || inventoryGrid.inventoryRect == null)
+        {
+            Debug.LogError("EngineerManager: inventoryGrid or inventoryRect missing");
+            yield break;
+        }
+
+        // Remove temporary canvas components BEFORE reparenting
+        Canvas itemCanvas = itemObject.GetComponent<Canvas>();
+        if (itemCanvas != null && itemCanvas.overrideSorting && itemCanvas.sortingOrder == 1000)
+        {
+            UnityEngine.UI.GraphicRaycaster raycaster = itemObject.GetComponent<UnityEngine.UI.GraphicRaycaster>();
+            if (raycaster != null) Destroy(raycaster);
+            Destroy(itemCanvas);
+        }
+
+        // Get current visual position in inventory space (for smooth tween start)
+        Vector2 startAnchored;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            inventoryGrid.inventoryRect,
+            RectTransformUtility.WorldToScreenPoint(null, itemRect.position),
+            null,
+            out startAnchored
+        );
+
+        // Reparent to inventory
+        itemRect.SetParent(inventoryGrid.inventoryRect);
+        itemRect.localScale = Vector3.one;
+        itemRect.localRotation = Quaternion.identity;
+        itemRect.anchoredPosition = startAnchored;
+
+        // Get target position from dragManager (this is the key simplification!)
+        Vector2 targetPos = dragManager.EquippedPos;
+        Vector2Int topLeftCell = Vector2Int.FloorToInt(dragManager.TopLeftCellPos);
+
+        Debug.Log($"[EngineerManager] Restoring to equippedPos: {targetPos}, topLeftCell: {topLeftCell}");
+
+        // Tween to target position
+        float elapsed = 0f;
+        while (elapsed < tweenDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = EaseOutBack(Mathf.Clamp01(elapsed / tweenDuration));
+            itemRect.anchoredPosition = Vector2.Lerp(startAnchored, targetPos, t);
+            yield return null;
+        }
+        itemRect.anchoredPosition = targetPos;
+
+        // Re-mark cells in inventory
+        if (inventoryGrid != null)
+        {
+            inventoryGrid.MarkCells(topLeftCell, itemScript.itemShape, itemObject);
+            itemScript.state = Item.itemState.equipped;
+            itemScript.TriggerEffectEquip();
+        }
+
+        Debug.Log($"✓ Restored {itemScript.itemData.itemName} to inventory at {topLeftCell}");
+    }
+
     private IEnumerator MoveToSlotRoutine(RectTransform rectTransform, Vector2 destination, float duration, System.Action onComplete = null)
     {
         if (rectTransform == null)
@@ -395,15 +429,13 @@ public class EngineerManager : MonoBehaviour
 
         if (duration > 0.0f)
         {
-            float startTime = Time.time;
+            float elapsed = 0f;
             Vector2 startPos = rectTransform.anchoredPosition;
-            float tweenCoeff = 1.0f / duration;
 
-            float dt = 0.0f;
-            while (dt < 1.0f && rectTransform != null)
+            while (elapsed < duration && rectTransform != null)
             {
-                dt = (Time.time - startTime) * tweenCoeff;
-                float t = EaseOutBack(dt);
+                elapsed += Time.deltaTime;
+                float t = EaseOutBack(Mathf.Clamp01(elapsed / duration));
 
                 if (rectTransform != null)
                 {
@@ -429,89 +461,48 @@ public class EngineerManager : MonoBehaviour
         return 1f + c3 * Mathf.Pow(t - 1f, 3f) + c1 * Mathf.Pow(t - 1f, 2f);
     }
 
-    /// <summary>
-    /// Merge button handler
-    /// </summary>
     private void OnMergeButtonClicked()
     {
-        if (slot1.slottedItemSO == null || slot2.slottedItemSO == null)
-        {
-            Debug.Log("[EngineerManager] Cannot merge: slots not filled");
-            return;
-        }
+        if (isProcessing) return;
+        if (slot1.slottedItemSO == null || slot2.slottedItemSO == null) return;
+        if (slot1.slottedItemSO.itemName != slot2.slottedItemSO.itemName) return;
 
-        if (slot1.slottedItemSO.itemName != slot2.slottedItemSO.itemName)
-        {
-            Debug.Log("[EngineerManager] Cannot merge: items don't match");
-            return;
-        }
-
-        Debug.Log($"=== MERGE ATTEMPTED ===");
-        Debug.Log($"Item 1: {slot1.slottedItemSO.itemName}");
-        Debug.Log($"Item 2: {slot2.slottedItemSO.itemName}");
-        Debug.Log($"IsMergeValid = true");
-        Debug.Log($"[TODO] Actual merge logic goes here");
+        isProcessing = true;
 
         if (feedbackText != null)
-            feedbackText.text = $"Merged {slot1.slottedItemSO.itemName}!";
+            feedbackText.text = $"Merging {slot1.slottedItemSO.itemName}...";
 
-        // Destroy the slotted items
-        if (slot1.slottedItemObject != null)
-            Destroy(slot1.slottedItemObject);
-            
-        if (slot2.slottedItemObject != null)
-            Destroy(slot2.slottedItemObject);
+        // TODO: Implement merge recipe -> spawn upgraded item
 
-        ClearSlots();
-        
-        // Close UI after short delay
-        StartCoroutine(CloseUIAfterDelay(1.5f));
+        StartCoroutine(ReturnAllItemsAndClose());
     }
 
-    /// <summary>
-    /// Decline button handler
-    /// </summary>
     private void OnDeclineButtonClicked()
     {
-        Debug.Log("=== ENGINEER MERGE DECLINED ===");
-        
-        // Return all slotted items to inventory
-        if (slot1?.slottedItemObject != null)
-        {
-            Item itemScript = slot1.slottedItemObject.GetComponent<Item>();
-            SnapBackToInventory(slot1.slottedItemObject, itemScript);
-        }
+        if (isProcessing) return;
 
-        if (slot2?.slottedItemObject != null)
-        {
-            Item itemScript = slot2.slottedItemObject.GetComponent<Item>();
-            SnapBackToInventory(slot2.slottedItemObject, itemScript);
-        }
+        isProcessing = true;
 
-        StartCoroutine(CloseUIAfterDelay(0.5f));
+        if (feedbackText != null)
+            feedbackText.text = "Merge cancelled. Returning items...";
+
+        StartCoroutine(ReturnAllItemsAndClose());
     }
 
-    private IEnumerator CloseUIAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        CloseEngineerUI();
-    }
-
-    /// <summary>
-    /// Clears both slots
-    /// </summary>
     private void ClearSlots()
     {
         if (slot1 != null)
         {
             slot1.slottedItemSO = null;
             slot1.slottedItemObject = null;
+            slot1.dragManager = null;
         }
 
         if (slot2 != null)
         {
             slot2.slottedItemSO = null;
             slot2.slottedItemObject = null;
+            slot2.dragManager = null;
         }
 
         if (mergeButton != null)
@@ -523,35 +514,42 @@ public class EngineerManager : MonoBehaviour
 
     public void CloseEngineerUI()
     {
-        if (!IsEngineerUIActive)
-            return;
+        if (!IsEngineerUIActive) return;
 
         Debug.Log("[EngineerManager] Closing Engineer UI");
 
-        // Return any remaining slotted items
-        if (slot1?.slottedItemObject != null)
-        {
-            Destroy(slot1.slottedItemObject);
-        }
-
-        if (slot2?.slottedItemObject != null)
-        {
-            Destroy(slot2.slottedItemObject);
-        }
-
         ClearSlots();
+        isProcessing = false;
 
         engineerUIPanel.SetActive(false);
         IsEngineerUIActive = false;
 
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            TrainFreezeController freezeController = player.GetComponent<TrainFreezeController>();
+            if (freezeController != null)
+            {
+                freezeController.ResumeTrain();
+                Debug.Log("[EngineerManager] Train resumed.");
+            }
+        }
+
         OnEngineerClosed?.Invoke();
+    }
+
+    private string GetSlotName(MergeSlot slot)
+    {
+        if (slot == slot1) return "Slot 1";
+        if (slot == slot2) return "Slot 2";
+        return "Unknown Slot";
     }
 
     private void OnDestroy()
     {
         if (mergeButton != null)
             mergeButton.onClick.RemoveListener(OnMergeButtonClicked);
-            
+
         if (declineButton != null)
             declineButton.onClick.RemoveListener(OnDeclineButtonClicked);
     }
