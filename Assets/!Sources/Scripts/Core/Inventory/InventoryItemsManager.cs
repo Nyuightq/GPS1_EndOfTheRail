@@ -39,9 +39,14 @@ public class InventoryItemManager : MonoBehaviour
         foreach (GameObject item in _inventory.equippedItems)
         {
             Item thisItem = item.GetComponent<Item>();
-            if (thisItem.itemEffect is ItemEffectCombat combatComp)
+            foreach(Effect effect in thisItem.effects)
             {
-                componentList.Add(combatComp.OnPrepareBattleComponent());
+                Debug.Log("Effect type: " + (effect != null ? effect.GetType().Name : "null"));
+                if (effect is WeaponSpawnEffect combatComp)
+                {
+                    Debug.Log("found a weapon!");
+                    componentList.Add(combatComp.OnPrepareBattleComponent());
+                }
             }
         }
 

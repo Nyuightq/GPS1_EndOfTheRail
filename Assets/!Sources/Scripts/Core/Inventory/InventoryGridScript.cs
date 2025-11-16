@@ -62,7 +62,7 @@ public class InventoryGridScript : MonoBehaviour
 
     private List<GameObject> previewCells = new List<GameObject>();
 
-    public List<GameObject> equippedItems = new List<GameObject>();
+    [SerializeField] public List<GameObject> equippedItems = new List<GameObject>();
 
     private float cellSize = GameManager.cellSize;
     private float canvasWidth;
@@ -260,6 +260,37 @@ public class InventoryGridScript : MonoBehaviour
             }
         }
         CheckItems();
+    }
+
+    public List<GameObject> GetAdjacentComponents(Vector2Int startingCell, ItemShapeCell[,] itemShape, GameObject itemId)
+    {
+        List<GameObject> adjacentComponents = new List<GameObject>();
+        for (int x = 0; x < itemShape.GetLength(0); x++)
+        {
+            for (int y = 0; y < itemShape.GetLength(1); y++)
+            {
+                if (itemShape[x, y].filled)
+                {
+                    Vector2 targetCellPos = new Vector2(startingCell.x + x, startingCell.y + y);
+                    InvCellData targetCell = inventoryGrid[(int)targetCellPos.x,(int)targetCellPos.y];
+                    if (targetCell.active && targetCell.item == itemId)
+                    {
+                        foreach(Vector2 adjacentCell in GetAdjacentCell(targetCellPos))
+                        {
+                            if (InGrid(adjacentCell))
+                            {
+                                InvCellData adjacentItemCell = inventoryGrid[(int)adjacentCell.x, (int)adjacentCell.y];
+                                if (adjacentCell != null && adjacentItemCell.item != itemId && adjacentItemCell.item != null && !adjacentComponents.Contains(adjacentItemCell.item))
+                                {
+                                    adjacentComponents.Add(adjacentItemCell.item);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return adjacentComponents;
     }
 
     //Debug Function for fun~
@@ -598,7 +629,7 @@ public class InventoryGridScript : MonoBehaviour
     }
 
 
-    private List<Vector2> GetAdjacentCell(Vector2 gridPos)
+    public List<Vector2> GetAdjacentCell(Vector2 gridPos)
     {
         List<Vector2> adjacentList = new List<Vector2>();
         Vector2[] directions = { Vector2.up, Vector2.down, Vector2.left, Vector2.right };

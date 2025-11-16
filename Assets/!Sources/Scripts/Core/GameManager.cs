@@ -15,9 +15,11 @@ public class GameManager : MonoBehaviour
     public static event Action<Vector3Int> onDestroyTile;
 
     [SerializeField] GameObject inputManagerPrefab;
+    [SerializeField] GameObject inventoryManagerPrefab;
     [SerializeField] public static int cellSize = 16;
 
     public PlayerStatusManager playerStatus;
+    public InventoryGridScript inventoryScript;
     public static InputManager input { get; private set; }
     private GameObject inputManager;
 
@@ -37,6 +39,7 @@ public class GameManager : MonoBehaviour
         }
 
         playerStatus = GetComponent<PlayerStatusManager>();
+        inventoryScript = inventoryManagerPrefab.GetComponent<InventoryGridScript>();
         inputManager = Instantiate(inputManagerPrefab);
         DontDestroyOnLoad(inputManager);
     }

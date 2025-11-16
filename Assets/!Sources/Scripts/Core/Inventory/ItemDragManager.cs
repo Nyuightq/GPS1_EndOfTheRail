@@ -19,7 +19,7 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
 
     private RectTransform rectTransform;
 
-    private Vector2 topLeftCellPos;
+    public Vector2 topLeftCellPos { get; private set; }
     private Vector2 dragDir;
     private bool dragging, mouseOnItem;
 
@@ -96,7 +96,7 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
 
     private void LeftClick()
     {
-        Debug.Log(GameStateManager.CurrentPhase);
+        //Debug.Log(GameStateManager.CurrentPhase);
         if (mouseOnItem && GameStateManager.CurrentPhase != Phase.Combat)
         {
             dragging = true;
@@ -105,6 +105,7 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
             {
                 inventoryGridScript.MarkCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, null);
                 itemScript.state = Item.itemState.unequipped;
+                itemScript.TriggerEffectUnequip();
             }
         }
     }
@@ -208,6 +209,14 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
             rectTransform.anchoredPosition = actualItemCellPos;
             equippedPos = actualItemCellPos;
             itemScript.state = Item.itemState.equipped;
+            itemScript.TriggerEffectEquip();
+
+            foreach(GameObject thingy in inventoryGridScript.GetAdjacentComponents(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape,this.gameObject))
+            {
+                Debug.Log($"<color=red>{gameObject} near {thingy}</color>");
+            }    
+
+
             firstEquip = false;
             return true;
         }
