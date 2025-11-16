@@ -144,7 +144,7 @@ public class CombatManager : MonoBehaviour
     private List<CombatComponentEntity> GenerateComponents()
     {
         List<CombatComponentData> componentDatas = InventoryItemManager.Instance.PrepareBattleComponents();
-        Debug.Log("componentDatas count: " + componentDatas.Count);
+        if (componentDatas != null) Debug.Log("componentDatas count: " + componentDatas.Count);
         List<CombatComponentEntity> components = new List<CombatComponentEntity>();
 
         if (componentDatas != null)
