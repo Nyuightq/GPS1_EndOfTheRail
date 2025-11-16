@@ -236,6 +236,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 963babcac9535514bb35648d9410596c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &266316047 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1413789572689411919, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
+  m_PrefabInstance: {fileID: 2625489668075140867}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1402c065742d104e97b1c8271812976, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &302595790 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7588662147450642708, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
@@ -1762,6 +1773,16 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
+--- !u!224 &2625489668075140868 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5435005992850150365, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
+  m_PrefabInstance: {fileID: 2625489668075140867}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &2625489668075140869 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 6771735947391212254, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
+  m_PrefabInstance: {fileID: 2625489668075140867}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2795926153029894879
 GameObject:
   m_ObjectHideFlags: 0
@@ -1781,16 +1802,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &2625489668075140868 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 5435005992850150365, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
-  m_PrefabInstance: {fileID: 2625489668075140867}
-  m_PrefabAsset: {fileID: 0}
---- !u!224 &2625489668075140869 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 6771735947391212254, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
-  m_PrefabInstance: {fileID: 2625489668075140867}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &3329886903113654316 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7285780891655300683, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
@@ -2440,6 +2451,14 @@ PrefabInstance:
     - target: {fileID: 4926789502135262990, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: healPromptButton
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4926789502135262990, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: dayNightController
+      value: 
+      objectReference: {fileID: 266316047}
+    - target: {fileID: 4926789502135262990, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: skipNightOnRestPoint
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5534164070626002141, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: engineerUIPanel
