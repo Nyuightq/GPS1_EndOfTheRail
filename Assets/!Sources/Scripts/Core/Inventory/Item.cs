@@ -3,9 +3,11 @@
 // Author: User
 // Description: -
 // --------------------------------------------------------------
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+
 
 public class Item : MonoBehaviour
 {
@@ -22,6 +24,10 @@ public class Item : MonoBehaviour
     public ItemEffect itemEffect;
     [SerializeField] private GameObject inventoryCellPrefab;
     [SerializeField] private float shapePreviewAlpha = 0.5f;
+
+    public Effect[] effects;
+    public event Action OnEquip, OnUnequip, OnBattleStart, OnUpdate, OnConditionTriggerOnce, OnBattleEnd, OnBattleUpdate;
+
     public ItemShapeCell[,] itemShape { get; private set; }
     public RectTransform spriteRectTransform, itemRect;
     public List<GameObject> shape = new List<GameObject>();
@@ -36,8 +42,48 @@ public class Item : MonoBehaviour
         spriteRectTransform = sprite.GetComponent<RectTransform>();
     }
 
+    #region event invokers
+    public void TriggerEffectUnequip() { OnUnequip.Invoke(); }
+    public void TriggerEffectEquip() { OnEquip.Invoke();  }
+    public void TriggerEffectConditionOnce() { OnConditionTriggerOnce.Invoke(); }
+    public void TriggerEffectUpdate() { OnUpdate.Invoke(); }
+    public void TriggerEffectBattleStart() { OnBattleStart.Invoke(); }
+    public void TriggerEffectBattleEnd() { OnBattleEnd.Invoke(); }
+    public void TriggerEffectBattleUpdate() { OnBattleUpdate.Invoke(); }
+    #endregion
+
     private void Start()
     {
+        effects = itemData.effects;
+
+        foreach (Effect effect in effects)
+        {
+            effect.owner = this;
+            switch (effect.trigger)
+            {
+                case triggers.OnUpdate:
+                    OnUpdate += effect.apply;
+                    break;
+                case triggers.OnEquip:
+                    OnEquip += effect.apply;
+                    break;
+                case triggers.OnConditionTriggerOnce:
+                    OnConditionTriggerOnce += effect.apply;
+                    OnBattleEnd += effect.remove;
+                    break;
+                case triggers.OnBattleStart:
+                    OnBattleStart += effect.apply;
+                    OnBattleEnd += effect.remove;
+                    break;
+                case triggers.OnBattleUpdate:
+                    OnBattleUpdate += effect.apply;
+                    OnBattleEnd += effect.remove;
+                    break;
+            }
+            OnUnequip += effect.remove;
+        }
+
+
         //Get the item Shape 2D Array 
         itemShape = itemData.GetShapeGrid();
 

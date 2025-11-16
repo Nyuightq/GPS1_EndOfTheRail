@@ -51,7 +51,7 @@ public class UI_PlayerStatus : MonoBehaviour
         playerStatus.OnScrapsChanged -= UpdateScrapsUI;
         playerStatus.OnCrystalHpChanged -= UpdateCrystalHpUI;
     }
-
+    
     private void UpdateScrapsUI(int currentScraps)
     {
         scrapsText.text = currentScraps.ToString();

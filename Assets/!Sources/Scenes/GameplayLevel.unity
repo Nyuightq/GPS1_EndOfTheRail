@@ -236,6 +236,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 963babcac9535514bb35648d9410596c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &302595790 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7588662147450642708, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
+  m_PrefabInstance: {fileID: 2625489668075140867}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &302595793 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7971016624545220107, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
+  m_PrefabInstance: {fileID: 2625489668075140867}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 302595790}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97d59333c60823042862d50394771d06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &303467814 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6976678101348498939, guid: 0b1b44059d2fe614d8ff16fecdaa8323, type: 3}
@@ -1678,6 +1694,10 @@ PrefabInstance:
       propertyPath: inventoryHeightMax
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 7971016624545220107, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
+      propertyPath: startingItems.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8131501017442361271, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -2250,6 +2270,14 @@ PrefabInstance:
       propertyPath: soundEffects.Array.data[31].volume
       value: 0.9
       objectReference: {fileID: 0}
+    - target: {fileID: 4921764918400996863, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: _hp
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 4921764918400996863, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: _baseMaxHp
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 4926789502135262990, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: scrapCost
       value: 30
@@ -2315,9 +2343,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 808508310}
     - target: {fileID: 8579136974911738680, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: inventoryScript
+      value: 
+      objectReference: {fileID: 302595793}
+    - target: {fileID: 8579136974911738680, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: inputManagerPrefab
       value: 
       objectReference: {fileID: 1721018559}
+    - target: {fileID: 8579136974911738680, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: inventoryManagerPrefab
+      value: 
+      objectReference: {fileID: 302595790}
     - target: {fileID: 8666137023644008668, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: m_Name
       value: ------------------------

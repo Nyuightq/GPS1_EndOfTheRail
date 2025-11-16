@@ -19,9 +19,13 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
 
     private RectTransform rectTransform;
 
-    private Vector2 topLeftCellPos;
+    public Vector2 topLeftCellPos { get; private set; }
     private Vector2 dragDir;
     private bool dragging, mouseOnItem;
+
+    //the last equipped position
+    private Vector2 equippedPos;
+    private bool firstEquip = true;
 
     InputActionMap playerActionMap;
 
@@ -92,7 +96,8 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
 
     private void LeftClick()
     {
-        if (mouseOnItem)
+        //Debug.Log(GameStateManager.CurrentPhase);
+        if (mouseOnItem && GameStateManager.CurrentPhase != Phase.Combat)
         {
             dragging = true;
 
@@ -100,6 +105,7 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
             {
                 inventoryGridScript.MarkCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, null);
                 itemScript.state = Item.itemState.unequipped;
+                itemScript.TriggerEffectUnequip();
             }
 
             if (EngineerManager.Instance != null && EngineerManager.Instance.IsEngineerUIActive)
@@ -117,25 +123,28 @@ private void LeftRelease()
     if (mouseOnItem)
     {
         dragging = false;
-        AttachToInventory();
+        bool sucess = AttachToInventory();
 
-            // Notify RewardManager (if active)
-            if (RewardManager.Instance != null)
-            {
-                RewardManager.Instance.OnItemReleased(gameObject);
-            }
+        //equipped pos defaults to 0 and 0 is largely impossible to get to at the start
+        if (!sucess && !firstEquip &&  itemScript.itemData.mandatoryItem)
+        {
+            // ADD THIS LINE - Critical for snap-back functionality
+            rectTransform.anchoredPosition = equippedPos;
+            AttachToInventory();
+        }
+
+        // ADD THIS LINE - Critical for snap-back functionality
+        // Notify RewardManager (if active)
+        if (RewardManager.Instance != null)
+        {
+            RewardManager.Instance.OnItemReleased(gameObject);
+        }
         
-            // Notify TransactionManager (if active)
-            if (TransactionManager.Instance != null)
-            {
-                TransactionManager.Instance.OnItemReleased(gameObject);
-            }
-
-            // Notify TransactionManager (if active)
-            if (TransactionManager.Instance != null)
-            {
-                TransactionManager.Instance.OnItemReleased(gameObject);
-            }
+        // Notify TransactionManager (if active)
+        if (TransactionManager.Instance != null)
+        {
+            TransactionManager.Instance.OnItemReleased(gameObject);
+        }
     }
 }
 
@@ -156,7 +165,7 @@ private void LeftRelease()
     }
     #endregion
 
-public void AttachToInventory()
+public bool AttachToInventory()
 {
     if (itemScript.state == Item.itemState.unequipped)
     {
@@ -174,7 +183,7 @@ public void AttachToInventory()
             }
             else
             {
-                return;
+                return false;
             }
         }
         
@@ -210,7 +219,20 @@ public void AttachToInventory()
         inventoryGridScript.MarkCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, gameObject);
 
         rectTransform.anchoredPosition = actualItemCellPos;
+        equippedPos = actualItemCellPos;
         itemScript.state = Item.itemState.equipped;
+        itemScript.TriggerEffectEquip();
+
+        foreach(GameObject thingy in inventoryGridScript.GetAdjacentComponents(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape,this.gameObject))
+            {
+                Debug.Log($"<color=red>{gameObject} near {thingy}</color>");
+            }    
+
+
+            firstEquip = false;
+            return true;
+        }
+        return false;
     }
 }
-}
+

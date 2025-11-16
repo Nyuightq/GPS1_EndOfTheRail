@@ -10,12 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 068edb241815e8b48bae3bd0df376ff4, type: 3}
-  m_Name: ItemTemplate2
+  m_Name: PlaceHolder2
   m_EditorClassIdentifier: 
   itemSprite: {fileID: 21300000, guid: 5d704657946588440a655df0600d1ddc, type: 3}
   itemName: Fack you
+  mandatoryItem: 0
   itemWidth: 3
   itemHeight: 2
+  effects:
+  - rid: 6451219851714232400
+  - rid: 6451219851714232414
+  itemEffectPrefab: {fileID: 0}
   itemShape:
   - filled: 1
   - filled: 1
@@ -23,3 +28,22 @@ MonoBehaviour:
   - filled: 1
   - filled: 1
   - filled: 1
+  references:
+    version: 2
+    RefIds:
+    - rid: 6451219851714232400
+      type: {class: HealEffect, ns: , asm: Assembly-CSharp}
+      data:
+        trigger: 0
+        conditions: []
+        inputType: 1
+        healAmount: 10
+        uses: 0
+    - rid: 6451219851714232414
+      type: {class: BuffStatEffect, ns: , asm: Assembly-CSharp}
+      data:
+        trigger: 0
+        conditions: []
+        inputType: 1
+        buffAmount: 10
+        statType: 1

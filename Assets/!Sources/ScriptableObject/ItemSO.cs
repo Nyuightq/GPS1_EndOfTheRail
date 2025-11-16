@@ -19,6 +19,9 @@ public class ItemSO : ScriptableObject
     public string itemName;
     public bool mandatoryItem = false;
     public int itemWidth, itemHeight;
+
+    [SerializeReference] public Effect[] effects;
+
     public GameObject itemEffectPrefab;
 
     [SerializeField] private ItemShapeCell[] itemShape;
