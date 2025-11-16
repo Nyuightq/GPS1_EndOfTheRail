@@ -214,17 +214,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 963babcac9535514bb35648d9410596c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &362641499 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4173668670732578445, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
-  m_PrefabInstance: {fileID: 6892035427243502869}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &382762167 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 9070070225845602918, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
@@ -896,6 +885,7 @@ MonoBehaviour:
       type: {class: HealEffect, ns: , asm: Assembly-CSharp}
       data:
         trigger: 0
+        triggerOnConditionOnce: 0
         conditions:
         - rid: 6451219851714232394
         inputType: 0
@@ -1415,40 +1405,48 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: startingItems.Array.size
-      value: 8
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: 'startingItems.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: d044c032c2424e545937da643f79d6a6, type: 2}
+      objectReference: {fileID: 11400000, guid: 4a34774a7cc9c2e45a71ff8ca0d37b52, type: 2}
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: 'startingItems.Array.data[1]'
       value: 
-      objectReference: {fileID: 11400000, guid: 4a34774a7cc9c2e45a71ff8ca0d37b52, type: 2}
+      objectReference: {fileID: 11400000, guid: e842aad5399021e44a017de95589eb76, type: 2}
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: 'startingItems.Array.data[2]'
       value: 
-      objectReference: {fileID: 11400000, guid: e842aad5399021e44a017de95589eb76, type: 2}
+      objectReference: {fileID: 11400000, guid: 7f5e6c7fef8eb6349bb1e30b30066a2f, type: 2}
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: 'startingItems.Array.data[3]'
       value: 
-      objectReference: {fileID: 11400000, guid: 7f5e6c7fef8eb6349bb1e30b30066a2f, type: 2}
+      objectReference: {fileID: 11400000, guid: 5dfdd4b74a8e23b419f78a95af47d93f, type: 2}
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: 'startingItems.Array.data[4]'
       value: 
-      objectReference: {fileID: 11400000, guid: 7f5e6c7fef8eb6349bb1e30b30066a2f, type: 2}
+      objectReference: {fileID: 11400000, guid: a147a81c1b63d4647bab7e37d625e0b3, type: 2}
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: 'startingItems.Array.data[5]'
       value: 
-      objectReference: {fileID: 11400000, guid: a147a81c1b63d4647bab7e37d625e0b3, type: 2}
+      objectReference: {fileID: 11400000, guid: d78dfe7417211fd4786162b553ce7d20, type: 2}
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: 'startingItems.Array.data[6]'
       value: 
-      objectReference: {fileID: 11400000, guid: d78dfe7417211fd4786162b553ce7d20, type: 2}
+      objectReference: {fileID: 11400000, guid: 5d5ed91e3b4b5e541a7dab091f198e02, type: 2}
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: 'startingItems.Array.data[7]'
       value: 
-      objectReference: {fileID: 11400000, guid: de151c82ef045eb4eac3cca1d519370a, type: 2}
+      objectReference: {fileID: 11400000, guid: 93c80f1e8b624c247b45a87254dc271d, type: 2}
+    - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: 'startingItems.Array.data[8]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 8e1b96c035b2b9343827835a3f2bd7d0, type: 2}
+    - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: 'startingItems.Array.data[9]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 8e1b96c035b2b9343827835a3f2bd7d0, type: 2}
     - target: {fileID: 8911030689567367474, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: rewardPanelRef
       value: 
@@ -1645,7 +1643,7 @@ PrefabInstance:
     - target: {fileID: 4926789502135262990, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: healPromptButton
       value: 
-      objectReference: {fileID: 362641499}
+      objectReference: {fileID: 0}
     - target: {fileID: 7030176318696570325, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: gridManager
       value: 
@@ -1674,6 +1672,10 @@ PrefabInstance:
       propertyPath: _railBuilderManager
       value: 
       objectReference: {fileID: 880395500}
+    - target: {fileID: 8579136974911738680, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: gridManager
+      value: 
+      objectReference: {fileID: 1234220176}
     - target: {fileID: 8579136974911738680, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: playerStatus
       value: 

@@ -26,7 +26,7 @@ public class Item : MonoBehaviour
     [SerializeField] private float shapePreviewAlpha = 0.5f;
 
     public Effect[] effects;
-    public event Action OnEquip, OnUnequip, OnBattleStart, OnUpdate, OnConditionTriggerOnce, OnBattleEnd, OnBattleUpdate;
+    public event Action OnEquip, OnUnequip, OnBattleStart, OnUpdate, /*OnConditionTriggerOnce,*/ OnBattleEnd, OnBattleUpdate, OnAdjacentEquip;
 
     public ItemShapeCell[,] itemShape { get; private set; }
     public RectTransform spriteRectTransform, itemRect;
@@ -35,6 +35,13 @@ public class Item : MonoBehaviour
 
     int cellSize = GameManager.cellSize;
 
+    private int baseLevel = 1;
+    [SerializeField] private int maxLevel = 3;
+    public int level
+    {
+        get => baseLevel;
+        set => baseLevel = Mathf.Clamp(value, 1, maxLevel);
+    }
 
     #region Unity LifeCycle
     private void OnEnable()
@@ -43,13 +50,14 @@ public class Item : MonoBehaviour
     }
 
     #region event invokers
-    public void TriggerEffectUnequip() { OnUnequip.Invoke(); }
-    public void TriggerEffectEquip() { OnEquip.Invoke();  }
-    public void TriggerEffectConditionOnce() { OnConditionTriggerOnce.Invoke(); }
-    public void TriggerEffectUpdate() { OnUpdate.Invoke(); }
-    public void TriggerEffectBattleStart() { OnBattleStart.Invoke(); }
-    public void TriggerEffectBattleEnd() { OnBattleEnd.Invoke(); }
-    public void TriggerEffectBattleUpdate() { OnBattleUpdate.Invoke(); }
+    public void TriggerEffectUnequip() { OnUnequip?.Invoke(); }
+    public void TriggerEffectAdjacentEquip() { OnAdjacentEquip?.Invoke(); }
+    public void TriggerEffectEquip() { OnEquip?.Invoke();  }
+    //public void TriggerEffectConditionOnce() { OnConditionTriggerOnce?.Invoke(); }
+    public void TriggerEffectUpdate() { OnUpdate?.Invoke(); }
+    public void TriggerEffectBattleStart() { OnBattleStart?.Invoke(); }
+    public void TriggerEffectBattleEnd() { OnBattleEnd?.Invoke(); }
+    public void TriggerEffectBattleUpdate() { OnBattleUpdate?.Invoke(); }
     #endregion
 
     private void Start()
@@ -67,10 +75,14 @@ public class Item : MonoBehaviour
                 case triggers.OnEquip:
                     OnEquip += effect.apply;
                     break;
-                case triggers.OnConditionTriggerOnce:
-                    OnConditionTriggerOnce += effect.apply;
-                    OnBattleEnd += effect.remove;
+                case triggers.OnEquipAndAdjacentEquip:
+                    OnEquip += effect.apply;
+                    OnAdjacentEquip += effect.apply;
                     break;
+                //case triggers.OnConditionTriggerOnce:
+                //    OnConditionTriggerOnce += effect.apply;
+                //    OnBattleEnd += effect.remove;
+                //    break;
                 case triggers.OnBattleStart:
                     OnBattleStart += effect.apply;
                     OnBattleEnd += effect.remove;
@@ -108,6 +120,11 @@ public class Item : MonoBehaviour
         GetComponent<RectTransform>().SetAsLastSibling();
     }
     #endregion
+
+    private void Update()
+    {
+        OnUpdate?.Invoke();
+    }
 
     private void GeneratePreview()
     {

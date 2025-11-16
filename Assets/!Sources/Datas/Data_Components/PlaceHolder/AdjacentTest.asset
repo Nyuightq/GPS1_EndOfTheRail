@@ -18,16 +18,36 @@ MonoBehaviour:
   itemWidth: 1
   itemHeight: 1
   effects:
-  - rid: 6451219851714232416
+  - rid: 6451219851714232428
+  - rid: 6451219851714232426
   itemEffectPrefab: {fileID: 0}
   itemShape:
   - filled: 1
   references:
     version: 2
     RefIds:
-    - rid: 6451219851714232416
-      type: {class: AdjacentWeaponBoosterEffect, ns: , asm: Assembly-CSharp}
+    - rid: 6451219851714232426
+      type: {class: BuffStatEffect, ns: , asm: Assembly-CSharp}
       data:
         trigger: 0
+        triggerOnConditionOnce: 0
         conditions: []
-        weaponBuffs: []
+        inputType: 1
+        buffAmount: 10
+        statType: 0
+    - rid: 6451219851714232428
+      type: {class: BuffStatEffect, ns: , asm: Assembly-CSharp}
+      data:
+        trigger: 2
+        triggerOnConditionOnce: 1
+        conditions:
+        - rid: 6451219851714232429
+        inputType: 1
+        buffAmount: 1
+        statType: 1
+    - rid: 6451219851714232429
+      type: {class: LessThanCondition, ns: , asm: Assembly-CSharp}
+      data:
+        valueType: 1
+        threshold: 0.5
+        maxValueType: 2

@@ -100,7 +100,7 @@ public class RailGridScript : MonoBehaviour
 
     public Vector3Int startPoint;
     public Vector3Int endPoint;
-    private GameObject _trainRef;
+    public GameObject _trainRef { get; private set; }
 
     public Dictionary<Vector3Int, RailData> railDataMap = new Dictionary<Vector3Int, RailData>();
     public delegate void RefreshRouteEvent();
