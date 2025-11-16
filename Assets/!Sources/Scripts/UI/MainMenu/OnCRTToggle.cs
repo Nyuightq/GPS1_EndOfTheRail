@@ -9,7 +9,7 @@ public class OnCRTToggle : MonoBehaviour, IPointerClickHandler
     [SerializeField] private AudioSource checkOffAudio;
 
     [SerializeField] private Color normalColor = new Color(255f / 255f, 255f / 255f, 255f / 255f);
-    [SerializeField] private Color clickColor = new Color(201f / 255f, 192f / 255f, 61f / 255f);
+    [SerializeField] private Color clickColor = new Color(251f / 255f, 197f / 255f, 97f / 255f);
 
     private bool isToggled = false;
 
