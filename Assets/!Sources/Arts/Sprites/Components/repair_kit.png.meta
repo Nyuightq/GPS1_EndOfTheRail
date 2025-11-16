@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: 5d704657946588440a655df0600d1ddc
+guid: c7897132a5e0bea439f88a31302b2e5c
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6771971255484106429
-    second: fack_you_0
+      213: 7590128964808157415
+    second: repair_kit_0
+  - first:
+      213: 4517692750326018784
+    second: repair_kit_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -89,6 +92,19 @@ TextureImporter:
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 1
+    textureFormat: -1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0

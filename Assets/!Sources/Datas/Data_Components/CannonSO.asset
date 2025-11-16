@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 068edb241815e8b48bae3bd0df376ff4, type: 3}
+  m_Name: CannonSO
+  m_EditorClassIdentifier: 
+  itemSprite: {fileID: 21300000, guid: c4cf5474f8f00ca4e95f490d6029b496, type: 3}
+  itemName: Cannon
+  mandatoryItem: 0
+  itemWidth: 3
+  itemHeight: 2
+  effects:
+  - rid: 6451219851714232399
+  itemEffectPrefab: {fileID: 0}
+  itemShape:
+  - filled: 1
+  - filled: 1
+  - filled: 1
+  - filled: 1
+  - filled: 1
+  - filled: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 6451219851714232399
+      type: {class: WeaponSpawnEffect, ns: , asm: Assembly-CSharp}
+      data:
+        trigger: 0
+        conditions: []
+        weaponName: Cannon
+        baseAttackDamage: 5
+        baseAttackSpeed: 3
+        baseAttackVariance: 2
+        animationClip: {fileID: 11400000, guid: e9c80bc114e1b69458a7b00e25d129bd, type: 2}
