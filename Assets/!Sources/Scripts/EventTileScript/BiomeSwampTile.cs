@@ -1,18 +1,15 @@
 // --------------------------------------------------------------
 // Creation Date: 2025-10-16 21:23
 // Author: ZQlie
-// Description: -
+// Description: A biome tile that accelerates day progression (day only) and slows the train
 // --------------------------------------------------------------
-
-
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Tiles/BiomeSwampTile")]
 public class BiomeSwampTile : EventTile
 {
     [Header("Tile Effects")]
-    [SerializeField] private int movementBonus = 2;       // adds extra movement to DayCycle
-    [SerializeField] private float speedReduction = 0.5f; // fraction or amount to reduce speed
+    [SerializeField] private float speedReduction = 0.5f; // amount to reduce train speed
     [SerializeField] private Sprite tileSprite;
 
     private void OnValidate()
@@ -31,24 +28,25 @@ public class BiomeSwampTile : EventTile
             return;
         }
 
+        // NOTE: Tile movement cost (2 during day, 1 during night) is now handled in TrainMovement.cs
+        // No need to modify dayCycleScript here
+
         DayCycleScript dayCycle = train.dayCycleManager.GetComponent<DayCycleScript>();
         if (dayCycle != null)
         {
-            // Only apply debuff if it's currently DAYTIME
             if (dayCycle.IsDayTime)
             {
-                dayCycle.addTilesMoved(movementBonus - 1);
-                Debug.Log($"BiomeSwampTile triggered during DAY! Added {movementBonus} tile movement bonus.");
+                Debug.Log("BiomeSwampTile: Entered during DAY - tile movement will be 2 (handled in TrainMovement)");
             }
             else
             {
-                Debug.Log("BiomeSwampTile entered at NIGHT — no movement bonus applied.");
+                Debug.Log("BiomeSwampTile: Entered during NIGHT - tile movement will be 1 (normal)");
             }
-            SoundManager.Instance.PlaySFX("SFX_TrainMovement_Swamp");
         }
 
-        // Train speed still reduced (visual slow-down but faster tile progress)
+        // Apply speed reduction (visual slow-down)
         train.ApplySpeedModifier(speedReduction);
+        SoundManager.Instance.PlaySFX("SFX_TrainMovement_Swamp");
     }
 
     public override void OnPlayerExit(GameObject player)
@@ -57,7 +55,7 @@ public class BiomeSwampTile : EventTile
         if (train != null)
         {
             train.ResetSpeedModifier();
+            Debug.Log("BiomeSwampTile: Train speed reset to base.");
         }
     }
 }
-

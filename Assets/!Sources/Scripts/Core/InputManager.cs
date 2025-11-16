@@ -17,6 +17,18 @@ public class InputManager : MonoBehaviour
     public static event Action OnLeftClick, OnLeftRelease, OnLeftHold;
     public static event Action OnRightClick, OnRightRelease, OnRightHold;
 
+    private void Awake()
+{
+    // Clear all event subscribers when scene loads
+    OnLeftClick = null;
+    OnLeftRelease = null;
+    OnLeftHold = null;
+    OnRightClick = null;
+    OnRightRelease = null;
+    OnRightHold = null;
+}
+
+
     private void OnEnable()
     {
         playerActionMap = inputActions.FindActionMap("Player");
@@ -28,6 +40,9 @@ public class InputManager : MonoBehaviour
 
         rightClickAction.performed += RightClicked;
         rightClickAction.canceled += RightReleased;
+
+        // Enable the action map
+        playerActionMap.Enable();
     }
 
     private void OnDisable()
@@ -37,6 +52,9 @@ public class InputManager : MonoBehaviour
 
         rightClickAction.performed -= RightClicked;
         rightClickAction.canceled -= RightReleased;
+
+        // Disable the action map
+        playerActionMap?.Disable();
     }
 
     private void Update()

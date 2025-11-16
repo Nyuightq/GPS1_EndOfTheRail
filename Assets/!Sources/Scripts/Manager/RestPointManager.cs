@@ -1,7 +1,7 @@
 // --------------------------------------------------------------
 // Creation Date: 2025-10-22 23:55
 // Author: ZQlie
-// Description: -
+// Description: Manages rest point interactions including healing and optional night skip
 // --------------------------------------------------------------
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,6 +11,7 @@ public class RestPointManager : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private PlayerStatusManager playerStatusManager;
+    [SerializeField] private DayCycleScript dayCycleScript;
     
     [Header("UI References")]
     [SerializeField] private Button healPromptButton;
@@ -23,12 +24,17 @@ public class RestPointManager : MonoBehaviour
     [SerializeField] private int healAmount = 20;
     [SerializeField] private int scrapCost = 10;
     
+    [Header("Skip Night Settings (Editor Only)")]
+    [SerializeField] private bool skipNightOnRestPoint = false;
+    [Tooltip("If enabled, night will be automatically skipped when entering a rest point during day time")]
+    [SerializeField] private OnDayToNight dayNightController;
+    
     private bool isOnRestPoint = false;
     private TrainMovement trainMovement;
 
     private void Start()
     {
-        // Subscribe to button clicks
+        // Subscribe to heal button clicks
         if (healPromptButton != null)
             healPromptButton.onClick.AddListener(OnPromptButtonClicked);
         
@@ -38,12 +44,20 @@ public class RestPointManager : MonoBehaviour
         if (cancelButton != null)
             cancelButton.onClick.AddListener(OnCancelButtonClicked);
         
+        // Find DayCycleScript if not assigned
+        if (dayCycleScript == null)
+            dayCycleScript = FindFirstObjectByType<DayCycleScript>();
+        
+        // Find OnDayToNight if not assigned
+        if (dayNightController == null)
+            dayNightController = FindFirstObjectByType<OnDayToNight>();
+        
         HideAll();
     }
 
     private void OnDestroy()
     {
-        // Unsubscribe from button clicks
+        // Unsubscribe from heal button clicks
         if (healPromptButton != null)
             healPromptButton.onClick.RemoveListener(OnPromptButtonClicked);
         
@@ -65,6 +79,16 @@ public class RestPointManager : MonoBehaviour
         
         if (healPromptButton != null)
             healPromptButton.gameObject.SetActive(true);
+        
+        // Auto-skip night if enabled and currently day time
+        if (skipNightOnRestPoint && dayCycleScript != null)
+        {
+            if (dayCycleScript.CurrentTime == DayCycleScript.TimeState.Day)
+            {
+                Debug.Log("[Editor Feature] Auto-skipping night on rest point");
+                SkipNightImmediate();
+            }
+        }
         
         Debug.Log("Entered Rest Point - Heal Button Available");
     }
@@ -126,6 +150,53 @@ public class RestPointManager : MonoBehaviour
         HideConfirmPanel();
     }
 
+    private void SkipNightImmediate()
+    {
+        if (dayCycleScript == null)
+            return;
+
+        // Check if it's day time
+        if (dayCycleScript.CurrentTime != DayCycleScript.TimeState.Day)
+        {
+            Debug.LogWarning("Can only skip night during day time!");
+            return;
+        }
+
+        Debug.Log($"[Editor] Skipping night - Fast forwarding to Day {dayCycleScript.GetDay() + 1}");
+
+        // Set tiles moved to the day length to trigger night transition
+        int requiredTiles = dayCycleScript.DayLength + dayCycleScript.DayLengthMod;
+        dayCycleScript.setTilesMoved(requiredTiles);
+
+        // Wait one frame for night to start, then immediately end it
+        StartCoroutine(SkipNightCoroutine());
+    }
+
+    private System.Collections.IEnumerator SkipNightCoroutine()
+    {
+        // Wait for one frame to let the day->night transition happen
+        yield return null;
+        
+        // Check if we're now in night phase
+        if (dayCycleScript.CurrentTime == DayCycleScript.TimeState.Night)
+        {
+            // Immediately end the night by setting tiles moved to night length
+            dayCycleScript.setTilesMoved(dayCycleScript.NightLength);
+            
+            // Force light intensity back to day
+            if (dayNightController != null)
+            {
+                dayNightController.ForceResetToDay();
+            }
+            
+            Debug.Log("[Editor] Night skipped - Starting new day with lighting reset");
+        }
+        else
+        {
+            Debug.LogWarning("Failed to skip night - not in night phase");
+        }
+    }
+
     private void ShowConfirmPanel(string description, bool canAfford)
     {
         if (confirmPanel != null)
@@ -137,7 +208,7 @@ public class RestPointManager : MonoBehaviour
         if (acceptButton != null)
             acceptButton.interactable = canAfford;
         
-        // Hide prompt button when panel is open
+        // Hide buttons when panel is open
         if (healPromptButton != null)
             healPromptButton.gameObject.SetActive(false);
     }
@@ -147,7 +218,7 @@ public class RestPointManager : MonoBehaviour
         if (confirmPanel != null)
             confirmPanel.SetActive(false);
         
-        // Show prompt button again
+        // Show heal button again if on rest point
         if (isOnRestPoint && healPromptButton != null)
             healPromptButton.gameObject.SetActive(true);
     }
@@ -167,6 +238,4 @@ public class RestPointManager : MonoBehaviour
         healAmount = amount;
         scrapCost = cost;
     }
-
-    
 }
