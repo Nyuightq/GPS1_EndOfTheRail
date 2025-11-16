@@ -17,6 +17,7 @@ using UnityEngine;
 /// </summary>
 public enum Phase
 {
+    None,
     Plan,
     Travel,
     Combat,
@@ -34,6 +35,7 @@ public class GameStateManager : MonoBehaviour
     public PlayerStatusManager playerStatus;
     private Phase _phase = Phase.Plan;
     private bool _pause = false;
+    [SerializeField] private bool _isInitial = false;
     // private int _scraps;
     public static Phase CurrentPhase => Instance._phase;
     // public int Scraps => _scraps;
@@ -41,9 +43,9 @@ public class GameStateManager : MonoBehaviour
     // Managers Reference to disable and enable
     // private CameraManager _cameraManager;
     // private UIManager _uiManager;
-    [SerializeField] private GameObject _railBuilderManager;
     [SerializeField] private GameObject _planPhasePanel;
     private RectTransform _planPhaseRect;
+    private GameObject _railBuilderManager;
 
     private void Awake()
     {
@@ -54,14 +56,20 @@ public class GameStateManager : MonoBehaviour
         }
 
         Instance = this;
-        //
-        _planPhaseRect = _planPhasePanel.GetComponent<RectTransform>();
         // DontDestroyOnLoad(gameObject);
 
         // Find Manager inside the scene
         // _cameraManager = FindObjectOfType<CameraManager>();
         // _uiManager = FindObjectOfType<UIManager>();
         // _railBuilderManager = FindObjectOfType<BuildRails>();
+    }
+
+    private void Start()
+    {
+        if (_planPhasePanel != null ) _planPhaseRect = _planPhasePanel.GetComponent<RectTransform>();
+
+        BuildRails buildRailsObject = FindFirstObjectByType<BuildRails>();
+        if (buildRailsObject != null) _railBuilderManager = buildRailsObject.gameObject;
     }
 
     /// <summary>
@@ -153,12 +161,12 @@ public class GameStateManager : MonoBehaviour
             _planPhasePanel.SetActive(true);
             _planPhaseRect.DOKill(); // stop previous tweens
             // _planPhaseRect.anchoredPosition = new Vector2(0, -200f); // start off-screen (adjust value as needed)
-            _planPhaseRect.DOAnchorPosY(80f, 0.6f).SetEase(Ease.OutBack);
+            _planPhaseRect.DOAnchorPosY(0f, 0.6f).SetEase(Ease.OutBack);
         }
         else
         {
             _planPhaseRect.DOKill();
-            _planPhaseRect.DOAnchorPosY(0f, 0.6f).SetEase(Ease.InBack)
+            _planPhaseRect.DOAnchorPosY(-100f, 0.6f).SetEase(Ease.InBack)
                 .OnComplete(() => _planPhasePanel.SetActive(false));
         }
     }
