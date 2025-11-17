@@ -96,14 +96,19 @@ public class OnClickImage : MonoBehaviour
 
     public void OnNarrative4()
     {
+        narrative4.SetActive(true);
+        narrative4Text.SetActive(true);
+
+        narrative3.SetActive(false);
+        narrative3Text.SetActive(false);
+
         clickedAudio = true;
         clickAudio.Play();
 
-        StartCoroutine(TransitionOut());
-        StartCoroutine(WaitThenNext());
+        StartCoroutine(TransitionOutToNextScene());
     }
 
-    private IEnumerator TransitionOut()
+    private IEnumerator TransitionOutToNextScene()
     {
         transitionGO.SetActive(true);
 
@@ -111,12 +116,8 @@ public class OnClickImage : MonoBehaviour
 
         transitionAnimator.enabled = true;
         transitionAnimator.Play("TransitionOutAnim", 0, 0f);
-    }
 
-    private IEnumerator WaitThenNext()
-    {
         yield return new WaitForSeconds(0.5f);
-
         SceneManager.LoadScene("GameplayLevel");
     }
 }
