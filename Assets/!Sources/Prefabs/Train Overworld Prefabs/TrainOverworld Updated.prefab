@@ -461,7 +461,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dayCycle: {fileID: 0}
-  tilesPerHPLoss: 10
+  baseTilesPerHPLoss: 2
 --- !u!114 &-8296277831885255952
 MonoBehaviour:
   m_ObjectHideFlags: 0

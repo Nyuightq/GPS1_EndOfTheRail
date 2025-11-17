@@ -24,7 +24,7 @@ MonoBehaviour:
     scrapsReward:
       baseCount: 10
       variance: 2
-  - dayNumber: 2
+  - dayNumber: 4
     combatStats:
       maxHp: 20
       attackDamage: 3
@@ -34,7 +34,7 @@ MonoBehaviour:
     scrapsReward:
       baseCount: 15
       variance: 2
-  - dayNumber: 3
+  - dayNumber: 7
     combatStats:
       maxHp: 27
       attackDamage: 3

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemSprite: {fileID: 21300000, guid: e11f387c30cbeb54c807abf004984f6f, type: 3}
   itemName: Reinforce Plate
+  itemDescription: 
   mandatoryItem: 0
   itemWidth: 4
   itemHeight: 1
@@ -32,7 +33,8 @@ MonoBehaviour:
       type: {class: BuffStatEffect, ns: , asm: Assembly-CSharp}
       data:
         trigger: 0
+        triggerOnConditionOnce: 0
         conditions: []
-        inputType: 0
-        buffAmount: 2
+        inputType: 1
+        buffAmount: 3
         statType: 0

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemSprite: {fileID: -425339959, guid: 05cd47249d8725c44b6c4bfff6e68d28, type: 3}
   itemName: Turret
+  itemDescription: 
   mandatoryItem: 0
   itemWidth: 2
   itemHeight: 2
@@ -32,9 +33,12 @@ MonoBehaviour:
       type: {class: WeaponSpawnEffect, ns: , asm: Assembly-CSharp}
       data:
         trigger: 0
+        triggerOnConditionOnce: 0
         conditions: []
         weaponName: Turret
-        baseAttackDamage: 3
+        baseAttackDamage: 4
         baseAttackSpeed: 5
-        baseAttackVariance: 1
+        baseAttackVariance: 2
+        weaponSprite: {fileID: 0}
         animationClip: {fileID: 11400000, guid: 483be9dd426cc144e87b5d5eedd3ece3, type: 2}
+        attackSfxName: SFX_TurretAttack
