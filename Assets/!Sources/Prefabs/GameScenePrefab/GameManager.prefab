@@ -63,7 +63,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputManagerPrefab: {fileID: 0}
+  inventoryManagerPrefab: {fileID: 0}
+  gridManager: {fileID: 0}
   playerStatus: {fileID: 4921764918400996863}
+  inventoryScript: {fileID: 0}
+  railGridScript: {fileID: 0}
 --- !u!114 &8456088590381804051
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -77,7 +81,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerStatus: {fileID: 4921764918400996863}
-  _railBuilderManager: {fileID: 0}
+  _isInitial: 0
   _planPhasePanel: {fileID: 0}
 --- !u!114 &4921764918400996863
 MonoBehaviour:
@@ -93,9 +97,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _scraps: 0
   _hp: 0
-  _maxHp: 100
+  _baseMaxHp: 0
   _crystalHp: 0
   _maxCrystalHp: 75
+  _baseDefense: 0
 --- !u!1 &319491141945272410
 GameObject:
   m_ObjectHideFlags: 0
@@ -230,6 +235,8 @@ MonoBehaviour:
   encounterTileSO: {fileID: 11400000, guid: 88ad12f5cae3aad40a5fbd6ecaf0e783, type: 2}
   globalSpawnChance: 0
   playerTrain: {fileID: 0}
+  uiImageA: {fileID: 0}
+  uiImageB: {fileID: 0}
 --- !u!114 &478392586998437590
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -343,6 +350,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   engineerUIPanel: {fileID: 0}
+  slot1:
+    slotAnchor: {fileID: 0}
+    slottedItemSO: {fileID: 0}
+    slottedItemObject: {fileID: 0}
+    dragManager: {fileID: 0}
+  slot2:
+    slotAnchor: {fileID: 0}
+    slottedItemSO: {fileID: 0}
+    slottedItemObject: {fileID: 0}
+    dragManager: {fileID: 0}
+  resultAnchor: {fileID: 0}
+  resultImage: {fileID: 0}
+  resultText: {fileID: 0}
+  mergeButton: {fileID: 0}
+  declineButton: {fileID: 0}
+  feedbackText: {fileID: 0}
+  tweenDuration: 0.28
 --- !u!1 &1662941285322990777
 GameObject:
   m_ObjectHideFlags: 0
@@ -747,6 +771,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerStatusManager: {fileID: 4921764918400996863}
+  dayCycleScript: {fileID: 0}
   healPromptButton: {fileID: 0}
   confirmPanel: {fileID: 0}
   descriptionText: {fileID: 0}
@@ -754,6 +779,8 @@ MonoBehaviour:
   cancelButton: {fileID: 0}
   healAmount: 10
   scrapCost: 5
+  skipNightOnRestPoint: 0
+  dayNightController: {fileID: 0}
 --- !u!1 &8666137023644008668
 GameObject:
   m_ObjectHideFlags: 0
