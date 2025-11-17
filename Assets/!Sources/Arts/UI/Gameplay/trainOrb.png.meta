@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 6f9734dd9865b8443aab8e990e831eb9
+guid: b0f4cd7f7adaac04c8eb552849c3ec69
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 718265035969390308
-    second: trial_0
+      213: -6111998020386564850
+    second: trainOrb_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -52,7 +52,7 @@ TextureImporter:
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 16
-  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteBorder: {x: 2, y: 2, z: 2, w: 2}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
@@ -160,7 +160,7 @@ TextureImporter:
         width: 96
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -178,7 +178,7 @@ TextureImporter:
     physicsShape: []
     bones: []
     spriteID: 5e97eb03825dee720800000000000000
-    internalID: 0
+    internalID: 1537655665
     vertices: []
     indices: 
     edges: []

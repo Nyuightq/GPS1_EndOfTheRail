@@ -28,6 +28,7 @@ public class RestPointManager : MonoBehaviour
     [SerializeField] private bool skipNightOnRestPoint = false;
     [Tooltip("If enabled, night will be automatically skipped when entering a rest point during day time")]
     [SerializeField] private OnDayToNight dayNightController;
+    [SerializeField] private OnTrainLight trainLightController;
     
     private bool isOnRestPoint = false;
     private TrainMovement trainMovement;
@@ -51,6 +52,10 @@ public class RestPointManager : MonoBehaviour
         // Find OnDayToNight if not assigned
         if (dayNightController == null)
             dayNightController = FindFirstObjectByType<OnDayToNight>();
+
+        // Find OnTrainLight if not assigned
+        if (trainLightController == null)
+            trainLightController = FindFirstObjectByType<OnTrainLight>();
         
         HideAll();
     }
@@ -182,12 +187,23 @@ public class RestPointManager : MonoBehaviour
         {
             // Immediately end the night by setting tiles moved to night length
             dayCycleScript.setTilesMoved(dayCycleScript.NightLength);
-            
-            // Force light intensity back to day
+
+            // Reset lights
+            dayNightController?.ForceResetToDay();
+            trainLightController?.ForceResetToDay();
+
+            /*// Force light intensity back to day
             if (dayNightController != null)
             {
                 dayNightController.ForceResetToDay();
             }
+
+            // Force train light intensity and alpha back to day
+            if (trainLightController != null)
+            {
+                trainLightController.ForceResetToDay();
+            }
+            */
             
             Debug.Log("[Editor] Night skipped - Starting new day with lighting reset");
         }

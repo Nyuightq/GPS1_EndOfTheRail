@@ -166,6 +166,10 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 509415783914132541, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: nightIntensity
+      value: 0.4
+      objectReference: {fileID: 0}
     - target: {fileID: 768408911272816417, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_RaycastTarget
       value: 0

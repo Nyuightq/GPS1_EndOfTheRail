@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using DG.Tweening;
 
 public class OnDayToNight : MonoBehaviour
 {
@@ -9,9 +10,13 @@ public class OnDayToNight : MonoBehaviour
 
     [Header("Light Settings")]
     [SerializeField] private float dayIntensity = 10f;
-    [SerializeField] private float nightIntensity = 0.10f;
+    [SerializeField] private float nightIntensity = 0.4f;
 
-    private SpriteRenderer trainPixelOrbRenderer;
+    [Header("Day Night Transition Duration")]
+    [SerializeField] private float transitionDuration = 3f;
+
+    private bool dayToNightTween = false;
+    private bool nightToDayTween = false;
     
     private void Start()
     {
@@ -36,15 +41,57 @@ public class OnDayToNight : MonoBehaviour
         float maxTiles = dayCycle.DayLength + dayCycle.DayLengthMod;
         float tilesMoved = Mathf.Clamp(dayCycle.TilesMoved, 0, maxTiles);
 
-        if (dayCycle.CurrentTime == DayCycleScript.TimeState.Day)
+        float progression = tilesMoved / maxTiles;
+
+        //Start the tweening process at 3/4 of the day
+        //which is 75% of the day is progressed
+        if (!dayToNightTween && progression >= 0.75f &&
+            dayCycle.CurrentTime == DayCycleScript.TimeState.Day)
         {
-            //Day to night
-            dayNightLight.intensity = Mathf.Lerp(dayIntensity, nightIntensity, tilesMoved / maxTiles);
+            //Day to night (this is visually progression, not tween)
+            //dayNightLight.intensity = Mathf.Lerp(dayIntensity, nightIntensity, tilesMoved / maxTiles);
+
+            //Day to night (UPDATED, USES DOTWEEN)
+            dayToNightTween = true;
+            nightToDayTween = false;
+
+            //Kill the previous tweening so it doesn't overlap with previous actions
+            DOTween.Kill(dayNightLight);
+
+            //Dotween.To(getter, setter, endValue, duration)
+            DOTween.To(
+                () => dayNightLight.intensity,
+                x => dayNightLight.intensity = x,
+                nightIntensity, transitionDuration).
+                SetEase(Ease.InOutSine).
+                SetTarget(dayNightLight);
         }
-        else
+        /*else
         {
             //Night to day
             dayNightLight.intensity = nightIntensity;
+        }
+        */
+
+        float nightToDayDuration = 4f;
+
+        //Night to day
+        if (!nightToDayTween && progression >= 0.75f &&
+            dayCycle.CurrentTime == DayCycleScript.TimeState.Night)
+        {
+            nightToDayTween = true;
+            dayToNightTween = false;
+
+            //Kill the previous tweening so it doesn't overlap with previous actions
+            DOTween.Kill(dayNightLight);
+
+            //Dotween.To(getter, setter, endValue, duration)
+            DOTween.To(
+                () => dayNightLight.intensity,
+                x => dayNightLight.intensity = x,
+                dayIntensity, nightToDayDuration).
+                SetEase(Ease.InOutSine).
+                SetTarget(dayNightLight);
         }
     }
 
@@ -55,6 +102,9 @@ public class OnDayToNight : MonoBehaviour
     {
         if (dayNightLight != null)
         {
+            //Kill any running tweens of this light
+            DOTween.Kill(dayNightLight);
+            
             dayNightLight.intensity = dayIntensity;
             Debug.Log($"[OnDayToNight] Light intensity forced to day value: {dayIntensity}");
         }
