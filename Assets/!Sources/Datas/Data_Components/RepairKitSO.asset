@@ -18,7 +18,7 @@ MonoBehaviour:
   itemWidth: 2
   itemHeight: 1
   effects:
-  - rid: 2343331222257664072
+  - rid: 6451219939876929615
   itemEffectPrefab: {fileID: 0}
   itemShape:
   - filled: 1
@@ -26,18 +26,18 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2343331222257664072
+    - rid: 6451219939876929615
       type: {class: HealEffect, ns: , asm: Assembly-CSharp}
       data:
         trigger: 2
         triggerOnConditionOnce: 1
         conditions:
-        - rid: 2343331222257664073
+        - rid: 6451219939876929616
         inputType: 0
-        healAmount: 30
+        healAmount: 50
         uses: 1
-    - rid: 2343331222257664073
-      type: {class: LessThanCondition, ns: , asm: Assembly-CSharp}
+    - rid: 6451219939876929616
+      type: {class: LessThanEqualCondition, ns: , asm: Assembly-CSharp}
       data:
         valueType: 1
         threshold: 0.5

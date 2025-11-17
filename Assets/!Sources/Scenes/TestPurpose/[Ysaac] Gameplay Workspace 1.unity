@@ -881,22 +881,18 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 6451219851714232393
       type: {class: HealEffect, ns: , asm: Assembly-CSharp}
       data:
         trigger: 0
         triggerOnConditionOnce: 0
         conditions:
-        - rid: 6451219851714232394
+        - rid: -2
         inputType: 0
         healAmount: 50
         uses: 0
-    - rid: 6451219851714232394
-      type: {class: LessThanCondition, ns: , asm: Assembly-CSharp}
-      data:
-        valueType: 1
-        threshold: 0.5
-        maxValueType: 2
 --- !u!114 &1785435374 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2388850013978184368, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
@@ -1414,7 +1410,7 @@ PrefabInstance:
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: 'startingItems.Array.data[1]'
       value: 
-      objectReference: {fileID: 11400000, guid: e842aad5399021e44a017de95589eb76, type: 2}
+      objectReference: {fileID: 11400000, guid: b210a5f8f71120044a4da9fc512b9cfb, type: 2}
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: 'startingItems.Array.data[2]'
       value: 
@@ -1430,7 +1426,7 @@ PrefabInstance:
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: 'startingItems.Array.data[5]'
       value: 
-      objectReference: {fileID: 11400000, guid: d78dfe7417211fd4786162b553ce7d20, type: 2}
+      objectReference: {fileID: 11400000, guid: b210a5f8f71120044a4da9fc512b9cfb, type: 2}
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: 'startingItems.Array.data[6]'
       value: 
@@ -1618,7 +1614,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4921764918400996863, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: _baseMaxHp
-      value: 10
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 4921764918400996863, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: _baseDefense

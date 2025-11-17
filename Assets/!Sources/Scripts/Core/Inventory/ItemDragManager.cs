@@ -166,6 +166,11 @@ private void LeftRelease()
             }
 
             itemScript.RotateShape(itemScript.itemShape);
+            itemScript.TriggerEffectAdjacentEquip();
+            foreach (GameObject adjacent in inventoryGridScript.GetAdjacentComponents(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, gameObject))
+            {
+                adjacent.GetComponent<Item>()?.TriggerEffectAdjacentEquip();
+            }
         }
     }
     #endregion
@@ -227,8 +232,9 @@ private void LeftRelease()
             equippedPos = actualItemCellPos;
             itemScript.state = Item.itemState.equipped;
             itemScript.TriggerEffectEquip();
+            itemScript.TriggerEffectAdjacentEquip();
 
-            foreach(GameObject adjacentItems in inventoryGridScript.GetAdjacentComponents(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, gameObject))
+            foreach (GameObject adjacentItems in inventoryGridScript.GetAdjacentComponents(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, gameObject))
             {
                 Debug.Log($"<color=green>{gameObject} near {adjacentItems}</color>");
                 adjacentItems.GetComponent<Item>().TriggerEffectAdjacentEquip();

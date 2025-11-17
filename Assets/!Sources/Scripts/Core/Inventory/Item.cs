@@ -100,6 +100,7 @@ public class Item : MonoBehaviour
                     break;
             }
             OnUnequip += effect.remove;
+            if (effect.triggerOnConditionOnce) OnBattleEnd += effect.ResetTriggered;
         }
 
 
