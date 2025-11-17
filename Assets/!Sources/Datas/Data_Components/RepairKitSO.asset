@@ -29,10 +29,11 @@ MonoBehaviour:
     - rid: 2343331222257664072
       type: {class: HealEffect, ns: , asm: Assembly-CSharp}
       data:
-        trigger: 1
+        trigger: 2
+        triggerOnConditionOnce: 1
         conditions:
         - rid: 2343331222257664073
-        inputType: 1
+        inputType: 0
         healAmount: 30
         uses: 1
     - rid: 2343331222257664073

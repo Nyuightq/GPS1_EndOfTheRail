@@ -16,10 +16,12 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] GameObject inputManagerPrefab;
     [SerializeField] GameObject inventoryManagerPrefab;
+    [SerializeField] GameObject gridManager;
     [SerializeField] public static int cellSize = 16;
 
     public PlayerStatusManager playerStatus;
     public InventoryGridScript inventoryScript;
+    public RailGridScript railGridScript;
     public static InputManager input { get; private set; }
     private GameObject inputManager;
 
@@ -40,6 +42,7 @@ public class GameManager : MonoBehaviour
 
         playerStatus = GetComponent<PlayerStatusManager>();
         inventoryScript = inventoryManagerPrefab.GetComponent<InventoryGridScript>();
+        railGridScript = gridManager.GetComponent<RailGridScript>();
         inputManager = Instantiate(inputManagerPrefab);
         DontDestroyOnLoad(inputManager);
     }

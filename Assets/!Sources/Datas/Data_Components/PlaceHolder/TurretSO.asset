@@ -31,7 +31,7 @@ MonoBehaviour:
         trigger: 0
         conditions: []
         weaponName: book of fuck you
-        baseAttackDamage: 0
-        baseAttackSpeed: 0
+        baseAttackDamage: 1
+        baseAttackSpeed: 9
         baseAttackVariance: 0
         animationClip: {fileID: 11400000, guid: e9c80bc114e1b69458a7b00e25d129bd, type: 2}

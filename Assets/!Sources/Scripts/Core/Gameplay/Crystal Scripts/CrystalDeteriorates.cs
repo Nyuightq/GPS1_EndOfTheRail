@@ -3,6 +3,7 @@
 // Author: ZQlie
 // Description: Handles crystal HP deterioration as the train travels
 // --------------------------------------------------------------
+using UnityEditor;
 using UnityEngine;
 
 [RequireComponent(typeof(TrainMovement))]
@@ -11,11 +12,21 @@ public class CrystalDeteriorates : MonoBehaviour
     [Header("References")]
     [SerializeField] private DayCycleScript dayCycle;    // Optional: if you want to sync with DayCycle
     [Header("Deterioration Settings")]
-    [SerializeField] private int tilesPerHPLoss = 10;    // How many tiles must be moved before losing HP
+    [SerializeField] private int baseTilesPerHPLoss = 1;    // How many tiles must be moved before losing HP
 
     private TrainMovement trainMovement;
     private PlayerStatusManager playerStatus;
     private int tilesMovedSinceLastHP = 0;
+
+    public int TilesPerHPLoss
+    {
+        get
+        {
+            var q = new Query<BuffableStats>(BuffableStats.TilePerCrystalDamage, baseTilesPerHPLoss);
+            PlayerStatusManager.mediator.PerformQuery(this, q);
+            return Mathf.FloorToInt(q.value);
+        }
+    }
 
     private void Awake()
     {
@@ -34,7 +45,7 @@ public class CrystalDeteriorates : MonoBehaviour
     {
         tilesMovedSinceLastHP++;
 
-        if (tilesMovedSinceLastHP >= tilesPerHPLoss)
+        if (tilesMovedSinceLastHP >= TilesPerHPLoss)
         {
             if (playerStatus != null)
             {

@@ -3,6 +3,7 @@
 // Author: nyuig
 // Description: Used to instantiate battle component when triggered battle.
 // --------------------------------------------------------------
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,11 +14,11 @@ public class CombatComponentData
 {
     public string name;
     public int level; // Component can upgrade
-    public int attackDamage;
-    public int attackSpeed;
-    public int attackVariance;
     public CombatAnimationClip animationClip;
     public string attackSfxName;
+    public StatsMediator<BuffableWeaponStats> weaponMediator;
+    public WeaponStats weaponStats;
+    public Sprite weaponSprite;
 }
 
 // --------------------------------------------------------------
@@ -34,15 +35,15 @@ public class ItemEffectCombat : ItemEffect
     [SerializeField] private CombatAnimationClip animationClip;
     [SerializeField] private string attackSfxName;
 
-    public CombatComponentData OnPrepareBattleComponent()
-    {
-        return new CombatComponentData {
-            name = componentName,
-            attackDamage = attackDamage,
-            attackSpeed = attackSpeed,
-            attackVariance = attackVariance,
-            animationClip = animationClip,
-            attackSfxName = attackSfxName
-        };
-    }
+    //public CombatComponentData OnPrepareBattleComponent()
+    //{
+    //    return new CombatComponentData {
+    //        name = componentName,
+    //        attackDamage = attackDamage,
+    //        attackSpeed = attackSpeed,
+    //        attackVariance = attackVariance,
+    //        animationClip = animationClip,
+    //        attackSfxName = attackSfxName
+    //    };
+    //}
 }

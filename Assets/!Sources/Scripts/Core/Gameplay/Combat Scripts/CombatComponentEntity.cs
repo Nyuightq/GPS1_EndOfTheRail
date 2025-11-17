@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class CombatComponentEntity : CombatEntity
 {
-    // Update is called once per frame
+    private WeaponStats _weaponStats;
     protected override void Start()
     {
         base.Start();
@@ -15,12 +15,15 @@ public class CombatComponentEntity : CombatEntity
     }
     public void Initialize(CombatComponentData data)
     {
+        _weaponStats = data.weaponStats;
         entityName = data.name;
         // _maxHp = data.maxHp;
         // _hp = data.maxHp;
-        _attackDamage = data.attackDamage;
-        _attackSpeed = data.attackSpeed;
-        _attackDamageVariance = data.attackVariance;
+        //_attackDamage = data.weaponStats.AttackDamage;
+        //_attackSpeed = data.weaponStats.AttackSpeed;
+        //_attackDamageVariance = data.weaponStats.AttackVariance;
+        RefreshStats();
+
         _attackSfxName = data.attackSfxName;
         // _defense = data.defense;
         // _evasion = data.evasion;
@@ -31,6 +34,13 @@ public class CombatComponentEntity : CombatEntity
         {
             animationScript.animationClip = data.animationClip;
         }
+    }
+
+    public void RefreshStats()
+    {
+        _attackDamage = _weaponStats.AttackDamage;
+        _attackSpeed = _weaponStats.AttackSpeed;
+        _attackDamageVariance = _weaponStats.AttackVariance;
     }
 
     public override void Attack(CombatEntity target)

@@ -1,9 +1,8 @@
 // --------------------------------------------------------------
 // Creation Date: 2025-10-20 05:54
 // Author: User
-// Description: Cleaned up with proper encapsulation - Refactored for Singleton Tooltip
+// Description: Cleaned up with proper encapsulation + Tooltip support + Adjacent triggers
 // --------------------------------------------------------------
-using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -28,6 +27,7 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
     private Vector2 dragDir;
     private bool dragging;
     private bool mouseOnItem;
+    private bool firstEquip = true; // Kept from Ysaac's version
 
     #region Unity LifeCycle
     private void OnEnable()
@@ -95,8 +95,8 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
     public void OnPointerEnter(PointerEventData pointerEventData)
     {
         mouseOnItem = true;
-        Debug.Log("POINTER ENTER - Item hovered!");
         
+        // Show tooltip when hovering
         if (tooltip != null)
         {
             tooltip.Show(itemScript);
@@ -106,8 +106,8 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
     public void OnPointerExit(PointerEventData pointerEventData)
     {
         mouseOnItem = false;
-        Debug.Log("POINTER EXIT - Item exit from hovered!");
         
+        // Hide tooltip when not hovering
         if (tooltip != null)
         {
             tooltip.Hide();
@@ -287,15 +287,22 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
         itemScript.state = Item.itemState.equipped;
         itemScript.TriggerEffectEquip();
 
-        // Log adjacent components (debug)
-        foreach(GameObject adjacent in inventoryGridScript.GetAdjacentComponents(
+        // Trigger adjacent item effects (Ysaac's feature)
+        foreach(GameObject adjacentItem in inventoryGridScript.GetAdjacentComponents(
             Vector2Int.FloorToInt(topLeftCellPos), 
             itemScript.itemShape, 
             gameObject))
         {
-            Debug.Log($"<color=red>{gameObject.name} near {adjacent.name}</color>");
+            Debug.Log($"<color=green>{gameObject.name} near {adjacentItem.name}</color>");
+            
+            Item adjacentItemScript = adjacentItem.GetComponent<Item>();
+            if (adjacentItemScript != null)
+            {
+                adjacentItemScript.TriggerEffectAdjacentEquip();
+            }
         }
 
+        firstEquip = false;
         return true;
     }
     #endregion

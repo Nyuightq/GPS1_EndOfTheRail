@@ -12,27 +12,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 068edb241815e8b48bae3bd0df376ff4, type: 3}
   m_Name: PreservationChamberSO
   m_EditorClassIdentifier: 
-  itemSprite: {fileID: 21300000, guid: 5f6170abedbce374c8a5a2c1cc0b23e3, type: 3}
+  itemSprite: {fileID: 21300000, guid: 8c0f6d1e78f2e4c4f8affdf76c4ed3dc, type: 3}
   itemName: Preservation Chamber
   mandatoryItem: 0
-  itemWidth: 2
-  itemHeight: 1
+  itemWidth: 1
+  itemHeight: 2
   effects:
-  - rid: 6451219851714232399
+  - rid: 6451219851714232418
   itemEffectPrefab: {fileID: 0}
   itemShape:
   - filled: 1
   - filled: 1
+  - filled: 0
+  - filled: 0
+  - filled: 0
+  - filled: 0
+  - filled: 0
+  - filled: 0
+  - filled: 0
+  - filled: 0
+  - filled: 0
+  - filled: 0
   references:
     version: 2
     RefIds:
-    - rid: 6451219851714232399
-      type: {class: WeaponSpawnEffect, ns: , asm: Assembly-CSharp}
+    - rid: 6451219851714232418
+      type: {class: BuffStatEffect, ns: , asm: Assembly-CSharp}
       data:
-        trigger: 0
-        conditions: []
-        weaponName: Turret
-        baseAttackDamage: 3
-        baseAttackSpeed: 5
-        baseAttackVariance: 1
-        animationClip: {fileID: 11400000, guid: e9c80bc114e1b69458a7b00e25d129bd, type: 2}
+        trigger: 1
+        triggerOnConditionOnce: 0
+        conditions:
+        - rid: 6451219851714232419
+        inputType: 0
+        buffAmount: 20
+        statType: 2
+    - rid: 6451219851714232419
+      type: {class: AdjacentCondition, ns: , asm: Assembly-CSharp}
+      data:
+        specificAdjacentItem: 1
+        requiredAdjacentItem: {fileID: 11400000, guid: 5d5ed91e3b4b5e541a7dab091f198e02, type: 2}

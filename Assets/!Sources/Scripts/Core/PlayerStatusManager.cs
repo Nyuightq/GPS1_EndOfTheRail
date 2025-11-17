@@ -9,7 +9,8 @@ using UnityEngine;
 public enum BuffableStats
 {
     Defense,
-    MaxHp
+    MaxHp,
+    TilePerCrystalDamage
 }
 
 public class PlayerStatusManager : MonoBehaviour

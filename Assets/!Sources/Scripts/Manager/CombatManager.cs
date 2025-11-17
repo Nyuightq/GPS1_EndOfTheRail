@@ -17,6 +17,7 @@ public class CombatManager : MonoBehaviour
     [SerializeField] private CombatSystem combatSystem;
     [SerializeField] private EnemyNumberEncounterData encounterQuantityData;
     [SerializeField] private DayCycleScript dayCycleSystem;
+    public List<CombatComponentEntity> components { get; set;}
     [Header("Combat Stats")]
     public int totalCombatsFaced = 0;
     public int totalEncountersFaced = 0;
@@ -65,7 +66,7 @@ public class CombatManager : MonoBehaviour
         ApplyInventoryDefenseBonus(playerEntity);
 
         // Generate Components
-        List<CombatComponentEntity> components = GenerateComponents();
+        components = GenerateComponents();
 
         // Generate enemies
         List<CombatEnemyEntity> enemies = GenerateEnemies();

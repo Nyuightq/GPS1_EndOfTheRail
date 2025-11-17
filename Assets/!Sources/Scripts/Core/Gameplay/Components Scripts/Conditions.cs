@@ -9,6 +9,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
+
 public enum ConditionStatType
 {
     scraps,
@@ -32,6 +33,8 @@ public enum BuffableWeaponStats
 
 [System.Serializable] public abstract class Conditions
 {
+    public object owner { get; set; }
+
     public float getValue(ConditionStatType statType)
     {
         switch (statType)
@@ -110,22 +113,85 @@ public enum BuffableWeaponStats
 }
 #endregion
 
+[System.Serializable] public class AdjacentCondition : Conditions
+{
+    [SerializeField] bool specificAdjacentItem;
+    [SerializeField] ItemSO requiredAdjacentItem;
+
+    public override bool check()
+    {
+        if (owner is Item item)
+        {
+            List<GameObject> adjacentList = GameManager.instance.inventoryScript.GetAdjacentComponents(Vector2Int.FloorToInt(item.GetComponent<ItemDragManager>().topLeftCellPos), item.itemShape, item.gameObject);
+            if (specificAdjacentItem)
+            {
+                foreach (GameObject adjacent in adjacentList)
+                {
+                    if (adjacent.GetComponent<Item>().itemData == requiredAdjacentItem) return true;
+                }
+                return false;
+            }
+            else
+            {
+                if (adjacentList.Count == 0) return false; else return true;
+            }
+        }
+        return false;
+    }
+}
+
 public enum triggers
 { 
     OnEquip,
+    OnEquipAndAdjacentEquip,
     OnUpdate,
     OnBattleStart,
-    OnBattleUpdate,
-    OnConditionTriggerOnce
+    OnBattleUpdate
+    //OnConditionTriggerOnce
 }
 
 
 [System.Serializable] public abstract class Effect
 {
     [SerializeField] public triggers trigger;
+    [SerializeField] public bool triggerOnConditionOnce;
     [SerializeReference] public Conditions[] conditions;
-    [NonSerialized] private object _owner; // hidden from inspector
-    public object owner { get => _owner; set => _owner = value; }
+    [NonSerialized] private object _owner;
+   // public object owner { get => _owner; set => _owner = value; }
+    public object owner
+    {
+        get => _owner;
+        set
+        {
+            _owner = value;
+
+            // propagate owner down into all conditions
+            if (conditions != null)
+            {
+                foreach (var c in conditions)
+                    c.owner = value;
+            }
+        }
+    }
+
+    bool hasTriggered = false;
+
+    public bool checkCondition()
+    {
+        if (triggerOnConditionOnce && hasTriggered) return false;
+
+        foreach (var condition in conditions)
+        {
+            if (!condition.check())
+            {
+                Debug.Log("Condition not met");
+                return false;
+            }
+        }
+        hasTriggered = true;
+        return true;
+    }
+
     public abstract void apply();
 
     public abstract void remove();
@@ -138,25 +204,21 @@ public enum triggers
     [SerializeField] private int uses;
     public override void apply()
     {
-        foreach(var condition in conditions)
-        {
-            if (!condition.check())
-            {
-                Debug.Log("Condition not met");
-                return;
-            }
-        }
+        if (!checkCondition()) return;
         CombatSystem combatSystem = UnityEngine.Object.FindFirstObjectByType<CombatSystem>();
+        Item item = owner as Item;
+        if (item == null) return;
+
         if (combatSystem != null)
         {
             switch (inputType)
             {
                 case InputType.percentage:
-                    combatSystem.player.HealCurrentHp(Mathf.FloorToInt(combatSystem.player.MaxHp * healAmount/100));
+                    combatSystem.player.HealCurrentHp(Mathf.FloorToInt(combatSystem.player.MaxHp * healAmount * item.level / 100));
                     Debug.Log($"healing {Mathf.FloorToInt(combatSystem.player.MaxHp * healAmount/100)} hp out of {combatSystem.player.MaxHp}");
                     break;
                 case InputType.flat:
-                    combatSystem.player.HealCurrentHp(Mathf.FloorToInt(healAmount));
+                    combatSystem.player.HealCurrentHp(Mathf.FloorToInt(healAmount * item.level));
                     Debug.Log($"healing {healAmount}");
                     break;
             }
@@ -175,15 +237,19 @@ public enum triggers
 
     public override void apply()
     {
+        if (!checkCondition()) return;
         StatsMediator<BuffableStats> mediator = PlayerStatusManager.mediator;
-        switch(inputType)
+        Item item = owner as Item;
+        if (item == null) return;
+
+        switch (inputType)
         {
             case InputType.percentage:
-                mod = new AdditionModifier<BuffableStats>(statType, buffAmount, AdditionModifier<BuffableStats>.AdditionType.percentage);
+                mod = new AdditionModifier<BuffableStats>(statType, buffAmount * item.level, AdditionModifier<BuffableStats>.AdditionType.percentage);
                 mediator.AddModifier(mod);                
                 break;
             case InputType.flat:
-                mod = new AdditionModifier<BuffableStats>(statType, buffAmount, AdditionModifier<BuffableStats>.AdditionType.flat);
+                mod = new AdditionModifier<BuffableStats>(statType, buffAmount * item.level, AdditionModifier<BuffableStats>.AdditionType.flat);
                 mediator.AddModifier(mod);
                 break;
         }
@@ -242,18 +308,32 @@ public class WeaponStats
     [SerializeField] private int baseAttackDamage;
     [SerializeField] private int baseAttackSpeed;
     [SerializeField] private int baseAttackVariance;
+    [SerializeField] private Sprite weaponSprite;
     [SerializeField] private CombatAnimationClip animationClip;
-    [NonSerialized] public WeaponStats weaponStats;
+    [SerializeField] private string attackSfxName;
 
+    private WeaponStats _weaponStats;  
+    public WeaponStats weaponStats
+    {
+        get
+        {
+            if (_weaponStats == null && owner is Item item)
+                _weaponStats = new WeaponStats(baseAttackDamage * item.level, baseAttackSpeed * item.level, baseAttackVariance * item.level);
+            return _weaponStats;
+        }
+        set => _weaponStats = value;
+    }
+    
     public CombatComponentData OnPrepareBattleComponent()
     {
         return new CombatComponentData
         {
             name = weaponName,
-            attackDamage = baseAttackDamage,
-            attackSpeed = baseAttackSpeed,
-            attackVariance = baseAttackVariance,
-            animationClip = animationClip
+            animationClip = animationClip,
+            weaponStats = weaponStats,
+            attackSfxName = attackSfxName,
+            weaponSprite = weaponSprite
+            //weaponMediator = mediator
         };
     }
 
@@ -261,37 +341,57 @@ public class WeaponStats
     public override void remove() {}
 }
 
-[System.Serializable] public class weaponStatBuff
-{
-    public BuffableWeaponStats statType;
-    public InputType inputType;
-    public int amount;
-}
-
 [System.Serializable] public class AdjacentWeaponBoosterEffect : Effect
 {
-    [SerializeField] weaponStatBuff[] weaponBuffs;
+    [SerializeField] private BuffableWeaponStats statType;
+    [SerializeField] private InputType inputType;
+    [SerializeField] private int buffAmount;
+    AdditionModifier<BuffableWeaponStats> mod;
+    List<AdditionModifier<BuffableWeaponStats>> modList = new List<AdditionModifier<BuffableWeaponStats>>();
+    
     public override void apply()
     {
+        if (!checkCondition()) return;
+
         if (owner is Item item)
         {
             List<GameObject> adjacentList = GameManager.instance.inventoryScript.GetAdjacentComponents(Vector2Int.FloorToInt(item.GetComponent<ItemDragManager>().TopLeftCellPos), item.itemShape, item.gameObject); // updated by zq to fetch topLeftCellPos
             foreach (GameObject adjacent in adjacentList)
             {
-                
-                if(adjacent.GetComponent<Item>() != null && adjacent.GetComponent<Item>().effects.Any(effect => effect is WeaponSpawnEffect))
+                Item adjacentItemScript = adjacent.GetComponent<Item>();
+                if(adjacentItemScript != null && adjacentItemScript.effects.Any(effect => effect is WeaponSpawnEffect))
                 {
                     Debug.Log($"<color=yellow>{item} is adjacent to {adjacent}</color>");
-                    //foreach (weaponStatBuff buff in weaponBuffs)
-                    //{
-                        
-                    //}
+                    List<WeaponSpawnEffect> weaponList = adjacentItemScript.effects.OfType<WeaponSpawnEffect>().ToList();
+                    foreach (WeaponSpawnEffect weapon in weaponList)
+                    {
+                        StatsMediator<BuffableWeaponStats> mediator = weapon.weaponStats.weaponMediator;
+                        switch (inputType)
+                        {
+                            case InputType.percentage:
+                                mod = new AdditionModifier<BuffableWeaponStats>(statType, buffAmount * item.level, AdditionModifier<BuffableWeaponStats>.AdditionType.percentage);
+                                mediator.AddModifier(mod);
+                                modList.Add(mod);
+                                break;
+                            case InputType.flat:
+                                mod = new AdditionModifier<BuffableWeaponStats>(statType, buffAmount * item.level, AdditionModifier<BuffableWeaponStats>.AdditionType.flat);
+                                mediator.AddModifier(mod);
+                                modList.Add(mod);
+                                break;
+                        }
+                        foreach(CombatComponentEntity combatComponent in CombatManager.Instance.components)
+                        {
+                            combatComponent.RefreshStats();
+                        }
+                    }
                 }
             }
-
         }
     }
-    public override void remove() {}
+    public override void remove() 
+    {
+        foreach (AdditionModifier<BuffableWeaponStats> mod in modList) mod.Dispose();
+    }
 }
 
 
