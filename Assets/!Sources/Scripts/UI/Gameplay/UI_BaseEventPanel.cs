@@ -46,7 +46,7 @@ public class UI_BaseEventPanel : MonoBehaviour
             .SetEase(Ease.OutQuad));
     }
 
-    public void HideEventPanel()
+    public void HideEventPanel(System.Action onHidden = null)
     {
         _panelRect.DOKill();
         _panelCanvasGroup.DOKill();
@@ -60,9 +60,11 @@ public class UI_BaseEventPanel : MonoBehaviour
         seq.Join(_panelCanvasGroup
             .DOFade(0f, slideDuration * 0.4f)
             .SetEase(Ease.InQuad));
+
         seq.OnComplete(() =>
         {
             gameObject.SetActive(false);
+            onHidden?.Invoke();
         });
     }
 }

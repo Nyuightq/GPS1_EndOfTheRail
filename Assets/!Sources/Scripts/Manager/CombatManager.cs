@@ -273,11 +273,8 @@ public class CombatManager : MonoBehaviour
     public void EndCombat(bool playerWon, int remainHp)
     {
         GameStateManager.Instance.playerStatus.UpdateCurrentHp(remainHp);
-        combatSystem.HideEventPanel();
+        combatSystem.HideEventPanel(() => OnCombatClosed?.Invoke());
         combatSystem.onBattleEnd -= EndCombat;
-
-        // Notify TrainFreezeController to resume movement
-        OnCombatClosed?.Invoke();
     }
 
     public void DestroyInstance()
