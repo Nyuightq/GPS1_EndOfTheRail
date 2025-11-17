@@ -18,7 +18,7 @@ MonoBehaviour:
   itemWidth: 3
   itemHeight: 2
   effects:
-  - rid: 6451219851714232417
+  - rid: 6451219939876929607
   itemEffectPrefab: {fileID: 0}
   itemShape:
   - filled: 0
@@ -30,10 +30,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 6451219851714232417
+    - rid: 6451219939876929607
       type: {class: AdjacentWeaponBoosterEffect, ns: , asm: Assembly-CSharp}
       data:
         trigger: 1
+        triggerOnConditionOnce: 0
         conditions: []
         statType: 0
         inputType: 1

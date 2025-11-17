@@ -130,7 +130,7 @@ public class Item : MonoBehaviour
 
     private void Update()
     {
-        OnUpdate?.Invoke();
+        if(state == itemState.equipped) OnUpdate?.Invoke();
     }
 
     private void GeneratePreview()

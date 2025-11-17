@@ -68,6 +68,12 @@ public class CombatSystem : UI_BaseEventPanel
     {
         isBattling = true;
         GameStateManager.SetPhase(Phase.Combat);
+
+        //trigger battle start effects
+        foreach(GameObject item in GameManager.instance.inventoryScript.equippedItems)
+        {
+            item.GetComponent<Item>().TriggerEffectBattleStart();
+        }
     }
 
     // Update is called once per frame
@@ -91,6 +97,12 @@ public class CombatSystem : UI_BaseEventPanel
         {
             if (enemy != null && !enemy.IsDead)
                 enemy.UpdateCombat(delta);
+        }
+
+        //trigger battle update effects
+        foreach (GameObject item in GameManager.instance.inventoryScript.equippedItems)
+        {
+            item.GetComponent<Item>().TriggerEffectBattleUpdate();
         }
     }
     
@@ -195,6 +207,12 @@ public class CombatSystem : UI_BaseEventPanel
         GameStateManager.SetPhase(Phase.Travel);
         int remainHp = player.CurrentHp;
         int rewardAmount = TotalScrapsFromEnemies();
+
+        //trigger battle end effects
+        foreach (GameObject item in GameManager.instance.inventoryScript.equippedItems)
+        {
+            item.GetComponent<Item>().TriggerEffectBattleEnd();
+        }
 
         if (playerWon)
         {
