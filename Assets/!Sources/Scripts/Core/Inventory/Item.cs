@@ -26,7 +26,7 @@ public class Item : MonoBehaviour
     [SerializeField] private float shapePreviewAlpha = 0.5f;
 
     public Effect[] effects;
-    public event Action OnEquip, OnUnequip, OnBattleStart, OnUpdate, /*OnConditionTriggerOnce,*/ OnBattleEnd, OnBattleUpdate, OnAdjacentEquip;
+    public event Action OnEquip, OnUnequip, OnBattleStart, OnUpdate, /*OnConditionTriggerOnce,*/ OnBattleEnd, OnBattleUpdate, OnAdjacentEquip, OnDayStart;
 
     public ItemShapeCell[,] itemShape { get; private set; }
     public RectTransform spriteRectTransform, itemRect;
@@ -58,6 +58,7 @@ public class Item : MonoBehaviour
     public void TriggerEffectBattleStart() { OnBattleStart?.Invoke(); }
     public void TriggerEffectBattleEnd() { OnBattleEnd?.Invoke(); }
     public void TriggerEffectBattleUpdate() { OnBattleUpdate?.Invoke(); }
+    public void TriggerEffectDayStart() { OnDayStart?.Invoke(); }
     #endregion
 
     private void Start()
@@ -90,6 +91,12 @@ public class Item : MonoBehaviour
                 case triggers.OnBattleUpdate:
                     OnBattleUpdate += effect.apply;
                     OnBattleEnd += effect.remove;
+                    break;
+                case triggers.OnBattleEnd:
+                    OnBattleEnd += effect.apply;
+                    break;
+                case triggers.OnDayStart:
+                    OnDayStart += effect.apply;
                     break;
             }
             OnUnequip += effect.remove;

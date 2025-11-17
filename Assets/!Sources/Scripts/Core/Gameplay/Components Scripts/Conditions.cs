@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering.Universal.Internal;
 
 
 public enum ConditionStatType
@@ -146,7 +147,9 @@ public enum triggers
     OnEquipAndAdjacentEquip,
     OnUpdate,
     OnBattleStart,
-    OnBattleUpdate
+    OnBattleUpdate,
+    OnBattleEnd,
+    OnDayStart
     //OnConditionTriggerOnce
 }
 
@@ -209,16 +212,18 @@ public enum triggers
         Item item = owner as Item;
         if (item == null) return;
 
+        float finalHealAmount = healAmount * item.level;
+
         if (combatSystem != null)
         {
             switch (inputType)
             {
                 case InputType.percentage:
-                    combatSystem.player.HealCurrentHp(Mathf.FloorToInt(combatSystem.player.MaxHp * healAmount * item.level / 100));
+                    combatSystem.player.HealCurrentHp(Mathf.FloorToInt(combatSystem.player.MaxHp * finalHealAmount / 100));
                     Debug.Log($"healing {Mathf.FloorToInt(combatSystem.player.MaxHp * healAmount/100)} hp out of {combatSystem.player.MaxHp}");
                     break;
                 case InputType.flat:
-                    combatSystem.player.HealCurrentHp(Mathf.FloorToInt(healAmount * item.level));
+                    combatSystem.player.HealCurrentHp(Mathf.FloorToInt(finalHealAmount));
                     Debug.Log($"healing {healAmount}");
                     break;
             }
@@ -242,14 +247,16 @@ public enum triggers
         Item item = owner as Item;
         if (item == null) return;
 
+        float finalBuffAmount = buffAmount * item.level;
+
         switch (inputType)
         {
             case InputType.percentage:
-                mod = new AdditionModifier<BuffableStats>(statType, buffAmount * item.level, AdditionModifier<BuffableStats>.AdditionType.percentage);
+                mod = new AdditionModifier<BuffableStats>(statType, finalBuffAmount, AdditionModifier<BuffableStats>.AdditionType.percentage);
                 mediator.AddModifier(mod);                
                 break;
             case InputType.flat:
-                mod = new AdditionModifier<BuffableStats>(statType, buffAmount * item.level, AdditionModifier<BuffableStats>.AdditionType.flat);
+                mod = new AdditionModifier<BuffableStats>(statType, finalBuffAmount, AdditionModifier<BuffableStats>.AdditionType.flat);
                 mediator.AddModifier(mod);
                 break;
         }
@@ -317,8 +324,14 @@ public class WeaponStats
     {
         get
         {
-            if (_weaponStats == null && owner is Item item)
-                _weaponStats = new WeaponStats(baseAttackDamage * item.level, baseAttackSpeed * item.level, baseAttackVariance * item.level);
+            Item item = owner as Item;
+            if (item == null) return null;
+
+            int finalBaseAttackDamage = baseAttackDamage * item.level;
+            int finalBaseAttackSpeed = baseAttackSpeed * item.level;
+            int finalBaseAttackVariance = baseAttackVariance * item.level;
+
+            _weaponStats = new WeaponStats(finalBaseAttackDamage, finalBaseAttackSpeed, finalBaseAttackVariance);
             return _weaponStats;
         }
         set => _weaponStats = value;
@@ -355,6 +368,8 @@ public class WeaponStats
 
         if (owner is Item item)
         {
+            int finalBuffAmount = buffAmount * item.level;
+
             List<GameObject> adjacentList = GameManager.instance.inventoryScript.GetAdjacentComponents(Vector2Int.FloorToInt(item.GetComponent<ItemDragManager>().topLeftCellPos), item.itemShape, item.gameObject);
             foreach (GameObject adjacent in adjacentList)
             {
@@ -369,12 +384,12 @@ public class WeaponStats
                         switch (inputType)
                         {
                             case InputType.percentage:
-                                mod = new AdditionModifier<BuffableWeaponStats>(statType, buffAmount * item.level, AdditionModifier<BuffableWeaponStats>.AdditionType.percentage);
+                                mod = new AdditionModifier<BuffableWeaponStats>(statType, finalBuffAmount, AdditionModifier<BuffableWeaponStats>.AdditionType.percentage);
                                 mediator.AddModifier(mod);
                                 modList.Add(mod);
                                 break;
                             case InputType.flat:
-                                mod = new AdditionModifier<BuffableWeaponStats>(statType, buffAmount * item.level, AdditionModifier<BuffableWeaponStats>.AdditionType.flat);
+                                mod = new AdditionModifier<BuffableWeaponStats>(statType, finalBuffAmount, AdditionModifier<BuffableWeaponStats>.AdditionType.flat);
                                 mediator.AddModifier(mod);
                                 modList.Add(mod);
                                 break;
