@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemSprite: {fileID: 21300000, guid: c4cf5474f8f00ca4e95f490d6029b496, type: 3}
   itemName: Cannon
-  itemDescription: Hello World
+  itemDescription: xxx
   mandatoryItem: 0
   itemWidth: 3
   itemHeight: 2
   effects:
-  - rid: 6451219851714232399
+  - rid: 3736806105115263048
   itemEffectPrefab: {fileID: 0}
   itemShape:
   - filled: 1
@@ -31,7 +31,7 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 6451219851714232399
+    - rid: 3736806105115263048
       type: {class: WeaponSpawnEffect, ns: , asm: Assembly-CSharp}
       data:
         trigger: 0

@@ -1,7 +1,7 @@
 // --------------------------------------------------------------
 // Creation Date: 2025-10-20 05:54
 // Author: User
-// Description: Cleaned up with proper encapsulation
+// Description: Cleaned up with proper encapsulation - Refactored for Singleton Tooltip
 // --------------------------------------------------------------
 using System;
 using UnityEngine;
@@ -14,15 +14,12 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
     private Item itemScript;
     private InventoryGridScript inventoryGridScript;
     private RectTransform rectTransform;
+    private ItemTooltip tooltip;
 
     // Public read-only properties for external access
     public Vector2 TopLeftCellPos => topLeftCellPos;
     public Vector2 EquippedPos => equippedPos;
     public bool IsHovered => mouseOnItem;
-
-    // Events for tooltip system
-    public static event Action<Item> OnItemHoverEnter;
-    public static event Action OnItemHoverExit;
 
     // Private backing fields
     private Vector2 topLeftCellPos;
@@ -42,6 +39,12 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
         InputManager.OnLeftClick += LeftClick;
         InputManager.OnLeftRelease += LeftRelease;
         InputManager.OnRightClick += RightClick;
+    }
+
+    private void Start()
+    {
+        // Get tooltip instance after it's initialized
+        tooltip = ItemTooltip.Instance;
     }
 
     private void OnDisable()
@@ -93,13 +96,22 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
     {
         mouseOnItem = true;
         Debug.Log("POINTER ENTER - Item hovered!");
-        OnItemHoverEnter?.Invoke(itemScript); 
+        
+        if (tooltip != null)
+        {
+            tooltip.Show(itemScript);
+        }
     }
 
     public void OnPointerExit(PointerEventData pointerEventData)
     {
         mouseOnItem = false;
-        OnItemHoverExit?.Invoke(); 
+        Debug.Log("POINTER EXIT - Item exit from hovered!");
+        
+        if (tooltip != null)
+        {
+            tooltip.Hide();
+        }
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -117,6 +129,12 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
         if (mouseOnItem && GameStateManager.CurrentPhase != Phase.Combat)
         {
             dragging = true;
+
+            // Hide tooltip when dragging starts
+            if (tooltip != null)
+            {
+                tooltip.Hide();
+            }
 
             // Unequip from inventory if currently equipped
             if (itemScript.state == Item.itemState.equipped)
@@ -143,6 +161,12 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
         if (!mouseOnItem) return;
 
         dragging = false;
+
+        // Show tooltip again after releasing if still hovering
+        if (mouseOnItem && tooltip != null)
+        {
+            tooltip.Show(itemScript);
+        }
 
         // Check Engineer first (higher priority when active)
         if (EngineerManager.Instance != null && EngineerManager.Instance.IsEngineerUIActive)
