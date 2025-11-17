@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 068edb241815e8b48bae3bd0df376ff4, type: 3}
   m_Name: ReinforcePlateSO
   m_EditorClassIdentifier: 
-  itemSprite: {fileID: 21300000, guid: e11f387c30cbeb54c807abf004984f6f, type: 3}
+  itemSprite: {fileID: 21300000, guid: 292d41c84199fcc41b2822d38e837a3c, type: 3}
   itemName: Reinforce Plate
   itemDescription: 
   mandatoryItem: 0

@@ -1,8 +1,3 @@
-// --------------------------------------------------------------
-// Creation Date: 2025-11-16
-// Author: User
-// Description: Singleton tooltip manager for item display
-// --------------------------------------------------------------
 using System;
 using System.Text;
 using UnityEngine;
@@ -107,7 +102,7 @@ public class ItemTooltip : MonoBehaviour
         Debug.Log($"<color=cyan>Effects count: {(_currentItem.itemData.effects != null ? _currentItem.itemData.effects.Length : 0)}</color>");
 
         // Set item name with styling
-        itemNameText.text = $"<size=110%>{_currentItem.itemData.itemName}</size>";
+        itemNameText.text = $"<size=110%><b>{_currentItem.itemData.itemName}</b></size>";
 
         // Build description from effects
         StringBuilder descBuilder = new StringBuilder();
@@ -115,19 +110,24 @@ public class ItemTooltip : MonoBehaviour
         // Parse effects and display their stats
         if (_currentItem.itemData.effects != null && _currentItem.itemData.effects.Length > 0)
         {
-            foreach (Effect effect in _currentItem.itemData.effects)
+            for (int i = 0; i < _currentItem.itemData.effects.Length; i++)
             {
+                Effect effect = _currentItem.itemData.effects[i];
+                
                 if (effect == null) 
                 {
                     Debug.LogWarning("Null effect found in effects array");
                     continue;
                 }
 
-                Debug.Log($"<color=yellow>Processing effect: {effect.GetType().Name}</color>");
+                Debug.Log($"<color=yellow>Processing effect {i}: {effect.GetType().Name}</color>");
 
                 string effectDescription = GetEffectDescription(effect);
                 if (!string.IsNullOrEmpty(effectDescription))
                 {
+                    if (i > 0 && descBuilder.Length > 0)
+                        descBuilder.AppendLine(); // Add spacing between effects
+                    
                     descBuilder.Append(effectDescription);
                     Debug.Log($"<color=yellow>Effect description added: {effectDescription}</color>");
                 }
@@ -155,127 +155,26 @@ public class ItemTooltip : MonoBehaviour
 
         Debug.Log($"<color=magenta>GetEffectDescription for type: {effectType.Name}</color>");
 
-        // Use proper reflection flags to get ALL fields (public, private, inherited)
-        var allFields = effectType.GetFields(System.Reflection.BindingFlags.Public | 
-                                            System.Reflection.BindingFlags.NonPublic | 
-                                            System.Reflection.BindingFlags.Instance);
-
-        Debug.Log($"<color=magenta>Found {allFields.Length} fields in {effectType.Name}</color>");
-        foreach (var f in allFields)
+        // Handle each effect type
+        if (effect is WeaponSpawnEffect weaponEffect)
         {
-            Debug.Log($"<color=magenta>  Field: {f.Name} ({f.FieldType.Name}) = {f.GetValue(effect)}</color>");
+            effectDesc.Append(GetWeaponSpawnDescription(weaponEffect));
         }
-
-        // Check for WeaponSpawnEffect
-        if (effectType.Name == "WeaponSpawnEffect")
+        else if (effect is HealEffect healEffect)
         {
-            var weaponNameField = effectType.GetField("weaponName", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var baseDamageField = effectType.GetField("baseAttackDamage", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var baseSpeedField = effectType.GetField("baseAttackSpeed", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var baseVarianceField = effectType.GetField("baseAttackVariance", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-            if (weaponNameField != null)
-            {
-                string weaponName = weaponNameField.GetValue(effect)?.ToString() ?? "Unknown";
-                effectDesc.AppendLine($"<color=#FFA500><b>{weaponName}</b></color>");
-            }
-
-            if (baseDamageField != null)
-            {
-                int damage = (int)(baseDamageField.GetValue(effect) ?? 0);
-                effectDesc.AppendLine($"Base Attack Damage: <color=#C23753>{damage}</color>");
-            }
-
-            if (baseSpeedField != null)
-            {
-                int speed = (int)(baseSpeedField.GetValue(effect) ?? 0);
-                string colorCode = speed <= 2 ? "#C23753" : speed >= 6 ? "#EBB85B" : "#FFFFFF";
-                effectDesc.AppendLine($"Base Attack Speed: <color={colorCode}>{speed}</color>");
-            }
-
-            if (baseVarianceField != null)
-            {
-                int variance = (int)(baseVarianceField.GetValue(effect) ?? 0);
-                if (variance > 0)
-                    effectDesc.AppendLine($"Base Attack Variance: <color=#88AAFF>{variance}</color>");
-            }
+            effectDesc.Append(GetHealEffectDescription(healEffect));
         }
-        // Check for HealEffect
-        else if (effectType.Name == "HealEffect")
+        else if (effect is BuffStatEffect buffEffect)
         {
-            var healAmountField = effectType.GetField("healAmount", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var conditionsField = effectType.GetField("conditions", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-            if (healAmountField != null)
-            {
-                int healAmount = (int)(healAmountField.GetValue(effect) ?? 0);
-                effectDesc.AppendLine($"<color=#77FF77><b>Heal: +{healAmount} HP</b></color>");
-            }
-
-            // Display conditions if they exist
-            if (conditionsField != null)
-            {
-                Conditions[] conditions = conditionsField.GetValue(effect) as Conditions[];
-                if (conditions != null && conditions.Length > 0)
-                {
-                    effectDesc.AppendLine("<color=#FFFF88>Conditions:</color>");
-                    foreach (Conditions condition in conditions)
-                    {
-                        if (condition != null)
-                        {
-                            string conditionDesc = GetConditionDescription(condition);
-                            if (!string.IsNullOrEmpty(conditionDesc))
-                                effectDesc.AppendLine($"  • {conditionDesc}");
-                        }
-                    }
-                }
-            }
+            effectDesc.Append(GetBuffStatDescription(buffEffect));
         }
-        // Check for BuffStatEffect
-        else if (effectType.Name == "BuffStatEffect")
+        else if (effect is AdjacentWeaponBoosterEffect boosterEffect)
         {
-            var statTypeField = effectType.GetField("statType", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var buffAmountField = effectType.GetField("buffAmount", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var conditionsField = effectType.GetField("conditions", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-            string statName = "Stat";
-            if (statTypeField != null)
-            {
-                object statValue = statTypeField.GetValue(effect);
-                if (statValue != null)
-                    statName = FormatCamelCase(statValue.ToString());
-            }
-
-            if (buffAmountField != null)
-            {
-                int buffAmount = (int)(buffAmountField.GetValue(effect) ?? 0);
-                string sign = buffAmount > 0 ? "+" : "";
-                string color = buffAmount > 0 ? "#77FF77" : "#FF7777";
-                effectDesc.AppendLine($"<color={color}><b>{statName}: {sign}{buffAmount}</b></color>");
-            }
-
-            // Display conditions if they exist
-            if (conditionsField != null)
-            {
-                Conditions[] conditions = conditionsField.GetValue(effect) as Conditions[];
-                if (conditions != null && conditions.Length > 0)
-                {
-                    effectDesc.AppendLine("<color=#FFFF88>Conditions:</color>");
-                    foreach (Conditions condition in conditions)
-                    {
-                        if (condition != null)
-                        {
-                            string conditionDesc = GetConditionDescription(condition);
-                            if (!string.IsNullOrEmpty(conditionDesc))
-                                effectDesc.AppendLine($"  • {conditionDesc}");
-                        }
-                    }
-                }
-            }
+            effectDesc.Append(GetAdjacentBoosterDescription(boosterEffect));
         }
-        // Fallback for unknown effect types
         else
         {
+            // Fallback for unknown effect types
             string effectTypeName = effectType.Name;
             if (effectTypeName.EndsWith("Effect"))
                 effectTypeName = effectTypeName.Substring(0, effectTypeName.Length - 6);
@@ -283,9 +182,241 @@ public class ItemTooltip : MonoBehaviour
             effectDesc.AppendLine($"<color=#FFA500><b>{FormatCamelCase(effectTypeName)}</b></color>");
         }
 
+        // Add conditions if present
+        if (effect.conditions != null && effect.conditions.Length > 0)
+        {
+            string conditionsText = GetConditionsDescription(effect.conditions);
+            if (!string.IsNullOrEmpty(conditionsText))
+            {
+                effectDesc.Append(conditionsText);
+            }
+        }
+
         string result = effectDesc.ToString();
         Debug.Log($"<color=magenta>Generated description: {result}</color>");
         return result;
+    }
+
+    /// <summary>
+    /// Gets description for WeaponSpawnEffect using reflection
+    /// </summary>
+    private string GetWeaponSpawnDescription(WeaponSpawnEffect effect)
+    {
+        StringBuilder desc = new StringBuilder();
+        Type effectType = effect.GetType();
+
+        var weaponNameField = effectType.GetField("weaponName", 
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var baseDamageField = effectType.GetField("baseAttackDamage", 
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var baseSpeedField = effectType.GetField("baseAttackSpeed", 
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var baseVarianceField = effectType.GetField("baseAttackVariance", 
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        if (weaponNameField != null)
+        {
+            string weaponName = weaponNameField.GetValue(effect)?.ToString() ?? "Unknown Weapon";
+            desc.AppendLine($"<color=#FFA500><b>{weaponName}</b></color>");
+        }
+
+        if (baseDamageField != null)
+        {
+            int damage = Convert.ToInt32(baseDamageField.GetValue(effect) ?? 0);
+            int actualDamage = damage * _currentItem.level;
+            desc.AppendLine($"<color=#C23753>Base Damage: {actualDamage}</color>");
+        }
+
+        if (baseSpeedField != null)
+        {
+            int speed = Convert.ToInt32(baseSpeedField.GetValue(effect) ?? 0);
+            int actualSpeed = speed * _currentItem.level;
+            string colorCode = actualSpeed <= 2 ? "#C23753" : actualSpeed >= 6 ? "#EBB85B" : "#FFFFFF";
+            desc.AppendLine($"<color={colorCode}>Attack Speed: {actualSpeed}</color>");
+        }
+
+        if (baseVarianceField != null)
+        {
+            int variance = Convert.ToInt32(baseVarianceField.GetValue(effect) ?? 0);
+            int actualVariance = variance * _currentItem.level;
+            if (actualVariance > 0)
+                desc.AppendLine($"<color=#88AAFF>Variance: {actualVariance}</color>");
+        }
+
+        return desc.ToString();
+    }
+
+    /// <summary>
+    /// Gets description for HealEffect using reflection
+    /// </summary>
+    private string GetHealEffectDescription(HealEffect effect)
+    {
+        StringBuilder desc = new StringBuilder();
+        Type effectType = effect.GetType();
+
+        var inputTypeField = effectType.GetField("inputType", 
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var healAmountField = effectType.GetField("healAmount", 
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var usesField = effectType.GetField("uses", 
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        if (healAmountField != null)
+        {
+            float healAmount = Convert.ToSingle(healAmountField.GetValue(effect) ?? 0f);
+            InputType inputType = InputType.flat;
+            
+            if (inputTypeField != null)
+            {
+                inputType = (InputType)(inputTypeField.GetValue(effect) ?? InputType.flat);
+            }
+
+            if (inputType == InputType.percentage)
+            {
+                float actualHeal = healAmount * _currentItem.level;
+                desc.AppendLine($"<color=#77FF77><b>Heal: {actualHeal}% Max HP</b></color>");
+            }
+            else
+            {
+                int actualHeal = Mathf.FloorToInt(healAmount * _currentItem.level);
+                desc.AppendLine($"<color=#77FF77><b>Heal: +{actualHeal} HP</b></color>");
+            }
+        }
+
+        if (usesField != null)
+        {
+            int uses = Convert.ToInt32(usesField.GetValue(effect) ?? 0);
+            if (uses > 0)
+                desc.AppendLine($"<color=#AAAAAA>Uses: {uses}</color>");
+        }
+
+        return desc.ToString();
+    }
+
+    /// <summary>
+    /// Gets description for BuffStatEffect using reflection
+    /// </summary>
+    private string GetBuffStatDescription(BuffStatEffect effect)
+    {
+        StringBuilder desc = new StringBuilder();
+        Type effectType = effect.GetType();
+
+        var inputTypeField = effectType.GetField("inputType", 
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var buffAmountField = effectType.GetField("buffAmount", 
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var statTypeField = effectType.GetField("statType", 
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        string statName = "Stat";
+        if (statTypeField != null)
+        {
+            object statValue = statTypeField.GetValue(effect);
+            if (statValue != null)
+                statName = FormatCamelCase(statValue.ToString());
+        }
+
+        if (buffAmountField != null)
+        {
+            float buffAmount = Convert.ToSingle(buffAmountField.GetValue(effect) ?? 0f);
+            InputType inputType = InputType.flat;
+            
+            if (inputTypeField != null)
+            {
+                inputType = (InputType)(inputTypeField.GetValue(effect) ?? InputType.flat);
+            }
+
+            if (inputType == InputType.percentage)
+            {
+                float actualBuff = buffAmount * _currentItem.level;
+                string sign = actualBuff > 0 ? "+" : "";
+                string color = actualBuff > 0 ? "#77FF77" : "#FF7777";
+                desc.AppendLine($"<color={color}><b>{statName}: {sign}{actualBuff}%</b></color>");
+            }
+            else
+            {
+                int actualBuff = Mathf.FloorToInt(buffAmount * _currentItem.level);
+                string sign = actualBuff > 0 ? "+" : "";
+                string color = actualBuff > 0 ? "#77FF77" : "#FF7777";
+                desc.AppendLine($"<color={color}><b>{statName}: {sign}{actualBuff}</b></color>");
+            }
+        }
+
+        return desc.ToString();
+    }
+
+    /// <summary>
+    /// Gets description for AdjacentWeaponBoosterEffect using reflection
+    /// </summary>
+    private string GetAdjacentBoosterDescription(AdjacentWeaponBoosterEffect effect)
+    {
+        StringBuilder desc = new StringBuilder();
+        Type effectType = effect.GetType();
+
+        desc.AppendLine("<color=#FF88FF><b>Adjacent Weapon Boost</b></color>");
+
+        var statTypeField = effectType.GetField("statType", 
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var inputTypeField = effectType.GetField("inputType", 
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var buffAmountField = effectType.GetField("buffAmount", 
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        string statName = "Stat";
+        if (statTypeField != null)
+        {
+            object statValue = statTypeField.GetValue(effect);
+            if (statValue != null)
+                statName = FormatCamelCase(statValue.ToString());
+        }
+
+        if (buffAmountField != null)
+        {
+            int buffAmount = Convert.ToInt32(buffAmountField.GetValue(effect) ?? 0);
+            InputType inputType = InputType.flat;
+            
+            if (inputTypeField != null)
+            {
+                inputType = (InputType)(inputTypeField.GetValue(effect) ?? InputType.flat);
+            }
+
+            int actualBuff = buffAmount * _currentItem.level;
+            string sign = actualBuff > 0 ? "+" : "";
+            
+            if (inputType == InputType.percentage)
+            {
+                desc.AppendLine($"<color=#FFAAFF>{statName}: {sign}{actualBuff}%</color>");
+            }
+            else
+            {
+                desc.AppendLine($"<color=#FFAAFF>{statName}: {sign}{actualBuff}</color>");
+            }
+        }
+
+        return desc.ToString();
+    }
+
+    /// <summary>
+    /// Generates a description for all conditions
+    /// </summary>
+    private string GetConditionsDescription(Conditions[] conditions)
+    {
+        if (conditions == null || conditions.Length == 0) return string.Empty;
+
+        StringBuilder condDesc = new StringBuilder();
+        condDesc.AppendLine("<color=#FFFF88>Conditions:</color>");
+
+        foreach (Conditions condition in conditions)
+        {
+            if (condition != null)
+            {
+                string singleCondDesc = GetConditionDescription(condition);
+                if (!string.IsNullOrEmpty(singleCondDesc))
+                    condDesc.AppendLine($"  • {singleCondDesc}");
+            }
+        }
+
+        return condDesc.ToString();
     }
 
     /// <summary>
@@ -303,23 +434,107 @@ public class ItemTooltip : MonoBehaviour
             conditionName = conditionName.Substring(0, conditionName.Length - 9);
 
         StringBuilder condDesc = new StringBuilder();
-        condDesc.Append($"<color=#88AAFF>{FormatCamelCase(conditionName)}</color>");
 
-        // Get all public fields from the condition
-        var fields = conditionType.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-        
-        if (fields.Length > 0)
+        // Handle specific condition types
+        if (condition is LessThanCondition || condition is MoreThanCondition || condition is EqualCondition)
         {
-            condDesc.Append(": ");
-            bool first = true;
-            foreach (var field in fields)
+            var valueTypeField = conditionType.GetField("valueType", 
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var thresholdField = conditionType.GetField("threshold", 
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var comparedValueField = conditionType.GetField("comparedValue", 
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var maxValueTypeField = conditionType.GetField("maxValueType", 
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            string valueTypeName = "Value";
+            if (valueTypeField != null)
             {
-                object value = field.GetValue(condition);
-                if (value != null)
+                object val = valueTypeField.GetValue(condition);
+                if (val != null) valueTypeName = FormatCamelCase(val.ToString());
+            }
+
+            float threshold = 0f;
+            if (thresholdField != null)
+            {
+                threshold = Convert.ToSingle(thresholdField.GetValue(condition) ?? 0f);
+            }
+            else if (comparedValueField != null)
+            {
+                threshold = Convert.ToSingle(comparedValueField.GetValue(condition) ?? 0f);
+            }
+
+            string comparisonOperator = "";
+            if (condition is LessThanCondition) comparisonOperator = "<";
+            else if (condition is MoreThanCondition) comparisonOperator = ">";
+            else if (condition is EqualCondition) comparisonOperator = "=";
+
+            if (threshold <= 1f)
+            {
+                string maxValueTypeName = "Max";
+                if (maxValueTypeField != null)
                 {
-                    if (!first) condDesc.Append(", ");
-                    condDesc.Append($"{FormatCamelCase(field.Name)} = {value}");
-                    first = false;
+                    object maxVal = maxValueTypeField.GetValue(condition);
+                    if (maxVal != null) maxValueTypeName = FormatCamelCase(maxVal.ToString());
+                }
+                condDesc.Append($"<color=#88AAFF>{valueTypeName} {comparisonOperator} {threshold * 100}% {maxValueTypeName}</color>");
+            }
+            else
+            {
+                condDesc.Append($"<color=#88AAFF>{valueTypeName} {comparisonOperator} {threshold}</color>");
+            }
+        }
+        else if (condition is AdjacentCondition)
+        {
+            var specificAdjacentField = conditionType.GetField("specificAdjacentItem", 
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var requiredAdjacentField = conditionType.GetField("requiredAdjacentItem", 
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            bool specificAdjacent = false;
+            if (specificAdjacentField != null)
+            {
+                specificAdjacent = Convert.ToBoolean(specificAdjacentField.GetValue(condition) ?? false);
+            }
+
+            if (specificAdjacent && requiredAdjacentField != null)
+            {
+                ItemSO requiredItem = requiredAdjacentField.GetValue(condition) as ItemSO;
+                if (requiredItem != null)
+                {
+                    condDesc.Append($"<color=#88AAFF>Adjacent to: {requiredItem.itemName}</color>");
+                }
+                else
+                {
+                    condDesc.Append("<color=#88AAFF>Adjacent to specific item</color>");
+                }
+            }
+            else
+            {
+                condDesc.Append("<color=#88AAFF>Has adjacent items</color>");
+            }
+        }
+        else
+        {
+            // Generic condition display
+            condDesc.Append($"<color=#88AAFF>{FormatCamelCase(conditionName)}</color>");
+
+            // Try to get all public fields
+            var fields = conditionType.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            
+            if (fields.Length > 0)
+            {
+                condDesc.Append(": ");
+                bool first = true;
+                foreach (var field in fields)
+                {
+                    object value = field.GetValue(condition);
+                    if (value != null && field.Name != "owner")
+                    {
+                        if (!first) condDesc.Append(", ");
+                        condDesc.Append($"{FormatCamelCase(field.Name)} = {value}");
+                        first = false;
+                    }
                 }
             }
         }

@@ -3389,7 +3389,7 @@ MonoBehaviour:
   mainMenuButtonWin: {fileID: 1246640217}
   mainMenuButtonLose: {fileID: 237998287}
   mainMenuSceneName: MainMenu
-  gameplaySceneName: GameplayLevel
+  gameplaySceneName: '[HuiSeng] GameplayLevel'
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

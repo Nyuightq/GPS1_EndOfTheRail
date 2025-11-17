@@ -118,6 +118,6 @@ public class OnClickImage : MonoBehaviour
         transitionAnimator.Play("TransitionOutAnim", 0, 0f);
 
         yield return new WaitForSeconds(0.5f);
-        SceneManager.LoadScene("GameplayLevel");
+        SceneManager.LoadScene("[HuiSeng] GameplayLevel");
     }
 }

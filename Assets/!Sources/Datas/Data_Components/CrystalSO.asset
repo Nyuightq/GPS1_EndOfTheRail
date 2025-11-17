@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: CrystalSO
   m_EditorClassIdentifier: 
   itemSprite: {fileID: 21300000, guid: c29bf505f0b0b4347b72281fedda5f11, type: 3}
-  itemName: Purrification Crystal
+  itemName: Purification Crystal
+  itemDescription: 
   mandatoryItem: 1
   itemWidth: 2
   itemHeight: 2
-  effects:
-  - rid: 2343331222257664076
+  effects: []
   itemEffectPrefab: {fileID: 0}
   itemShape:
   - filled: 1
@@ -27,12 +27,4 @@ MonoBehaviour:
   - filled: 1
   references:
     version: 2
-    RefIds:
-    - rid: 2343331222257664076
-      type: {class: BuffStatEffect, ns: , asm: Assembly-CSharp}
-      data:
-        trigger: 0
-        conditions: []
-        inputType: 1
-        buffAmount: 0
-        statType: 1
+    RefIds: []
