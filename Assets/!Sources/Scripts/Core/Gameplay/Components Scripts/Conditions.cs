@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering.Universal.Internal;
 
 
 public enum ConditionStatType
@@ -53,7 +52,7 @@ public enum BuffableWeaponStats
 }
 
 #region comparison conditions
-[System.Serializable] public class LessThanCondition : Conditions
+[System.Serializable] public class LessThanEqualCondition : Conditions
 {
     [SerializeField] ConditionStatType valueType;
     [SerializeField] float threshold;
@@ -67,13 +66,13 @@ public enum BuffableWeaponStats
 
         if(threshold <= 1)
         {
-            return value < Mathf.FloorToInt(maxValue * threshold);
+            return value <= Mathf.FloorToInt(maxValue * threshold);
         }
-        return value < threshold;
+        return value <= threshold;
     }
 }
 
-[System.Serializable] public class MoreThanCondition : Conditions
+[System.Serializable] public class MoreThanEqualCondition : Conditions
 {
     [SerializeField] ConditionStatType valueType;
     [SerializeField] float threshold;
@@ -87,9 +86,9 @@ public enum BuffableWeaponStats
 
         if (threshold <= 1)
         {
-            return value > Mathf.FloorToInt(maxValue * threshold);
+            return value >= Mathf.FloorToInt(maxValue * threshold);
         }
-        return value > threshold;
+        return value >= threshold;
     }
 }
 
@@ -181,19 +180,23 @@ public enum triggers
 
     public bool checkCondition()
     {
+        Debug.Log($"<color=yellow> hasTrigged : {hasTriggered} </color>");
         if (triggerOnConditionOnce && hasTriggered) return false;
-
+        
         foreach (var condition in conditions)
         {
             if (!condition.check())
             {
-                Debug.Log("Condition not met");
+                //Debug.Log("Condition not met");
                 return false;
             }
         }
+        Debug.Log("<color=green>Condition met</color>");
         hasTriggered = true;
         return true;
     }
+
+    public void ResetTriggered(){ hasTriggered = false; }
 
     public abstract void apply();
 
@@ -204,10 +207,11 @@ public enum triggers
 {
     [SerializeField] private InputType inputType;
     [SerializeField] private float healAmount;
+    [SerializeField] private bool limitedUses;
     [SerializeField] private int uses;
     public override void apply()
     {
-        if (!checkCondition()) return;
+        if ((limitedUses && uses <= 0) || !checkCondition()) return;
         CombatSystem combatSystem = UnityEngine.Object.FindFirstObjectByType<CombatSystem>();
         Item item = owner as Item;
         if (item == null) return;
@@ -220,13 +224,14 @@ public enum triggers
             {
                 case InputType.percentage:
                     combatSystem.player.HealCurrentHp(Mathf.FloorToInt(combatSystem.player.MaxHp * finalHealAmount / 100));
-                    Debug.Log($"healing {Mathf.FloorToInt(combatSystem.player.MaxHp * healAmount/100)} hp out of {combatSystem.player.MaxHp}");
+                    Debug.Log($"<color=green>healing {Mathf.FloorToInt(combatSystem.player.MaxHp * healAmount/100)} hp out of {combatSystem.player.MaxHp}</color>");
                     break;
                 case InputType.flat:
                     combatSystem.player.HealCurrentHp(Mathf.FloorToInt(finalHealAmount));
-                    Debug.Log($"healing {healAmount}");
+                    Debug.Log($"<color=green>healing {healAmount}</color>");
                     break;
             }
+            if(limitedUses) uses--;
         }
     }
 
@@ -271,9 +276,11 @@ public enum triggers
 public class WeaponStats
 {
     private int baseAttackDamage, baseAttackSpeed, baseAttackVariance;
+    private Item item;
     public StatsMediator<BuffableWeaponStats> weaponMediator = new StatsMediator<BuffableWeaponStats>();
-    public WeaponStats(int baseAttackDamage, int baseAttackSpeed, int baseAttackVariance)
+    public WeaponStats(Item item, int baseAttackDamage, int baseAttackSpeed, int baseAttackVariance)
     {
+        this.item = item;
         this.baseAttackDamage = baseAttackDamage;
         this.baseAttackSpeed = baseAttackSpeed;
         this.baseAttackVariance = baseAttackVariance;
@@ -283,7 +290,7 @@ public class WeaponStats
     {
         get
         {
-            var q = new Query<BuffableWeaponStats>(BuffableWeaponStats.AttackDamage, baseAttackDamage);
+            var q = new Query<BuffableWeaponStats>(BuffableWeaponStats.AttackDamage, baseAttackDamage * item.level);
             weaponMediator.PerformQuery(this, q);
             return Mathf.FloorToInt(q.value);
         }
@@ -292,7 +299,7 @@ public class WeaponStats
     {
         get
         {
-            var q = new Query<BuffableWeaponStats>(BuffableWeaponStats.AttackSpeed, baseAttackSpeed);
+            var q = new Query<BuffableWeaponStats>(BuffableWeaponStats.AttackSpeed, baseAttackSpeed * item.level);
             weaponMediator.PerformQuery(this, q);
             return Mathf.FloorToInt(q.value);
         }
@@ -301,7 +308,7 @@ public class WeaponStats
     {
         get
         {
-            var q = new Query<BuffableWeaponStats>(BuffableWeaponStats.AttackVariance, baseAttackVariance);
+            var q = new Query<BuffableWeaponStats>(BuffableWeaponStats.AttackVariance, baseAttackVariance * item.level);
             weaponMediator.PerformQuery(this, q);
             return Mathf.FloorToInt(q.value);
         }
@@ -324,16 +331,10 @@ public class WeaponStats
     {
         get
         {
-            Item item = owner as Item;
-            if (item == null)
+            if (_weaponStats == null && owner is Item item)
             {
-                return null;
+                _weaponStats = new WeaponStats(item, baseAttackDamage, baseAttackSpeed, baseAttackVariance);
             }
-            int finalBaseAttackDamage = baseAttackDamage * item.level;
-            int finalBaseAttackSpeed = baseAttackSpeed * item.level;
-            int finalBaseAttackVariance = baseAttackVariance * item.level;
-
-            _weaponStats = new WeaponStats(finalBaseAttackDamage, finalBaseAttackSpeed, finalBaseAttackVariance);
             return _weaponStats;
         }
         set => _weaponStats = value;
@@ -356,77 +357,97 @@ public class WeaponStats
     public override void remove() {}
 }
 
-[System.Serializable] public class AdjacentWeaponBoosterEffect : Effect
+[System.Serializable]
+public class AdjacentWeaponBoosterEffect : Effect
 {
     [SerializeField] private BuffableWeaponStats statType;
     [SerializeField] private InputType inputType;
     [SerializeField] private int buffAmount;
 
-    private bool applied = false;
-    AdditionModifier<BuffableWeaponStats> mod;
-    List<AdditionModifier<BuffableWeaponStats>> modList = new List<AdditionModifier<BuffableWeaponStats>>();
-    
+    // Track which weapons have which modifier applied by this booster
+    private Dictionary<Item, AdditionModifier<BuffableWeaponStats>> activeModifiers
+        = new Dictionary<Item, AdditionModifier<BuffableWeaponStats>>();
+
     public override void apply()
     {
-        if (!checkCondition() /*&& applied*/) return;
+        if (!checkCondition()) return;
+        if (owner is not Item booster) return;
 
-        if (owner is Item item)
+        int finalBuffAmount = buffAmount * booster.level;
+
+        // Get all currently adjacent weapon items
+        List<GameObject> adjacentList = GameManager.instance.inventoryScript.GetAdjacentComponents(Vector2Int.FloorToInt(booster.GetComponent<ItemDragManager>().topLeftCellPos), booster.itemShape, booster.gameObject);
+
+        List<Item> adjacentItems = new List<Item>();
+        foreach(GameObject adjacentObject in adjacentList)
         {
-            List<GameObject> adjacentList = GameManager.instance.inventoryScript.GetAdjacentComponents(Vector2Int.FloorToInt(item.GetComponent<ItemDragManager>().TopLeftCellPos), item.itemShape, item.gameObject); // updated by zq to fetch topLeftCellPos
-            int finalBuffAmount = buffAmount * item.level;
-
-            //List<GameObject> adjacentList = GameManager.instance.inventoryScript.GetAdjacentComponents(Vector2Int.FloorToInt(item.GetComponent<ItemDragManager>().topLeftCellPos), item.itemShape, item.gameObject);
-            foreach (GameObject adjacent in adjacentList)
+            Item item = adjacentObject.GetComponent<Item>();
+            if(item != null && item.effects.OfType<WeaponSpawnEffect>().Any() )
             {
-                
-
-                Item adjacentItemScript = adjacent.GetComponent<Item>();
-                if (adjacentItemScript == null) continue;
-                if (adjacentItemScript != null && adjacentItemScript.effects.Any(effect => effect is WeaponSpawnEffect))
-                {
-                    Debug.Log($"<color=yellow>{item} is adjacent to {adjacent}</color>");
-                    List<WeaponSpawnEffect> weaponList = adjacentItemScript.effects.OfType<WeaponSpawnEffect>().ToList();
-                    foreach (WeaponSpawnEffect weapon in weaponList)
-                    {
-                        if (weapon.weaponStats == null) continue;
-                        StatsMediator<BuffableWeaponStats> mediator = weapon.weaponStats.weaponMediator;
-                        switch (inputType)
-                        {
-                            case InputType.percentage:
-                                mod = new AdditionModifier<BuffableWeaponStats>(statType, finalBuffAmount, AdditionModifier<BuffableWeaponStats>.AdditionType.percentage);
-                                mediator.AddModifier(mod);
-                                modList.Add(mod);
-                                break;
-                            case InputType.flat:
-                                mod = new AdditionModifier<BuffableWeaponStats>(statType, finalBuffAmount, AdditionModifier<BuffableWeaponStats>.AdditionType.flat);
-                                mediator.AddModifier(mod);
-                                modList.Add(mod);
-                                break;
-                        }
-                        applied = true;
-                        Debug.Log($"weapon: {weapon}, weapon.weaponStats: {weapon.weaponStats}, mediator: {weapon.weaponStats?.weaponMediator}");
-                        if (CombatManager.Instance == null || CombatManager.Instance.components == null) return;
-
-                        foreach (CombatComponentEntity combatComponent in CombatManager.Instance.components)
-                        {
-                            if (combatComponent == null) continue;
-                            combatComponent.RefreshStats();
-                        }
-                    }
-                }
+                adjacentItems.Add(item);
             }
         }
+
+        // Remove buffs from items that are no longer adjacent
+        List<Item> itemsToRemove = activeModifiers.Keys.Where(item => !adjacentItems.Contains(item)).ToList();
+
+        foreach (Item item in itemsToRemove)
+        {
+            activeModifiers[item].Dispose();
+            activeModifiers.Remove(item);
+        }
+
+        // Apply buffs to newly adjacent weapons
+        foreach (Item weaponItem in adjacentItems)
+        {
+            //already buffed
+            if (activeModifiers.ContainsKey(weaponItem)) continue;
+
+            foreach (WeaponSpawnEffect weapon in weaponItem.effects.OfType<WeaponSpawnEffect>())
+            {
+                if (weapon.weaponStats == null) continue;
+
+                StatsMediator<BuffableWeaponStats> mediator = weapon.weaponStats.weaponMediator;
+                AdditionModifier<BuffableWeaponStats> mod = null;
+
+                switch (inputType)
+                {
+                    case InputType.percentage:
+                        mod = new AdditionModifier<BuffableWeaponStats>(statType,finalBuffAmount,AdditionModifier<BuffableWeaponStats>.AdditionType.percentage);
+                        break;
+                    case InputType.flat:
+                        mod = new AdditionModifier<BuffableWeaponStats>(statType,finalBuffAmount,AdditionModifier<BuffableWeaponStats>.AdditionType.flat);
+                        break;
+                    default:
+                        mod = null;
+                        break;
+                }
+
+                if (mod != null)
+                {
+                    mediator.AddModifier(mod);
+                    activeModifiers[weaponItem] = mod;
+                }
+            }
+
+            // Subscribe to the weapon's Unequip to remove the buff if it moves away
+            weaponItem.OnUnequip += () =>
+            {
+                if (activeModifiers.ContainsKey(weaponItem))
+                {
+                    activeModifiers[weaponItem].Dispose();
+                    activeModifiers.Remove(weaponItem);
+                }
+            };
+        }
     }
-    public override void remove() 
+
+    public override void remove()
     {
-        //mod.Dispose();
-        foreach (AdditionModifier<BuffableWeaponStats> mod in modList) mod.Dispose();
-        //applied = false;
+        foreach (var mod in activeModifiers.Values)
+        {
+            mod.Dispose();
+        }
+        activeModifiers.Clear();
     }
 }
-
-
-
-
-
-

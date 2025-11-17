@@ -197,12 +197,20 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
         
         if (itemScript.state == Item.itemState.equipped)
         {
-            inventoryGridScript.MarkCells(
-                Vector2Int.FloorToInt(topLeftCellPos), 
-                itemScript.itemShape, 
-                null
-            );
-            itemScript.state = Item.itemState.unequipped;
+            Debug.Log("Attempting to rotate");
+
+            if (topLeftCellPos != null && itemScript.state == Item.itemState.equipped)
+            {
+                inventoryGridScript.MarkCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, null);
+                itemScript.state = Item.itemState.unequipped;
+            }
+
+            itemScript.RotateShape(itemScript.itemShape);
+            itemScript.TriggerEffectAdjacentEquip();
+            foreach (GameObject adjacent in inventoryGridScript.GetAdjacentComponents(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, gameObject))
+            {
+                adjacent.GetComponent<Item>()?.TriggerEffectAdjacentEquip();
+            }
         }
 
         itemScript.RotateShape(itemScript.itemShape);
@@ -282,8 +290,9 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
             equippedPos = actualItemCellPos; // Store the equipped position
             itemScript.state = Item.itemState.equipped;
             itemScript.TriggerEffectEquip();
+            itemScript.TriggerEffectAdjacentEquip();
 
-            foreach(GameObject adjacentItems in inventoryGridScript.GetAdjacentComponents(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, gameObject))
+            foreach (GameObject adjacentItems in inventoryGridScript.GetAdjacentComponents(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, gameObject))
             {
                 Debug.Log($"<color=green>{gameObject} near {adjacentItems}</color>");
                 adjacentItems.GetComponent<Item>().TriggerEffectAdjacentEquip();
