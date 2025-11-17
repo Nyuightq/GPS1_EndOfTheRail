@@ -29,9 +29,12 @@ MonoBehaviour:
       type: {class: WeaponSpawnEffect, ns: , asm: Assembly-CSharp}
       data:
         trigger: 0
+        triggerOnConditionOnce: 0
         conditions: []
         weaponName: book of fuck you
         baseAttackDamage: 1
         baseAttackSpeed: 9
         baseAttackVariance: 0
+        weaponSprite: {fileID: 21300000, guid: 11c5e2f49c01c8044a3b5ed25d0004d7, type: 3}
         animationClip: {fileID: 11400000, guid: e9c80bc114e1b69458a7b00e25d129bd, type: 2}
+        attackSfxName: dasdsa

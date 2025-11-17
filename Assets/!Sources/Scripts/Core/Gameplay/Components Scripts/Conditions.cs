@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering.Universal.Internal;
 
 
 public enum ConditionStatType
@@ -146,7 +147,9 @@ public enum triggers
     OnEquipAndAdjacentEquip,
     OnUpdate,
     OnBattleStart,
-    OnBattleUpdate
+    OnBattleUpdate,
+    OnBattleEnd,
+    OnDayStart
     //OnConditionTriggerOnce
 }
 
@@ -209,16 +212,18 @@ public enum triggers
         Item item = owner as Item;
         if (item == null) return;
 
+        float finalHealAmount = healAmount * item.level;
+
         if (combatSystem != null)
         {
             switch (inputType)
             {
                 case InputType.percentage:
-                    combatSystem.player.HealCurrentHp(Mathf.FloorToInt(combatSystem.player.MaxHp * healAmount * item.level / 100));
+                    combatSystem.player.HealCurrentHp(Mathf.FloorToInt(combatSystem.player.MaxHp * finalHealAmount / 100));
                     Debug.Log($"healing {Mathf.FloorToInt(combatSystem.player.MaxHp * healAmount/100)} hp out of {combatSystem.player.MaxHp}");
                     break;
                 case InputType.flat:
-                    combatSystem.player.HealCurrentHp(Mathf.FloorToInt(healAmount * item.level));
+                    combatSystem.player.HealCurrentHp(Mathf.FloorToInt(finalHealAmount));
                     Debug.Log($"healing {healAmount}");
                     break;
             }
@@ -242,14 +247,16 @@ public enum triggers
         Item item = owner as Item;
         if (item == null) return;
 
+        float finalBuffAmount = buffAmount * item.level;
+
         switch (inputType)
         {
             case InputType.percentage:
-                mod = new AdditionModifier<BuffableStats>(statType, buffAmount * item.level, AdditionModifier<BuffableStats>.AdditionType.percentage);
+                mod = new AdditionModifier<BuffableStats>(statType, finalBuffAmount, AdditionModifier<BuffableStats>.AdditionType.percentage);
                 mediator.AddModifier(mod);                
                 break;
             case InputType.flat:
-                mod = new AdditionModifier<BuffableStats>(statType, buffAmount * item.level, AdditionModifier<BuffableStats>.AdditionType.flat);
+                mod = new AdditionModifier<BuffableStats>(statType, finalBuffAmount, AdditionModifier<BuffableStats>.AdditionType.flat);
                 mediator.AddModifier(mod);
                 break;
         }
@@ -317,8 +324,16 @@ public class WeaponStats
     {
         get
         {
-            if (_weaponStats == null && owner is Item item)
-                _weaponStats = new WeaponStats(baseAttackDamage * item.level, baseAttackSpeed * item.level, baseAttackVariance * item.level);
+            Item item = owner as Item;
+            if (item == null)
+            {
+                return null;
+            }
+            int finalBaseAttackDamage = baseAttackDamage * item.level;
+            int finalBaseAttackSpeed = baseAttackSpeed * item.level;
+            int finalBaseAttackVariance = baseAttackVariance * item.level;
+
+            _weaponStats = new WeaponStats(finalBaseAttackDamage, finalBaseAttackSpeed, finalBaseAttackVariance);
             return _weaponStats;
         }
         set => _weaponStats = value;
@@ -346,41 +361,55 @@ public class WeaponStats
     [SerializeField] private BuffableWeaponStats statType;
     [SerializeField] private InputType inputType;
     [SerializeField] private int buffAmount;
+
+    private bool applied = false;
     AdditionModifier<BuffableWeaponStats> mod;
     List<AdditionModifier<BuffableWeaponStats>> modList = new List<AdditionModifier<BuffableWeaponStats>>();
     
     public override void apply()
     {
-        if (!checkCondition()) return;
+        if (!checkCondition() /*&& applied*/) return;
 
         if (owner is Item item)
         {
             List<GameObject> adjacentList = GameManager.instance.inventoryScript.GetAdjacentComponents(Vector2Int.FloorToInt(item.GetComponent<ItemDragManager>().TopLeftCellPos), item.itemShape, item.gameObject); // updated by zq to fetch topLeftCellPos
+            int finalBuffAmount = buffAmount * item.level;
+
+            //List<GameObject> adjacentList = GameManager.instance.inventoryScript.GetAdjacentComponents(Vector2Int.FloorToInt(item.GetComponent<ItemDragManager>().topLeftCellPos), item.itemShape, item.gameObject);
             foreach (GameObject adjacent in adjacentList)
             {
+                
+
                 Item adjacentItemScript = adjacent.GetComponent<Item>();
-                if(adjacentItemScript != null && adjacentItemScript.effects.Any(effect => effect is WeaponSpawnEffect))
+                if (adjacentItemScript == null) continue;
+                if (adjacentItemScript != null && adjacentItemScript.effects.Any(effect => effect is WeaponSpawnEffect))
                 {
                     Debug.Log($"<color=yellow>{item} is adjacent to {adjacent}</color>");
                     List<WeaponSpawnEffect> weaponList = adjacentItemScript.effects.OfType<WeaponSpawnEffect>().ToList();
                     foreach (WeaponSpawnEffect weapon in weaponList)
                     {
+                        if (weapon.weaponStats == null) continue;
                         StatsMediator<BuffableWeaponStats> mediator = weapon.weaponStats.weaponMediator;
                         switch (inputType)
                         {
                             case InputType.percentage:
-                                mod = new AdditionModifier<BuffableWeaponStats>(statType, buffAmount * item.level, AdditionModifier<BuffableWeaponStats>.AdditionType.percentage);
+                                mod = new AdditionModifier<BuffableWeaponStats>(statType, finalBuffAmount, AdditionModifier<BuffableWeaponStats>.AdditionType.percentage);
                                 mediator.AddModifier(mod);
                                 modList.Add(mod);
                                 break;
                             case InputType.flat:
-                                mod = new AdditionModifier<BuffableWeaponStats>(statType, buffAmount * item.level, AdditionModifier<BuffableWeaponStats>.AdditionType.flat);
+                                mod = new AdditionModifier<BuffableWeaponStats>(statType, finalBuffAmount, AdditionModifier<BuffableWeaponStats>.AdditionType.flat);
                                 mediator.AddModifier(mod);
                                 modList.Add(mod);
                                 break;
                         }
-                        foreach(CombatComponentEntity combatComponent in CombatManager.Instance.components)
+                        applied = true;
+                        Debug.Log($"weapon: {weapon}, weapon.weaponStats: {weapon.weaponStats}, mediator: {weapon.weaponStats?.weaponMediator}");
+                        if (CombatManager.Instance == null || CombatManager.Instance.components == null) return;
+
+                        foreach (CombatComponentEntity combatComponent in CombatManager.Instance.components)
                         {
+                            if (combatComponent == null) continue;
                             combatComponent.RefreshStats();
                         }
                     }
@@ -390,7 +419,9 @@ public class WeaponStats
     }
     public override void remove() 
     {
+        //mod.Dispose();
         foreach (AdditionModifier<BuffableWeaponStats> mod in modList) mod.Dispose();
+        //applied = false;
     }
 }
 
