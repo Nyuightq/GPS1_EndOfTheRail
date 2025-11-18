@@ -34,6 +34,5 @@ MonoBehaviour:
   m_InstancedGameObject: {fileID: 0}
   m_Flags: 1
   m_ColliderType: 1
-  dayReduction: 1
-  speedBonus: 5
+  speedBonus: 2
   tileSprite: {fileID: 0}
