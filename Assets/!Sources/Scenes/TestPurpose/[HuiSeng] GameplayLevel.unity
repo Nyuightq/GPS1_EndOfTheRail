@@ -2356,7 +2356,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: a9e1c0cde7fc0f44b83edb86cc2a00fd, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 28eb4dd662b1183479da16730a542e54, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3784,14 +3784,6 @@ PrefabInstance:
       propertyPath: nightIntensity
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 1463578713219434411, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1463578713219434411, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 6.5
-      objectReference: {fileID: 0}
     - target: {fileID: 1547456390709753563, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
       propertyPath: m_SizeDelta.x
       value: 0
@@ -4566,22 +4558,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6787507166490693092, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6925153947817651364, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
-      propertyPath: m_margin.z
-      value: 36.14209
-      objectReference: {fileID: 0}
-    - target: {fileID: 6925153947817651364, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
-      propertyPath: m_fontAsset
-      value: 
-      objectReference: {fileID: 11400000, guid: f3e19c02e8b2a0944b425876dd12117d, type: 2}
-    - target: {fileID: 6925153947817651364, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
-      propertyPath: m_sharedMaterial
-      value: 
-      objectReference: {fileID: -4828059864804258163, guid: f3e19c02e8b2a0944b425876dd12117d, type: 2}
-    - target: {fileID: 6925153947817651364, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
-      propertyPath: m_hasFontAssetChanged
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6945120374384656794, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
