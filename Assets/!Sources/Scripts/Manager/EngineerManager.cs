@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using System.Collections;
 
 /// <summary>
-/// EngineerManager - Simplified version using ItemDragManager's equippedPos
+/// EngineerManager - Allows multiple merges in single session with cooldown protection
 /// </summary>
 public class EngineerManager : MonoBehaviour
 {
@@ -51,6 +51,7 @@ public class EngineerManager : MonoBehaviour
     private bool isProcessing = false;
 
     public bool IsEngineerUIActive { get; private set; }
+    public bool IsCooldownActive { get; private set; } = false;
 
     private void Awake()
     {
@@ -92,9 +93,9 @@ public class EngineerManager : MonoBehaviour
 
     public void OpenEngineerUI(GameObject player = null)
     {
-        if (IsEngineerUIActive)
+        if (IsEngineerUIActive || IsCooldownActive)
         {
-            Debug.Log("[EngineerManager] Engineer UI already open");
+            Debug.Log("[EngineerManager] Ignored OpenEngineerUI request (UI busy or cooldown active)");
             return;
         }
 
@@ -106,7 +107,7 @@ public class EngineerManager : MonoBehaviour
         if (feedbackText != null)
             feedbackText.text = "Drag two identical items to merge";
 
-        Debug.Log("[EngineerManager] Engineer UI opened");
+        Debug.Log("[EngineerManager] Engineer UI opened - multiple merges allowed");
     }
 
     public void OnItemDragStarted(GameObject item)
@@ -321,6 +322,43 @@ public class EngineerManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Complete merge and prepare for next merge without closing UI
+    /// </summary>
+    private IEnumerator CompleteMergeAndReset()
+    {
+        GameObject itemA = slot1?.slottedItemObject;
+        ItemDragManager dragA = slot1?.dragManager;
+
+        // Item B gets destroyed in MergeItems(), so we just clear the slot
+        slot2.slottedItemSO = null;
+        slot2.slottedItemObject = null;
+        slot2.dragManager = null;
+
+        // Return the merged item (item A) to inventory
+        if (itemA != null)
+        {
+            slot1.slottedItemSO = null;
+            slot1.slottedItemObject = null;
+            slot1.dragManager = null;
+            StartCoroutine(RestoreItemCoroutine(itemA, dragA));
+        }
+
+        yield return new WaitForSeconds(tweenDuration + 0.12f);
+
+        // Reset for next merge
+        isProcessing = false;
+        ClearSlots();
+        
+        if (feedbackText != null)
+            feedbackText.text = "Merge complete! Drag more items to continue.";
+        
+        Debug.Log("[EngineerManager] Merge complete - ready for next merge");
+    }
+
+    /// <summary>
+    /// Return all items when declining/closing
+    /// </summary>
     private IEnumerator ReturnAllItemsAndClose()
     {
         GameObject itemA = slot1?.slottedItemObject;
@@ -472,10 +510,11 @@ public class EngineerManager : MonoBehaviour
         if (feedbackText != null)
             feedbackText.text = $"Merging {slot1.slottedItemSO.itemName}...";
 
-        // TODO: Implement merge recipe -> spawn upgraded item
-        MergeItems(slot1.slottedItemObject,slot2.slottedItemObject);
+        // Perform merge (destroys item2, upgrades item1)
+        MergeItems(slot1.slottedItemObject, slot2.slottedItemObject);
 
-        StartCoroutine(ReturnAllItemsAndClose());
+        // Instead of closing, reset for next merge
+        StartCoroutine(CompleteMergeAndReset());
     }
 
     private void OnDeclineButtonClicked()
@@ -509,8 +548,8 @@ public class EngineerManager : MonoBehaviour
         if (mergeButton != null)
             mergeButton.interactable = false;
 
-        if (feedbackText != null)
-            feedbackText.text = "";
+        if (feedbackText != null && !isProcessing)
+            feedbackText.text = "Drag two identical items to merge";
     }
 
     public void CloseEngineerUI()
@@ -537,6 +576,21 @@ public class EngineerManager : MonoBehaviour
         }
 
         OnEngineerClosed?.Invoke();
+
+        // Begin cooldown to prevent immediate retriggering
+        StartCoroutine(CloseCooldown());
+    }
+
+    /// <summary>
+    /// Cooldown after closing to prevent retriggering while still on tile
+    /// </summary>
+    private IEnumerator CloseCooldown()
+    {
+        IsCooldownActive = true;
+        Debug.Log("[EngineerManager] Close cooldown started");
+        yield return new WaitForSeconds(0.5f);
+        IsCooldownActive = false;
+        Debug.Log("[EngineerManager] Cooldown finished, ready for next trigger.");
     }
 
     private string GetSlotName(MergeSlot slot)
@@ -550,7 +604,7 @@ public class EngineerManager : MonoBehaviour
     {
         item1.GetComponent<Item>().level++;
         Destroy(item2);
-        Debug.Log($"<color=teal>component level: {item1.GetComponent<Item>().level}</color>");
+        Debug.Log($"<color=teal>Merge complete! Component level: {item1.GetComponent<Item>().level}</color>");
     }
 
     private void OnDestroy()
