@@ -27,7 +27,7 @@ public class OnHome : MonoBehaviour
         // Toggle pause/play whenever Home button is pressed
         if (pausePlayScript != null)
         {
-            pausePlayScript.OnPausePlayButton();
+            pausePlayScript.OnSettingButton(true);
         }
     }
 
@@ -38,7 +38,7 @@ public class OnHome : MonoBehaviour
         // Resume game
         if (pausePlayScript != null)
         {
-            pausePlayScript.OnPausePlayButton();
+            pausePlayScript.OnSettingButton(false);
         }
     }
 

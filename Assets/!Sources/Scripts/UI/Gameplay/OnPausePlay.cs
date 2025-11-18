@@ -11,13 +11,49 @@ public class OnPausePlay : MonoBehaviour
     [SerializeField] private GameObject pausePlayPanel;
 
     [SerializeField] private MonoBehaviour[] scriptsToPause;
+    private TrainMovement trainMovement;
 
-    private bool isToggled = false;
-    private bool isPaused = false;
+    private bool _isToggled = false;
+    private bool _isPaused = false;
+    public bool IsPaused => _isPaused;
+    public delegate void OnTogglePauseEvent(bool isPausing);
+    public event OnTogglePauseEvent onTogglePauseEvent;
 
     public void Start()
     {
         pausePlayPanel.SetActive(false);
+        
+        // FindTrainMovementToPause();
+    }
+
+    private void FindTrainMovementToPause()
+    {
+        if (trainMovement == null)
+        {
+            trainMovement = FindAnyObjectByType<TrainMovement>();
+        }
+
+        if (trainMovement != null)
+        {
+            PauseTrain(_isPaused);
+        }
+    }
+
+    private void PauseTrain(bool pausing = true)
+    {
+        if (trainMovement == null) return;
+        trainMovement.enabled = !pausing;
+    }
+
+    public void OnSettingButton(bool pausing = true)
+    {
+        if (_isToggled == false)
+        {
+            _isPaused = pausing;
+            onTogglePauseEvent?.Invoke(_isPaused);
+        }
+        
+        PauseProcess();
     }
 
     public void OnPausePlayButton()
@@ -27,12 +63,22 @@ public class OnPausePlay : MonoBehaviour
             return;
         }
         
-        isToggled = !isToggled;
-        isPaused = !isPaused;
+        _isToggled = !_isToggled;
+        _isPaused = !_isPaused;
+        onTogglePauseEvent?.Invoke(_isPaused);
 
-        if (isPaused)
+        PauseProcess();
+
+        pausePlayImage.sprite = _isToggled ? playSprite : pauseSprite;
+    }
+
+    private void PauseProcess()
+    {
+        bool PAUSETIME = true;
+
+        if (_isPaused)
         {
-            Time.timeScale = 0f; //Pause the game
+            if (PAUSETIME) Time.timeScale = 0f; //Pause the game
 
             if (pausePlayPanel != null)
             {
@@ -49,7 +95,7 @@ public class OnPausePlay : MonoBehaviour
         }
         else
         {
-            Time.timeScale = 1f; //Play the game
+            if (PAUSETIME) Time.timeScale = 1f; //Play the game
 
             if (pausePlayPanel != null)
             {
@@ -64,14 +110,12 @@ public class OnPausePlay : MonoBehaviour
                 }
             }
         }
-
-        pausePlayImage.sprite = isToggled ? playSprite : pauseSprite;
     }
 
     public void ResetPauseState()
     {
-        isPaused = false;
-        isToggled = false;
+        _isPaused = false;
+        _isToggled = false;
 
         pausePlayImage.sprite = pauseSprite; // Make sure it shows the pause icon again
         if (pausePlayPanel != null)
