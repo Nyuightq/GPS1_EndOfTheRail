@@ -3048,6 +3048,14 @@ PrefabInstance:
       propertyPath: nightIntensity
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1463578713219434411, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1463578713219434411, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 6.5
+      objectReference: {fileID: 0}
     - target: {fileID: 1547456390709753563, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
       propertyPath: m_SizeDelta.x
       value: 0
@@ -3824,6 +3832,22 @@ PrefabInstance:
       propertyPath: m_AnchorMin.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6925153947817651364, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
+      propertyPath: m_margin.z
+      value: 36.14209
+      objectReference: {fileID: 0}
+    - target: {fileID: 6925153947817651364, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: f3e19c02e8b2a0944b425876dd12117d, type: 2}
+    - target: {fileID: 6925153947817651364, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -4828059864804258163, guid: f3e19c02e8b2a0944b425876dd12117d, type: 2}
+    - target: {fileID: 6925153947817651364, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6945120374384656794, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
       propertyPath: m_SizeDelta.x
       value: 100
@@ -4238,7 +4262,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8529336832604604248, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -11.9999695
+      value: -12
       objectReference: {fileID: 0}
     - target: {fileID: 8540691934945132982, guid: 368c49a50da1c0d4f9f86ee0edcba85c, type: 3}
       propertyPath: m_Color.b
