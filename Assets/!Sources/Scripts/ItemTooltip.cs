@@ -436,7 +436,7 @@ public class ItemTooltip : MonoBehaviour
         StringBuilder condDesc = new StringBuilder();
 
         // Handle specific condition types
-        if (condition is LessThanCondition || condition is MoreThanCondition || condition is EqualCondition)
+        if (condition is LessThanEqualCondition || condition is MoreThanEqualCondition || condition is EqualCondition)
         {
             var valueTypeField = conditionType.GetField("valueType", 
                 System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
@@ -465,8 +465,8 @@ public class ItemTooltip : MonoBehaviour
             }
 
             string comparisonOperator = "";
-            if (condition is LessThanCondition) comparisonOperator = "<";
-            else if (condition is MoreThanCondition) comparisonOperator = ">";
+            if (condition is LessThanEqualCondition) comparisonOperator = "<";
+            else if (condition is MoreThanEqualCondition) comparisonOperator = ">";
             else if (condition is EqualCondition) comparisonOperator = "=";
 
             if (threshold <= 1f)

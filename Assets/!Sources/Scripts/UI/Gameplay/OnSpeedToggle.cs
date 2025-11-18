@@ -1,12 +1,14 @@
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class OnSpeedToggle : MonoBehaviour
 {
     public static OnSpeedToggle Instance;
     [SerializeField] private TMP_Text speedButtonText;
-    [SerializeField] private string firstText = "N";
-    [SerializeField] private string secondText = "X2";
+    [SerializeField] private Sprite speedOneSprite;
+    [SerializeField] private Sprite speedTwoSprite;
+    [SerializeField] private Image speedSpriteImage;
 
     private bool isToggled = false;
 
@@ -21,7 +23,7 @@ public class OnSpeedToggle : MonoBehaviour
     {
         Instance.isToggled = !Instance.isToggled;
         //speedButtonText.text = isToggled ? secondText : firstText;
-        SpeedMultiplier = isToggled ? 4f : 1f; // <� core logic
-        Instance.speedButtonText.text = Instance.isToggled ? secondText : firstText;
+        SpeedMultiplier = isToggled ? 2f : 1f;
+        Instance.speedSpriteImage.sprite = Instance.isToggled ? speedTwoSprite : speedOneSprite;
     }
 }
