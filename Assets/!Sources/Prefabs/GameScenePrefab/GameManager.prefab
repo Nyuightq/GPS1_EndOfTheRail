@@ -781,6 +781,7 @@ MonoBehaviour:
   scrapCost: 5
   skipNightOnRestPoint: 0
   dayNightController: {fileID: 0}
+  trainLightController: {fileID: 8670061359520600027, guid: 148ee9b71a7a03a43970a2530f4daee3, type: 3}
 --- !u!1 &8666137023644008668
 GameObject:
   m_ObjectHideFlags: 0

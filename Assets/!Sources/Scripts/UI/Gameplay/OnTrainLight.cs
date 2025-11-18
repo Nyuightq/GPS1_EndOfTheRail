@@ -94,7 +94,7 @@ public class OnTrainLight : MonoBehaviour
             .SetTarget(trainLight.gameObject);
 
             // --- ORB Tween (your shorter duration for going back to day) ---
-            float orbDuration = isDay ? transitionDuration : 0.15f;
+            float orbDuration = isDay ? transitionDuration : 0.25f;
 
             DOTween.To(
                 () => orbRenderer.color.a,

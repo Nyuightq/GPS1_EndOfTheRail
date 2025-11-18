@@ -158,6 +158,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 54229842964835545, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -4.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 54229842964835545, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 7.6
+      objectReference: {fileID: 0}
     - target: {fileID: 141493641268551081, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_SizeDelta.x
       value: 0
@@ -233,6 +241,10 @@ PrefabInstance:
     - target: {fileID: 852940132303081404, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 856967917951206569, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_Name
+      value: Instructions
       objectReference: {fileID: 0}
     - target: {fileID: 1001966004365486911, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_AnchorMax.y
@@ -1090,6 +1102,48 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: e75b9242fde6d624286292b05e76f4dd, type: 3}
+    - target: {fileID: 8400359030436972502, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_text
+      value: "Drag components into grid to 'powerup' your stat!\n\nWASD \ncamera
+        movement\n\nLM Drag\nbuild rails\n\nRM Click\nchange rotation of components\n\nGOALS\nget
+        to the end flag to win the game!\n"
+      objectReference: {fileID: 0}
+    - target: {fileID: 8400359030436972502, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_fontSize
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8400359030436972502, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_margin.x
+      value: 43.159546
+      objectReference: {fileID: 0}
+    - target: {fileID: 8400359030436972502, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_margin.z
+      value: 58.036133
+      objectReference: {fileID: 0}
+    - target: {fileID: 8400359030436972502, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: f3e19c02e8b2a0944b425876dd12117d, type: 2}
+    - target: {fileID: 8400359030436972502, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_lineSpacing
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8400359030436972502, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8400359030436972502, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8400359030436972502, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -4828059864804258163, guid: f3e19c02e8b2a0944b425876dd12117d, type: 2}
+    - target: {fileID: 8400359030436972502, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8423644863338361891, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_Sprite
       value: 
