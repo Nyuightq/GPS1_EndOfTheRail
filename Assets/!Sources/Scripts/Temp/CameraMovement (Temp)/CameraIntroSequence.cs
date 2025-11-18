@@ -52,7 +52,6 @@ public class CameraIntroSequence : MonoBehaviour
             gameplayCanvas.enabled = false;
             
 
-        railGrid.enabled = false;
         buildRail.enabled = false;
         StartCoroutine(IntroSequence());
     }
@@ -82,7 +81,6 @@ public class CameraIntroSequence : MonoBehaviour
         if (gameplayCanvas != null)
         {
             gameplayCanvas.enabled = true;
-            railGrid.enabled = true;
             buildRail.enabled = true;
         }
 

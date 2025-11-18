@@ -144,6 +144,7 @@ public class InventoryGridScript : MonoBehaviour
         }
 
         GenerateGrid();
+        InputManager.OnLeftClick += LeftClick;
 
         if (spawnItemInInventory)
         {
@@ -162,6 +163,7 @@ public class InventoryGridScript : MonoBehaviour
 
     private void Update()
     {
+        
         Vector2 mouseBottomLeft = getMousePosGrid();
         
         //Debug.Log($"Local mouse: {mouse}, success={success}");
@@ -200,10 +202,12 @@ public class InventoryGridScript : MonoBehaviour
     #region input handling
     private void LeftClick()
     {
+        Debug.Log("InventoryGridScript: LeftClick()");
         if(currentInventoryState == InventoryState.adding)
         {
             foreach (Vector2 pos in GetExpendableCells())
             {
+                Debug.Log(GetCellAtPos(getMousePosGrid()) == pos);
                 if (GetCellAtPos(getMousePosGrid()) == pos && GameManager.instance.playerStatus.Scraps >= currentCost)
                 {
                     GameManager.instance.playerStatus.ConsumeScraps(currentCost);

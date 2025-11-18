@@ -27,7 +27,7 @@ public class OnTrainLight : MonoBehaviour
     private void Start()
     {
         if (dayCycle == null)
-            dayCycle = FindObjectOfType<DayCycleScript>();
+            dayCycle = FindFirstObjectByType<DayCycleScript>();
 
         if (trainOrb != null)
             orbRenderer = trainOrb.GetComponent<SpriteRenderer>();
