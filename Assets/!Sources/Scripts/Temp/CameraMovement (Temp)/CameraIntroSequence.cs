@@ -6,6 +6,7 @@ public class CameraIntroSequence : MonoBehaviour
     [Header("References")]
     [SerializeField] private CameraMovementTemp cameraMovement;
     [SerializeField] private RailGridScript railGrid;
+    [SerializeField] private BuildRails buildRail;
 
     [Header("UI Settings")]
     [Tooltip("Main gameplay Canvas that should be disabled during intro.")]
@@ -36,6 +37,9 @@ public class CameraIntroSequence : MonoBehaviour
         if (railGrid == null)
             railGrid = FindFirstObjectByType<RailGridScript>();
 
+        if (buildRail == null)
+            buildRail = FindFirstObjectByType<BuildRails>();
+
         cam = Camera.main;
         originalSize = cam.orthographicSize;
 
@@ -46,7 +50,10 @@ public class CameraIntroSequence : MonoBehaviour
         // Disable gameplay UI immediately
         if (gameplayCanvas != null)
             gameplayCanvas.enabled = false;
+            
 
+        railGrid.enabled = false;
+        buildRail.enabled = false;
         StartCoroutine(IntroSequence());
     }
 
@@ -73,7 +80,11 @@ public class CameraIntroSequence : MonoBehaviour
 
         // --- STEP 4: Enable UI Canvas once movement is done ---
         if (gameplayCanvas != null)
+        {
             gameplayCanvas.enabled = true;
+            railGrid.enabled = true;
+            buildRail.enabled = true;
+        }
 
         // --- STEP 5: Zoom in on START ---
         yield return StartCoroutine(SmoothZoom(cam.orthographicSize, zoomedSize));
