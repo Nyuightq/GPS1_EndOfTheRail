@@ -44,7 +44,9 @@ public class GameStateManager : MonoBehaviour
     // private CameraManager _cameraManager;
     // private UIManager _uiManager;
     [SerializeField] private GameObject _planPhasePanel;
+    [SerializeField] private GameObject _planPhasePanel_2;
     private RectTransform _planPhaseRect;
+    private RectTransform _planPhaseRect_2;
     private GameObject _railBuilderManager;
 
     private void Awake()
@@ -67,6 +69,7 @@ public class GameStateManager : MonoBehaviour
     private void Start()
     {
         if (_planPhasePanel != null ) _planPhaseRect = _planPhasePanel.GetComponent<RectTransform>();
+        if (_planPhasePanel_2 != null ) _planPhaseRect_2 = _planPhasePanel_2.GetComponent<RectTransform>();
 
         BuildRails buildRailsObject = FindFirstObjectByType<BuildRails>();
         if (buildRailsObject != null) _railBuilderManager = buildRailsObject.gameObject;
@@ -162,12 +165,23 @@ public class GameStateManager : MonoBehaviour
             _planPhaseRect.DOKill(); // stop previous tweens
             // _planPhaseRect.anchoredPosition = new Vector2(0, -200f); // start off-screen (adjust value as needed)
             _planPhaseRect.DOAnchorPosY(0f, 0.6f).SetEase(Ease.OutBack);
+
+            _planPhasePanel_2.SetActive(true);
+            _planPhaseRect_2.DOKill();
+            _planPhaseRect_2.DOAnchorPosX(-480f, 0.6f).SetEase(Ease.OutBack);
         }
         else
         {
             _planPhaseRect.DOKill();
             _planPhaseRect.DOAnchorPosY(-100f, 0.6f).SetEase(Ease.InBack)
                 .OnComplete(() => _planPhasePanel.SetActive(false));
+
+            _planPhaseRect_2.DOKill();
+            _planPhaseRect_2.DOAnchorPosX(-420f, 0.6f).SetEase(Ease.InBack)
+                .OnComplete(() => _planPhasePanel_2.SetActive(false));
+
+            InventoryGridScript inventory = GameManager.instance.inventoryScript;
+            inventory.OnToggleInventoryState(true);
         }
     }
     public void DestroyInstance()

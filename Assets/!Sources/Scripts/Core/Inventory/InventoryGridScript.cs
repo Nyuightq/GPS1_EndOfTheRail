@@ -5,6 +5,7 @@
 // --------------------------------------------------------------
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -45,6 +46,7 @@ public class InventoryGridScript : MonoBehaviour
     [Header("Inventory Expansion stuff")]
     [SerializeField] private int baseCost;
     [SerializeField] private float costMultiplier;
+    [SerializeField] private TextMeshProUGUI costText;
 
     [Header("Item Spawning Configs")]
     [SerializeField] private bool spawnItemInInventory;
@@ -97,6 +99,21 @@ public class InventoryGridScript : MonoBehaviour
         }
     }
 
+    public void OnToggleInventoryState(bool close = false)
+    {
+        if (close)
+        {
+            CurrentInventoryState = InventoryState.normal;
+            return;
+        }
+
+        if (GameStateManager.CurrentPhase != Phase.Plan) return;
+        if(CurrentInventoryState != InventoryState.adding) 
+            CurrentInventoryState = InventoryState.adding; 
+        else 
+            CurrentInventoryState = InventoryState.normal;
+    }
+
     #region Unity Lifecycle
     void Awake()
     {
@@ -107,7 +124,8 @@ public class InventoryGridScript : MonoBehaviour
     private void OnEnable()
     {
         currentCost = baseCost;
-        InputManager.OnLeftClick += LeftClick;        
+        InputManager.OnLeftClick += LeftClick;       
+        UpdateCurrentCostText(); 
     }
 
     //slight delay for start so i can properly generate the grid
@@ -164,12 +182,6 @@ public class InventoryGridScript : MonoBehaviour
             }
         }
 
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            //Instantiate(itemSpawn,inventoryRect);
-            if(CurrentInventoryState != InventoryState.adding) CurrentInventoryState = InventoryState.adding; else CurrentInventoryState = InventoryState.normal;
-        }
-
         //for if stuff needs to be done for different inventory states
         switch(currentInventoryState)
         {
@@ -196,6 +208,7 @@ public class InventoryGridScript : MonoBehaviour
                 {
                     GameManager.instance.playerStatus.ConsumeScraps(currentCost);
                     currentCost = (int)(currentCost * costMultiplier);
+                    UpdateCurrentCostText();
                     ExpandInventory(pos);
                     return;
                 }
@@ -411,6 +424,11 @@ public class InventoryGridScript : MonoBehaviour
         }
     }
 
+    public void DeleteItems ()
+    {
+        
+    }
+    
     private IEnumerator AttachNextFrame(ItemDragManager drag)
     {
         yield return null; // wait 1 frame
@@ -645,6 +663,11 @@ public class InventoryGridScript : MonoBehaviour
     {
         foreach (GameObject previewCell in previewCells) Destroy(previewCell);
         previewCells.Clear();
+    }
+
+    private void UpdateCurrentCostText()
+    {
+        if (costText != null) costText.text = currentCost.ToString();
     }
     #endregion
 
