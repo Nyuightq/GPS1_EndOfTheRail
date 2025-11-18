@@ -299,7 +299,7 @@ public class WeaponStats
     {
         get
         {
-            var q = new Query<BuffableWeaponStats>(BuffableWeaponStats.AttackSpeed, baseAttackSpeed * item.level);
+            var q = new Query<BuffableWeaponStats>(BuffableWeaponStats.AttackSpeed, baseAttackSpeed);
             weaponMediator.PerformQuery(this, q);
             return Mathf.FloorToInt(q.value);
         }
@@ -308,7 +308,7 @@ public class WeaponStats
     {
         get
         {
-            var q = new Query<BuffableWeaponStats>(BuffableWeaponStats.AttackVariance, baseAttackVariance * item.level);
+            var q = new Query<BuffableWeaponStats>(BuffableWeaponStats.AttackVariance, baseAttackVariance);
             weaponMediator.PerformQuery(this, q);
             return Mathf.FloorToInt(q.value);
         }

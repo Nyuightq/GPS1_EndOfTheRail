@@ -473,6 +473,7 @@ public class EngineerManager : MonoBehaviour
             feedbackText.text = $"Merging {slot1.slottedItemSO.itemName}...";
 
         // TODO: Implement merge recipe -> spawn upgraded item
+        MergeItems(slot1.slottedItemObject,slot2.slottedItemObject);
 
         StartCoroutine(ReturnAllItemsAndClose());
     }
@@ -543,6 +544,13 @@ public class EngineerManager : MonoBehaviour
         if (slot == slot1) return "Slot 1";
         if (slot == slot2) return "Slot 2";
         return "Unknown Slot";
+    }
+
+    private void MergeItems(GameObject item1, GameObject item2)
+    {
+        item1.GetComponent<Item>().level++;
+        Destroy(item2);
+        Debug.Log($"<color=teal>component level: {item1.GetComponent<Item>().level}</color>");
     }
 
     private void OnDestroy()
