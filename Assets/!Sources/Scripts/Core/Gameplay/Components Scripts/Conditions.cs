@@ -365,43 +365,43 @@ public class AdjacentWeaponBoosterEffect : Effect
     [SerializeField] private int buffAmount;
 
     // Track which weapons have which modifier applied by this booster
-    private Dictionary<Item, AdditionModifier<BuffableWeaponStats>> activeModifiers
-        = new Dictionary<Item, AdditionModifier<BuffableWeaponStats>>();
+    // Track modifiers per (booster, weapon) pair
+    private Dictionary<(Item booster, Item weapon), AdditionModifier<BuffableWeaponStats>> activeModifiers
+        = new Dictionary<(Item, Item), AdditionModifier<BuffableWeaponStats>>();
 
     public override void apply()
     {
         if (!checkCondition()) return;
         if (owner is not Item booster) return;
 
-        int finalBuffAmount = buffAmount * booster.level;
-
         // Get all currently adjacent weapon items
-        List<GameObject> adjacentList = GameManager.instance.inventoryScript.GetAdjacentComponents(Vector2Int.FloorToInt(booster.GetComponent<ItemDragManager>().topLeftCellPos), booster.itemShape, booster.gameObject);
+        List<GameObject> adjacentList = GameManager.instance.inventoryScript.GetAdjacentComponents(Vector2Int.FloorToInt(booster.GetComponent<ItemDragManager>().topLeftCellPos),booster.itemShape,booster.gameObject);
 
         List<Item> adjacentItems = new List<Item>();
-        foreach(GameObject adjacentObject in adjacentList)
+        foreach (GameObject adjacentObject in adjacentList)
         {
             Item item = adjacentObject.GetComponent<Item>();
-            if(item != null && item.effects.OfType<WeaponSpawnEffect>().Any() )
+            if (item != null && item.effects.OfType<WeaponSpawnEffect>().Any())
             {
                 adjacentItems.Add(item);
             }
         }
 
         // Remove buffs from items that are no longer adjacent
-        List<Item> itemsToRemove = activeModifiers.Keys.Where(item => !adjacentItems.Contains(item)).ToList();
+        var keysToRemove = activeModifiers.Keys.Where(key => key.booster == booster && !adjacentItems.Contains(key.weapon)).ToList();
 
-        foreach (Item item in itemsToRemove)
+        foreach (var key in keysToRemove)
         {
-            activeModifiers[item].Dispose();
-            activeModifiers.Remove(item);
+            activeModifiers[key].Dispose();
+            activeModifiers.Remove(key);
         }
 
         // Apply buffs to newly adjacent weapons
         foreach (Item weaponItem in adjacentItems)
         {
-            //already buffed
-            if (activeModifiers.ContainsKey(weaponItem)) continue;
+            var key = (booster, weaponItem);
+
+            if (activeModifiers.ContainsKey(key)) continue;
 
             foreach (WeaponSpawnEffect weapon in weaponItem.effects.OfType<WeaponSpawnEffect>())
             {
@@ -413,10 +413,10 @@ public class AdjacentWeaponBoosterEffect : Effect
                 switch (inputType)
                 {
                     case InputType.percentage:
-                        mod = new AdditionModifier<BuffableWeaponStats>(statType,finalBuffAmount,AdditionModifier<BuffableWeaponStats>.AdditionType.percentage);
+                        mod = new AdditionModifier<BuffableWeaponStats>(statType,buffAmount * booster.level,AdditionModifier<BuffableWeaponStats>.AdditionType.percentage);
                         break;
                     case InputType.flat:
-                        mod = new AdditionModifier<BuffableWeaponStats>(statType,finalBuffAmount,AdditionModifier<BuffableWeaponStats>.AdditionType.flat);
+                        mod = new AdditionModifier<BuffableWeaponStats>(statType, buffAmount * booster.level, AdditionModifier<BuffableWeaponStats>.AdditionType.flat);
                         break;
                     default:
                         mod = null;
@@ -426,17 +426,17 @@ public class AdjacentWeaponBoosterEffect : Effect
                 if (mod != null)
                 {
                     mediator.AddModifier(mod);
-                    activeModifiers[weaponItem] = mod;
+                    activeModifiers[key] = mod;
                 }
             }
 
             // Subscribe to the weapon's Unequip to remove the buff if it moves away
             weaponItem.OnUnequip += () =>
             {
-                if (activeModifiers.ContainsKey(weaponItem))
+                if (activeModifiers.TryGetValue(key, out var oldMod))
                 {
-                    activeModifiers[weaponItem].Dispose();
-                    activeModifiers.Remove(weaponItem);
+                    oldMod.Dispose();
+                    activeModifiers.Remove(key);
                 }
             };
         }

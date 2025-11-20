@@ -14,11 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemSprite: {fileID: 21300000, guid: 9ba8e6f2b6a6ae743a22bd3080c6c2d1, type: 3}
   itemName: Amplification Rock
+  itemDescription: 
   mandatoryItem: 0
   itemWidth: 3
   itemHeight: 2
   effects:
-  - rid: 6451219939876929607
+  - rid: 6451219939876929617
   itemEffectPrefab: {fileID: 0}
   itemShape:
   - filled: 0
@@ -30,7 +31,7 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 6451219939876929607
+    - rid: 6451219939876929617
       type: {class: AdjacentWeaponBoosterEffect, ns: , asm: Assembly-CSharp}
       data:
         trigger: 1
