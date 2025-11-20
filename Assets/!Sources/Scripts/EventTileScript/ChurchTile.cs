@@ -66,7 +66,7 @@ public class ChurchTile : EventTile
 
     public override void OnPlayerExit(GameObject player)
     {
-        SoundManager.Instance.PlaySFX("SFX_ButtonOnCancel");
+        // SoundManager.Instance.PlaySFX("SFX_ButtonOnCancel");
         Debug.Log("SFX_ButtonOnCancel");
 
         Debug.Log("Player exited Church Tile");

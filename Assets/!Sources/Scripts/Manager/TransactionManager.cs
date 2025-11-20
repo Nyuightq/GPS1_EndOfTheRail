@@ -36,7 +36,7 @@ public class TransactionManager : MonoBehaviour
     [SerializeField] private List<TransactionSlot> transactionSlots = new List<TransactionSlot>(3);
 
     [Header("UI References")]
-    [SerializeField] private GameObject uiPanel;
+    [SerializeField] private UI_BaseEventPanel uiPanel;
     [SerializeField] private Button declineButton;
     [SerializeField] private RectTransform transactionContainer;
 
@@ -92,7 +92,7 @@ public class TransactionManager : MonoBehaviour
         Instance = this;
 
         if (uiPanel != null)
-            uiPanel.SetActive(false);
+            uiPanel.HideEventPanel();
     }
 
     private void Start()
@@ -151,7 +151,7 @@ public class TransactionManager : MonoBehaviour
 
         if (uiPanel != null)
         {
-            uiPanel.SetActive(true);
+            uiPanel.ShowEventPanel();
             IsTransactionUIActive = true;
         }
 
@@ -503,13 +503,17 @@ public class TransactionManager : MonoBehaviour
         }
 
         if (uiPanel != null)
-            uiPanel.SetActive(false);
+        {
+            uiPanel.HideEventPanel(() => OnTransactionClosed?.Invoke());
+            SoundManager.Instance.PlaySFX("SFX_ButtonOnCancel");
+        }
+            
 
         playerStatus = null;
         IsTransactionUIActive = false;
 
         Debug.Log("Transaction UI closed.");
-        OnTransactionClosed?.Invoke();
+        //OnTransactionClosed?.Invoke();
 
         StartCoroutine(CloseCooldown());
     }

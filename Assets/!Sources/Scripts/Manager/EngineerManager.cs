@@ -26,7 +26,7 @@ public class EngineerManager : MonoBehaviour
     }
 
     [Header("Engineer UI")]
-    [SerializeField] private GameObject engineerUIPanel;
+    [SerializeField] private UI_BaseEventPanel engineerUIPanel;
 
     [Header("Merge Slots (2 input slots)")]
     [SerializeField] private MergeSlot slot1;
@@ -63,7 +63,7 @@ public class EngineerManager : MonoBehaviour
         Instance = this;
 
         if (engineerUIPanel != null)
-            engineerUIPanel.SetActive(false);
+            engineerUIPanel.HideEventPanel();
     }
 
     private void Start()
@@ -101,7 +101,7 @@ public class EngineerManager : MonoBehaviour
 
         ClearSlots();
         isProcessing = false;
-        engineerUIPanel.SetActive(true);
+        engineerUIPanel.ShowEventPanel();
         IsEngineerUIActive = true;
 
         if (feedbackText != null)
@@ -560,23 +560,9 @@ public class EngineerManager : MonoBehaviour
 
         ClearSlots();
         isProcessing = false;
-
-        engineerUIPanel.SetActive(false);
+        engineerUIPanel.HideEventPanel(() => OnEngineerClosed?.Invoke());
+        SoundManager.Instance.PlaySFX("SFX_ButtonOnCancel");
         IsEngineerUIActive = false;
-
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
-        {
-            TrainFreezeController freezeController = player.GetComponent<TrainFreezeController>();
-            if (freezeController != null)
-            {
-                freezeController.ResumeTrain();
-                Debug.Log("[EngineerManager] Train resumed.");
-            }
-        }
-
-        OnEngineerClosed?.Invoke();
-
         // Begin cooldown to prevent immediate retriggering
         StartCoroutine(CloseCooldown());
     }

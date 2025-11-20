@@ -43,10 +43,16 @@ public class GameStateManager : MonoBehaviour
     // Managers Reference to disable and enable
     // private CameraManager _cameraManager;
     // private UIManager _uiManager;
+    [Header("Plan Phase UI")]
     [SerializeField] private GameObject _planPhasePanel;
     [SerializeField] private GameObject _planPhasePanel_2;
     private RectTransform _planPhaseRect;
     private RectTransform _planPhaseRect_2;
+    [Header("General UI")]
+    [SerializeField] private GameObject _topPanel;
+    [SerializeField] private GameObject _asidePanel;
+    private RectTransform _topPanelRect;
+    private RectTransform _asidePanelRect;
     private GameObject _railBuilderManager;
 
     private void Awake()
@@ -71,8 +77,18 @@ public class GameStateManager : MonoBehaviour
         if (_planPhasePanel != null ) _planPhaseRect = _planPhasePanel.GetComponent<RectTransform>();
         if (_planPhasePanel_2 != null ) _planPhaseRect_2 = _planPhasePanel_2.GetComponent<RectTransform>();
 
+        if (_topPanel != null ) _topPanelRect = _topPanel.GetComponent<RectTransform>();
+        if (_asidePanel != null ) _asidePanelRect = _asidePanel.GetComponent<RectTransform>();
+
         BuildRails buildRailsObject = FindFirstObjectByType<BuildRails>();
         if (buildRailsObject != null) _railBuilderManager = buildRailsObject.gameObject;
+
+        InitialGeneralUI();
+    }
+
+    private void InitialGeneralUI()
+    {
+        if (_isInitial) return;
     }
 
     /// <summary>

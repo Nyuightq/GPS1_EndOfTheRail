@@ -152,13 +152,14 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
             }
         }
     }
+    //
 
     // Only showing the updated LeftRelease() method
     // Add this to your existing ItemDragManager.cs
 
     private void LeftRelease()
     {
-        if (!mouseOnItem) return;
+        if (!dragging) return;
         
         dragging = false;
 

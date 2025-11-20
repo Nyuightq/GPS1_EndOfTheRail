@@ -92,7 +92,7 @@ public class TransactionTile : EventTile
         // Play exit SFX
         if (SoundManager.Instance != null)
         {
-            SoundManager.Instance.PlaySFX("SFX_ButtonOnCancel");
+            //SoundManager.Instance.PlaySFX("SFX_ButtonOnCancel");
             Debug.Log("[TransactionTile] Played SFX_ButtonOnCancel");
         }
 

@@ -50,11 +50,11 @@ public class RewardTile : EventTile
 
     public override void OnPlayerExit(GameObject player)
     {
-        SoundManager.Instance.PlaySFX("SFX_ButtonOnCancel");
+        //SoundManager.Instance.PlaySFX("SFX_ButtonOnCancel");
         Debug.Log($"SFX_ButtonOnCancel");
 
         Debug.Log("Player exited Reward Tile");
-        RewardManager.Instance.CloseRewardUI();
+        // RewardManager.Instance.CloseRewardUI();
     }
 
     private static void DeleteRewardTile()

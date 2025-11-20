@@ -23,7 +23,7 @@ public class RewardManager : MonoBehaviour
     [SerializeField] private List<RewardSlot> rewardSlots = new List<RewardSlot>(3);
 
     [Header("Reward UI")]
-    [SerializeField] private GameObject rewardUIPanel;
+    [SerializeField] private UI_BaseEventPanel rewardUIPanel;
     [SerializeField] private RectTransform rewardContainer;
 
     [Header("Tween Settings")]
@@ -90,7 +90,7 @@ public class RewardManager : MonoBehaviour
 
         if (rewardUIPanel != null)
         {
-            rewardUIPanel.SetActive(false);
+            rewardUIPanel.HideEventPanel();
         }
     }
 
@@ -178,7 +178,7 @@ public class RewardManager : MonoBehaviour
             Debug.Log($"✓ Spawned {itemData.itemName} at position {spawnPosition}");
         }
 
-        rewardUIPanel.SetActive(true);
+        rewardUIPanel.ShowEventPanel();
     }
 
     private List<ItemSO> GetRandomRewards(int count)
@@ -374,12 +374,8 @@ public class RewardManager : MonoBehaviour
             }
         }
         
-        if (rewardUIPanel != null)
-        {
-            rewardUIPanel.SetActive(false);
-        }
-
-        OnRewardClosed?.Invoke();
+        SoundManager.Instance.PlaySFX("SFX_ButtonOnCancel");
+        rewardUIPanel.HideEventPanel(()=> OnRewardClosed?.Invoke());
     }
 
     public void OnDeclineButtonClicked()

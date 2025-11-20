@@ -15,7 +15,7 @@ public class ChurchManager : MonoBehaviour
     public static event System.Action OnChurchClosed;
 
     [Header("UI References")]
-    [SerializeField] private GameObject uiPanel;
+    [SerializeField] private UI_BaseEventPanel uiPanel;
     [SerializeField] private Button yesButton;
 
     [Header("TMP References")]
@@ -40,7 +40,7 @@ public class ChurchManager : MonoBehaviour
         Instance = this;
 
         if (uiPanel != null)
-            uiPanel.SetActive(false);
+            uiPanel.HideEventPanel();
     }
 
     public void OpenChurchUI(GameObject player)
@@ -54,7 +54,7 @@ public class ChurchManager : MonoBehaviour
         currentPlayer = player;
         if (uiPanel == null) return;
 
-        uiPanel.SetActive(true);
+        uiPanel.ShowEventPanel();
         IsChurchUIActive = true;
 
         yesButton.onClick.RemoveAllListeners();
@@ -98,14 +98,14 @@ public class ChurchManager : MonoBehaviour
             return;
 
         if (uiPanel != null)
-            uiPanel.SetActive(false);
+        {
+            uiPanel.HideEventPanel(()=>OnChurchClosed?.Invoke());
+            SoundManager.Instance.PlaySFX("SFX_ButtonOnCancel");
+        }
+            
 
         currentPlayer = null;
         IsChurchUIActive = false;
-
-        Debug.Log("Church UI closed. Event fired.");
-        OnChurchClosed?.Invoke();
-
         // Begin cooldown before another tile can trigger
         StartCoroutine(CloseCooldown());
     }

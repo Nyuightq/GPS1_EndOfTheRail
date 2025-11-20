@@ -62,6 +62,9 @@ public class EngineerTile : EventTile
         Debug.Log("[EngineerTile] Player exited Engineer Tile");
         
         if (SoundManager.Instance != null)
-            SoundManager.Instance.PlaySFX("SFX_ButtonOnCancel");
+        {
+            
+        }
+            //SoundManager.Instance.PlaySFX("SFX_ButtonOnCancel");
     }
 }
