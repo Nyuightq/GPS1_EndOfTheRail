@@ -94,6 +94,11 @@ public class DayCycleScript : MonoBehaviour
                     
                     ClearNightEncounters();
                     RestoreUIPositions();
+
+                    foreach (GameObject item in GameManager.instance.inventoryScript.equippedItems)
+                    {
+                        item.GetComponent<Item>().TriggerEffectDayStart();
+                    }
                 }
                 break;
         }

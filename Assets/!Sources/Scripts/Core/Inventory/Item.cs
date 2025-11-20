@@ -4,9 +4,10 @@
 // Description: -
 // --------------------------------------------------------------
 using System;
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 
 public class Item : MonoBehaviour
@@ -63,11 +64,17 @@ public class Item : MonoBehaviour
 
     private void Start()
     {
-        effects = itemData.effects;
+        effects = new Effect[itemData.effects.Length];
+        for (int i = 0; i < itemData.effects.Length; i++)
+        {
+            // Create a copy of each effect (you'll need a Clone() method in Effect)
+            effects[i] = itemData.effects[i].clone();
+            effects[i].owner = this; // assign this Item as the owner
+        }
 
         foreach (Effect effect in effects)
         {
-            effect.owner = this;
+            //effect.owner = this;
             switch (effect.trigger)
             {
                 case triggers.OnUpdate:

@@ -75,11 +75,7 @@ public class CombatSystem : UI_BaseEventPanel
         isBattling = true;
         GameStateManager.SetPhase(Phase.Combat);
 
-        //trigger battle start effects
-        foreach(GameObject item in GameManager.instance.inventoryScript.equippedItems)
-        {
-            item.GetComponent<Item>().TriggerEffectBattleStart();
-        }
+        StartCoroutine(DelayedBattleStartEffects());
     }
 
     // Update is called once per frame
@@ -271,5 +267,15 @@ public class CombatSystem : UI_BaseEventPanel
     {
         yield return new WaitForSeconds(0.35f);
         rewardPanelRef.Setup(amount, onRewardComplete);
+    }
+
+    private IEnumerator DelayedBattleStartEffects()
+    {
+        yield return null; // wait 1 frame so Start() finishes
+
+        foreach (GameObject item in GameManager.instance.inventoryScript.equippedItems)
+        {
+            item.GetComponent<Item>().TriggerEffectBattleStart();
+        }
     }
 }

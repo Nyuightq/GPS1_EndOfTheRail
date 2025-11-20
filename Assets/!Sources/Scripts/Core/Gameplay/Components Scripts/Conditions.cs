@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 
@@ -30,7 +29,19 @@ public enum BuffableWeaponStats
     AttackVariance
 }
 
+public enum triggers
+{
+    OnEquip,
+    OnEquipAndAdjacentEquip,
+    OnUpdate,
+    OnBattleStart,
+    OnBattleUpdate,
+    OnBattleEnd,
+    OnDayStart
+    //OnConditionTriggerOnce
+}
 
+#region conditions
 [System.Serializable] public abstract class Conditions
 {
     public object owner { get; set; }
@@ -139,20 +150,9 @@ public enum BuffableWeaponStats
         return false;
     }
 }
+#endregion
 
-public enum triggers
-{ 
-    OnEquip,
-    OnEquipAndAdjacentEquip,
-    OnUpdate,
-    OnBattleStart,
-    OnBattleUpdate,
-    OnBattleEnd,
-    OnDayStart
-    //OnConditionTriggerOnce
-}
-
-
+#region effects
 [System.Serializable] public abstract class Effect
 {
     [SerializeField] public triggers trigger;
@@ -160,6 +160,14 @@ public enum triggers
     [SerializeReference] public Conditions[] conditions;
     [NonSerialized] private object _owner;
    // public object owner { get => _owner; set => _owner = value; }
+
+    public Effect(triggers trigger, bool triggerOnConditionOnce, Conditions[] conditions)
+    {
+        this.trigger = trigger;
+        this.triggerOnConditionOnce = triggerOnConditionOnce;
+        this.conditions = conditions;
+    }
+
     public object owner
     {
         get => _owner;
@@ -198,6 +206,7 @@ public enum triggers
 
     public void ResetTriggered(){ hasTriggered = false; }
 
+    public abstract Effect clone();
     public abstract void apply();
 
     public abstract void remove();
@@ -209,6 +218,19 @@ public enum triggers
     [SerializeField] private float healAmount;
     [SerializeField] private bool limitedUses;
     [SerializeField] private int uses;
+    public HealEffect(triggers trigger, bool triggerOnConditionOnce, Conditions[] conditions, InputType inputType, float healAmount, bool limitedUses, int uses) : base(trigger,triggerOnConditionOnce,conditions)
+    {
+        this.inputType = inputType;
+        this.healAmount = healAmount;
+        this.limitedUses = limitedUses;
+        this.uses = uses;
+    }
+
+    public override Effect clone()
+    {
+        return new HealEffect(trigger,triggerOnConditionOnce,conditions,inputType,healAmount,limitedUses,uses);
+    }
+
     public override void apply()
     {
         if ((limitedUses && uses <= 0) || !checkCondition()) return;
@@ -218,20 +240,37 @@ public enum triggers
 
         float finalHealAmount = healAmount * item.level;
 
-        if (combatSystem != null)
+        Debug.Log($"[HEAL EFFECT] Owner item = {item.name}, item.level = {item.level}");
+
+        if (combatSystem != null && combatSystem.player != null)
         {
             switch (inputType)
             {
                 case InputType.percentage:
                     combatSystem.player.HealCurrentHp(Mathf.FloorToInt(combatSystem.player.MaxHp * finalHealAmount / 100));
-                    Debug.Log($"<color=green>healing {Mathf.FloorToInt(combatSystem.player.MaxHp * healAmount/100)} hp out of {combatSystem.player.MaxHp}</color>");
+                    Debug.Log($"<color=green>healing {Mathf.FloorToInt(combatSystem.player.MaxHp * finalHealAmount / 100)} hp out of {combatSystem.player.MaxHp}</color>");
                     break;
                 case InputType.flat:
                     combatSystem.player.HealCurrentHp(Mathf.FloorToInt(finalHealAmount));
-                    Debug.Log($"<color=green>healing {healAmount}</color>");
+                    Debug.Log($"<color=green>healing {finalHealAmount}</color>");
                     break;
             }
             if(limitedUses) uses--;
+        }
+        else
+        {
+            switch (inputType)
+            {
+                case InputType.percentage:
+                    GameManager.instance.playerStatus.HealCurrentHp(Mathf.FloorToInt(combatSystem.player.MaxHp * finalHealAmount / 100));
+                    Debug.Log($"<color=green>healing {Mathf.FloorToInt(combatSystem.player.MaxHp * finalHealAmount / 100)} hp out of {combatSystem.player.MaxHp}</color>");
+                    break;
+                case InputType.flat:
+                    GameManager.instance.playerStatus.HealCurrentHp(Mathf.FloorToInt(finalHealAmount));
+                    Debug.Log($"<color=green>healing {finalHealAmount}</color>");
+                    break;
+            }
+            if (limitedUses) uses--;
         }
     }
 
@@ -244,6 +283,19 @@ public enum triggers
     [SerializeField] private float buffAmount;
     [SerializeField] private BuffableStats statType;
     AdditionModifier<BuffableStats> mod;
+
+    public BuffStatEffect(triggers trigger, bool triggerOnConditionOnce, Conditions[] conditions, InputType inputType, float buffAmount, BuffableStats statType, AdditionModifier<BuffableStats> mod) : base(trigger,triggerOnConditionOnce,conditions)
+    {
+        this.inputType = inputType;
+        this.buffAmount = buffAmount;
+        this.statType = statType;
+        this.mod = mod;
+    }
+
+    public override Effect clone()
+    {
+        return new BuffStatEffect(trigger,triggerOnConditionOnce,conditions,inputType,buffAmount,statType,mod);
+    }
 
     public override void apply()
     {
@@ -339,7 +391,23 @@ public class WeaponStats
         }
         set => _weaponStats = value;
     }
-    
+
+    public WeaponSpawnEffect(triggers trigger, bool triggerOnConditionOnce, Conditions[] conditions, string weaponName, int baseAttackDamage, int baseAttackSpeed, int baseAttackVariance, Sprite weaponSprite, CombatAnimationClip animationClip, string attackSfxName): base(trigger, triggerOnConditionOnce, conditions)
+    {
+        this.weaponName = weaponName;
+        this.baseAttackDamage = baseAttackDamage;
+        this.baseAttackSpeed = baseAttackSpeed;
+        this.baseAttackVariance = baseAttackVariance;
+        this.weaponSprite = weaponSprite;
+        this.animationClip = animationClip;
+        this.attackSfxName = attackSfxName;
+    }
+
+    public override Effect clone()
+    {
+        return new WeaponSpawnEffect(trigger, triggerOnConditionOnce, conditions, weaponName, baseAttackDamage, baseAttackSpeed, baseAttackVariance, weaponSprite, animationClip, attackSfxName);        
+    }
+
     public CombatComponentData OnPrepareBattleComponent()
     {
         return new CombatComponentData
@@ -365,15 +433,26 @@ public class AdjacentWeaponBoosterEffect : Effect
     [SerializeField] private int buffAmount;
 
     // Track which weapons have which modifier applied by this booster
-    private Dictionary<Item, AdditionModifier<BuffableWeaponStats>> activeModifiers
-        = new Dictionary<Item, AdditionModifier<BuffableWeaponStats>>();
+    private Dictionary<Item, AdditionModifier<BuffableWeaponStats>> activeModifiers = new Dictionary<Item, AdditionModifier<BuffableWeaponStats>>();
+
+    public AdjacentWeaponBoosterEffect(triggers trigger, bool triggerOnConditionOnce, Conditions[] conditions, BuffableWeaponStats statType, InputType inputType, int buffAmount):base(trigger, triggerOnConditionOnce, conditions)
+    {
+        this.statType = statType;
+        this.inputType = inputType;
+        this.buffAmount = buffAmount;
+    }
+
+    public override Effect clone()
+    {
+        return new AdjacentWeaponBoosterEffect(trigger,triggerOnConditionOnce,conditions,statType,inputType,buffAmount);
+    }
 
     public override void apply()
     {
         if (!checkCondition()) return;
         if (owner is not Item booster) return;
 
-        int finalBuffAmount = buffAmount * booster.level;
+        float finalBuffAmount = buffAmount * booster.level;
 
         // Get all currently adjacent weapon items
         List<GameObject> adjacentList = GameManager.instance.inventoryScript.GetAdjacentComponents(Vector2Int.FloorToInt(booster.GetComponent<ItemDragManager>().topLeftCellPos), booster.itemShape, booster.gameObject);
@@ -413,10 +492,10 @@ public class AdjacentWeaponBoosterEffect : Effect
                 switch (inputType)
                 {
                     case InputType.percentage:
-                        mod = new AdditionModifier<BuffableWeaponStats>(statType,finalBuffAmount,AdditionModifier<BuffableWeaponStats>.AdditionType.percentage);
+                        mod = new AdditionModifier<BuffableWeaponStats>(statType, finalBuffAmount, AdditionModifier<BuffableWeaponStats>.AdditionType.percentage);
                         break;
                     case InputType.flat:
-                        mod = new AdditionModifier<BuffableWeaponStats>(statType,finalBuffAmount,AdditionModifier<BuffableWeaponStats>.AdditionType.flat);
+                        mod = new AdditionModifier<BuffableWeaponStats>(statType, finalBuffAmount, AdditionModifier<BuffableWeaponStats>.AdditionType.flat);
                         break;
                     default:
                         mod = null;
@@ -451,3 +530,4 @@ public class AdjacentWeaponBoosterEffect : Effect
         activeModifiers.Clear();
     }
 }
+#endregion
