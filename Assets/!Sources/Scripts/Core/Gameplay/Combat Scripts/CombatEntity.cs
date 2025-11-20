@@ -53,7 +53,7 @@ public class CombatEntity : MonoBehaviour
     {
         if (_hp == 0) _hp = _maxHp;
     }
-    void Awake()
+    protected virtual void Awake()
     {
         if (_hp == 0) _hp = _maxHp;
         combatEntityUI = GetComponentInChildren<UI_CombatEntity>();

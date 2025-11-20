@@ -8,10 +8,14 @@ using UnityEngine;
 public class CombatComponentEntity : CombatEntity
 {
     private WeaponStats _weaponStats;
+    protected override void Awake()
+    {
+        base.Awake();
+        _isComponent = true;
+    }
     protected override void Start()
     {
         base.Start();
-        _isComponent = true;
     }
     public void Initialize(CombatComponentData data)
     {

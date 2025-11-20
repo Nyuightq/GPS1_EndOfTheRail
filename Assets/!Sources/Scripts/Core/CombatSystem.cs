@@ -54,7 +54,7 @@ public class CombatSystem : UI_BaseEventPanel
         {
             component.OnAttackReady += HandleAttack;
             
-            float randomStart = UnityEngine.Random.Range(0f, component.AttackTakenTime);
+            float randomStart = UnityEngine.Random.Range(0f, component.AttackTakenTime * 0.3f);
             component.UpdateCombat(randomStart);
         }
 
