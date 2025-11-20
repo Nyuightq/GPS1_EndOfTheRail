@@ -1,5 +1,5 @@
 using UnityEngine;
-using System.Collections;
+using DG.Tweening;
 
 public class CameraIntroSequence : MonoBehaviour
 {
@@ -50,97 +50,71 @@ public class CameraIntroSequence : MonoBehaviour
         // Disable gameplay UI immediately
         if (gameplayCanvas != null)
             gameplayCanvas.enabled = false;
-            
 
         buildRail.enabled = false;
-        StartCoroutine(IntroSequence());
+
+        RunIntro();
     }
 
-    private IEnumerator IntroSequence()
+    private void RunIntro()
     {
-        // Wait for railGrid to initialize start/end (avoid using Vector3Int.zero if you use a different default)
-        yield return new WaitUntil(() => railGrid != null &&
-            railGrid.startPoint != new Vector3Int(500, 500, 500) &&
-            railGrid.endPoint != new Vector3Int(500, 500, 500));
+        // Ensure start/end are valid
+        if (railGrid.startPoint == new Vector3Int(500, 500, 500) ||
+            railGrid.endPoint == new Vector3Int(500, 500, 500))
+        {
+            Debug.LogWarning("RailGrid start/end not initialized.");
+            return;
+        }
 
         Vector3 endWorld = railGrid.snapToGrid(railGrid.endPoint);
         Vector3 startWorld = railGrid.snapToGrid(railGrid.startPoint);
 
-        // --- STEP 1: Focus on END with zoom-in ---
-        cam.transform.position = ClampPositionWithCamera(endWorld);
-        yield return StartCoroutine(SmoothZoom(cam.orthographicSize, zoomedSize));
-        yield return new WaitForSeconds(holdTimeAtEnd);
+        // Clamp initial position
+        Vector3 endPos = ClampPositionWithCamera(endWorld);
+        Vector3 startPos = ClampPositionWithCamera(startWorld);
 
-        // --- STEP 2: Zoom back out to original size ---
-        yield return StartCoroutine(SmoothZoom(cam.orthographicSize, originalSize));
+        // Force camera to end position first
+        cam.transform.position = new Vector3(endPos.x, endPos.y, -10f);
 
-        // --- STEP 3: Pan END -> START ---
-        yield return StartCoroutine(PanToPosition(new Vector3(startWorld.x, startWorld.y, cam.transform.position.z), moveDuration));
+        // ---- DOTWEEN SEQUENCE ----
+        Sequence seq = DOTween.Sequence();
 
-        // --- STEP 4: Enable UI Canvas once movement is done ---
-        if (gameplayCanvas != null)
+        // STEP 1: Hold on end
+        seq.AppendInterval(holdTimeAtEnd);
+
+        // STEP 2: Move END -> START
+        seq.Append(
+            cam.transform.DOMove(new Vector3(startPos.x, startPos.y, -10f), moveDuration)
+            .SetEase(Ease.InOutSine)
+        );
+
+        // STEP 3: Enable gameplay UI
+        seq.AppendCallback(() =>
         {
-            gameplayCanvas.enabled = true;
-            buildRail.enabled = true;
-        }
+            if (gameplayCanvas != null)
+            {
+                gameplayCanvas.enabled = true;
+                GameStateManager.Instance.InitialGeneralUI();
+                buildRail.enabled = true;
+            }
+        });
 
-        // --- STEP 5: Zoom in on START ---
-        yield return StartCoroutine(SmoothZoom(cam.orthographicSize, zoomedSize));
-        yield return new WaitForSeconds(holdTimeAtStart);
+        // STEP 4: Hold at start
+        seq.AppendInterval(holdTimeAtStart);
 
-        // --- STEP 6: Restore original zoom ---
-        yield return StartCoroutine(SmoothZoom(cam.orthographicSize, originalSize));
-
-        // --- STEP 7: Re-enable normal camera movement ---
-        CameraMovementTemp.ToggleCameraFollowMode(false);
-        this.enabled = false;
-    }
-
-    // Pan while clamping each frame using CameraMovementTemp's ClampToBounds
-    private IEnumerator PanToPosition(Vector3 targetPosition, float duration)
-    {
-        Vector3 fromPos = cam.transform.position;
-        float elapsed = 0f;
-
-        while (elapsed < duration)
+        // STEP 5: Re-enable camera input
+        seq.AppendCallback(() =>
         {
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / duration);
-            Vector3 candidate = Vector3.Lerp(fromPos, targetPosition, t);
-
-            if (cameraMovement != null)
-                candidate = cameraMovement.ClampToBounds(candidate);
-
-            cam.transform.position = new Vector3(candidate.x, candidate.y, cam.transform.position.z);
-            yield return null;
-        }
-
-        Vector3 final = targetPosition;
-        if (cameraMovement != null)
-            final = cameraMovement.ClampToBounds(final);
-        cam.transform.position = new Vector3(final.x, final.y, cam.transform.position.z);
+            CameraMovementTemp.ToggleCameraFollowMode(false);
+            this.enabled = false;
+        });
     }
 
     private Vector3 ClampPositionWithCamera(Vector3 worldTarget)
     {
-        Vector3 candidate = new Vector3(worldTarget.x, worldTarget.y, cam.transform.position.z);
+        Vector3 candidate = new Vector3(worldTarget.x, worldTarget.y, -10f);
         if (cameraMovement != null)
             candidate = cameraMovement.ClampToBounds(candidate);
         return candidate;
-    }
-
-    private IEnumerator SmoothZoom(float fromSize, float toSize)
-    {
-        float t = 0f;
-        float duration = Mathf.Max(0.01f, 1f / zoomSpeed);
-
-        while (t < 1f)
-        {
-            t += Time.deltaTime / duration;
-            cam.orthographicSize = Mathf.Lerp(fromSize, toSize, t);
-            yield return null;
-        }
-
-        cam.orthographicSize = toSize;
     }
 }

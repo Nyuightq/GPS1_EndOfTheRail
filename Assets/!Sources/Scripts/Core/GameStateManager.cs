@@ -83,12 +83,37 @@ public class GameStateManager : MonoBehaviour
         BuildRails buildRailsObject = FindFirstObjectByType<BuildRails>();
         if (buildRailsObject != null) _railBuilderManager = buildRailsObject.gameObject;
 
-        InitialGeneralUI();
+        if (!_isInitial)
+        {
+            Vector2 pos = _topPanelRect.anchoredPosition;
+            pos.y += 24f;
+            _topPanelRect.anchoredPosition = pos;
+
+            pos = _asidePanelRect.anchoredPosition;
+            pos.x += 136f;
+            _asidePanelRect.anchoredPosition = pos;
+
+            _planPhasePanel.SetActive(false);
+            _planPhasePanel_2.SetActive(false);
+        }
     }
 
-    private void InitialGeneralUI()
+    public void InitialGeneralUI()
     {
         if (_isInitial) return;
+
+        float duration = 0.6f;
+
+        _topPanelRect.DOKill();
+        _topPanelRect.DOAnchorPosY(-135f, duration)
+            .SetEase(Ease.OutCubic);
+        
+        _asidePanelRect.DOKill();
+        _asidePanelRect.DOAnchorPosX(0f, duration)
+            .SetEase(Ease.OutCubic)
+            .OnComplete(() => TogglePlanPanel(true));
+
+        _isInitial = true;
     }
 
     /// <summary>
@@ -177,11 +202,19 @@ public class GameStateManager : MonoBehaviour
         // Ensure active if showing
         if (show)
         {
+            _planPhaseRect.anchoredPosition = new Vector2(
+                _planPhaseRect.anchoredPosition.x,
+                -100f
+            );
             _planPhasePanel.SetActive(true);
-            _planPhaseRect.DOKill(); // stop previous tweens
-            // _planPhaseRect.anchoredPosition = new Vector2(0, -200f); // start off-screen (adjust value as needed)
+            _planPhaseRect.DOKill();
             _planPhaseRect.DOAnchorPosY(0f, 0.6f).SetEase(Ease.OutBack);
 
+
+            _planPhaseRect_2.anchoredPosition = new Vector2(
+                -420f,
+                _planPhaseRect_2.anchoredPosition.y
+            );
             _planPhasePanel_2.SetActive(true);
             _planPhaseRect_2.DOKill();
             _planPhaseRect_2.DOAnchorPosX(-480f, 0.6f).SetEase(Ease.OutBack);
