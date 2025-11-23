@@ -117,15 +117,18 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
     //handles being able to drag stuff
     public void OnDrag(PointerEventData eventData)
     {
-        dragDir = eventData.position;
-        float moveX = Mathf.Lerp(rectTransform.position.x, dragDir.x, 0.2f);
-        float moveY = Mathf.Lerp(rectTransform.position.y, dragDir.y, 0.2f);
-        rectTransform.position = new Vector2(moveX, moveY);
-
-        // Hide tooltip when dragging starts
-        if (tooltip != null)
+        if (dragging)
         {
-            tooltip.Hide();
+            dragDir = eventData.position;
+            float moveX = Mathf.Lerp(rectTransform.position.x, dragDir.x, 0.2f);
+            float moveY = Mathf.Lerp(rectTransform.position.y, dragDir.y, 0.2f);
+            rectTransform.position = new Vector2(moveX, moveY);
+
+            // Hide tooltip when dragging starts
+            if (tooltip != null)
+            {
+                tooltip.Hide();
+            }
         }
     }
 
