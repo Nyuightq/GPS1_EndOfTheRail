@@ -1,8 +1,9 @@
 using System;
+using System.Reflection;
 using System.Text;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class ItemTooltip : MonoBehaviour
 {
@@ -112,8 +113,8 @@ public class ItemTooltip : MonoBehaviour
         {
             for (int i = 0; i < _currentItem.itemData.effects.Length; i++)
             {
-                Effect effect = _currentItem.itemData.effects[i];
-                
+                Effect effect = _currentItem.effects[i];
+
                 if (effect == null) 
                 {
                     Debug.LogWarning("Null effect found in effects array");
@@ -207,12 +208,17 @@ public class ItemTooltip : MonoBehaviour
 
         var weaponNameField = effectType.GetField("weaponName", 
             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var baseDamageField = effectType.GetField("baseAttackDamage", 
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var baseSpeedField = effectType.GetField("baseAttackSpeed", 
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var baseVarianceField = effectType.GetField("baseAttackVariance", 
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        //var baseDamageField = effectType.GetField("baseAttackDamage", 
+        //    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        //var baseSpeedField = effectType.GetField("baseAttackSpeed", 
+        //    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        //var baseVarianceField = effectType.GetField("baseAttackVariance", 
+        //    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        var weaponStatsProperty = effectType.GetProperty("weaponStats",
+        BindingFlags.Public | BindingFlags.Instance);
+
+        
 
         if (weaponNameField != null)
         {
@@ -220,28 +226,45 @@ public class ItemTooltip : MonoBehaviour
             desc.AppendLine($"<color=#FFA500><b>{weaponName}</b></color>");
         }
 
-        if (baseDamageField != null)
+        if (weaponStatsProperty != null)
         {
-            int damage = Convert.ToInt32(baseDamageField.GetValue(effect) ?? 0);
-            int actualDamage = damage * _currentItem.level;
-            desc.AppendLine($"<color=#C23753>Base Damage: {actualDamage}</color>");
+            WeaponStats stats = weaponStatsProperty.GetValue(effect) as WeaponStats;
+
+            if (stats != null)
+            {
+                
+                
+                desc.AppendLine($"<color=#C23753>Damage: {stats.AttackDamage}</color>");
+
+                string colorCode = stats.AttackSpeed <= 2 ? "#C23753" : stats.AttackSpeed >= 6 ? "#EBB85B" : "#FFFFFF";
+                desc.AppendLine($"<color={colorCode}>Speed: {stats.AttackSpeed}</color>");
+
+                if (stats.AttackVariance > 0) desc.AppendLine($"<color=#88AAFF>Variance: {stats.AttackVariance}</color>");
+            }
         }
 
-        if (baseSpeedField != null)
-        {
-            int speed = Convert.ToInt32(baseSpeedField.GetValue(effect) ?? 0);
-            int actualSpeed = speed * _currentItem.level;
-            string colorCode = actualSpeed <= 2 ? "#C23753" : actualSpeed >= 6 ? "#EBB85B" : "#FFFFFF";
-            desc.AppendLine($"<color={colorCode}>Attack Speed: {actualSpeed}</color>");
-        }
+        //if (baseDamageField != null)
+        //{
+        //    int damage = Convert.ToInt32(baseDamageField.GetValue(effect) ?? 0);
+        //    int actualDamage = damage * _currentItem.level;
+        //    desc.AppendLine($"<color=#C23753>Base Damage: {actualDamage}</color>");
+        //}
 
-        if (baseVarianceField != null)
-        {
-            int variance = Convert.ToInt32(baseVarianceField.GetValue(effect) ?? 0);
-            int actualVariance = variance * _currentItem.level;
-            if (actualVariance > 0)
-                desc.AppendLine($"<color=#88AAFF>Variance: {actualVariance}</color>");
-        }
+        //if (baseSpeedField != null)
+        //{
+        //    int speed = Convert.ToInt32(baseSpeedField.GetValue(effect) ?? 0);
+        //    int actualSpeed = speed * _currentItem.level;
+        //    string colorCode = actualSpeed <= 2 ? "#C23753" : actualSpeed >= 6 ? "#EBB85B" : "#FFFFFF";
+        //    desc.AppendLine($"<color={colorCode}>Attack Speed: {actualSpeed}</color>");
+        //}
+
+        //if (baseVarianceField != null)
+        //{
+        //    int variance = Convert.ToInt32(baseVarianceField.GetValue(effect) ?? 0);
+        //    int actualVariance = variance * _currentItem.level;
+        //    if (actualVariance > 0)
+        //        desc.AppendLine($"<color=#88AAFF>Variance: {actualVariance}</color>");
+        //}
 
         return desc.ToString();
     }

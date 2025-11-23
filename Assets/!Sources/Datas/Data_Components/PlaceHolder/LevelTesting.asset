@@ -37,7 +37,7 @@ MonoBehaviour:
     - rid: 6451220019977912391
       type: {class: HealEffect, ns: , asm: Assembly-CSharp}
       data:
-        trigger: 3
+        trigger: 6
         triggerOnConditionOnce: 0
         conditions: []
         inputType: 1
