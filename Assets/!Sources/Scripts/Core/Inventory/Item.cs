@@ -116,19 +116,19 @@ public class Item : MonoBehaviour
 
         if (itemData != null && itemData.itemSprite != null)
         {
-            sprite.sprite = itemData.itemSprite;
+            changeSprite(itemData.itemSprite);
+            itemRect = GetComponent<RectTransform>();
+            itemRect.sizeDelta = spriteRectTransform.sizeDelta;
         }
 
-        if (itemEffect == null && itemData.itemEffectPrefab != null)
-        {
-            var effectObj = Instantiate(itemData.itemEffectPrefab, transform);
-            itemEffect = effectObj.GetComponent<ItemEffect>();
-        }
+        //if (itemEffect == null && itemData.itemEffectPrefab != null)
+        //{
+        //    var effectObj = Instantiate(itemData.itemEffectPrefab, transform);
+        //    itemEffect = effectObj.GetComponent<ItemEffect>();
+        //}
 
         //Ensure that the sprite child and the actual object size is equal
-        sprite.SetNativeSize();
-        itemRect = GetComponent<RectTransform>();
-        itemRect.sizeDelta = spriteRectTransform.sizeDelta;
+        
 
         GeneratePreview();
         spriteRectTransform.SetAsLastSibling();
@@ -216,5 +216,11 @@ public class Item : MonoBehaviour
         itemShape = newShape;
         GeneratePreview();
         Debug.Log("REFRESHED!");
+    }
+
+    public void changeSprite(Sprite newSprite)
+    {
+        sprite.sprite = newSprite;
+        sprite.SetNativeSize();
     }
 }

@@ -158,14 +158,15 @@ public enum triggers
     [SerializeField] public triggers trigger;
     [SerializeField] public bool triggerOnConditionOnce;
     [SerializeReference] public Conditions[] conditions;
+    [SerializeField] public Sprite conditionMetSprite;
     [NonSerialized] private object _owner;
-   // public object owner { get => _owner; set => _owner = value; }
-
-    public Effect(triggers trigger, bool triggerOnConditionOnce, Conditions[] conditions)
+    
+    public Effect(triggers trigger, bool triggerOnConditionOnce, Conditions[] conditions, Sprite conditionMetSprite)
     {
         this.trigger = trigger;
         this.triggerOnConditionOnce = triggerOnConditionOnce;
         this.conditions = conditions;
+        this.conditionMetSprite = conditionMetSprite;
     }
 
     public object owner
@@ -195,12 +196,26 @@ public enum triggers
         {
             if (!condition.check())
             {
+                //change the item sprite back to its original sprite
+                if (conditionMetSprite != null)
+                {
+                    Item item = owner as Item;
+                    item.changeSprite(item.itemData.itemSprite);
+                }
                 //Debug.Log("Condition not met");
                 return false;
             }
         }
         Debug.Log("<color=green>Condition met</color>");
         hasTriggered = true;
+
+        //change the item into its activated sprite
+        if(conditionMetSprite != null)
+        {
+            Item item = owner as Item;
+            item.changeSprite(conditionMetSprite);
+        }
+
         return true;
     }
 
@@ -210,6 +225,7 @@ public enum triggers
     public abstract void apply();
 
     public abstract void remove();
+
 }
 
 [System.Serializable] public class HealEffect : Effect
@@ -218,17 +234,20 @@ public enum triggers
     [SerializeField] private float healAmount;
     [SerializeField] private bool limitedUses;
     [SerializeField] private int uses;
-    public HealEffect(triggers trigger, bool triggerOnConditionOnce, Conditions[] conditions, InputType inputType, float healAmount, bool limitedUses, int uses) : base(trigger,triggerOnConditionOnce,conditions)
+    [SerializeField] private Sprite usedSprite;
+    
+    public HealEffect(triggers trigger, bool triggerOnConditionOnce, Conditions[] conditions, Sprite conditionMetSprite, InputType inputType, float healAmount, bool limitedUses, int uses, Sprite usedSprite) : base(trigger,triggerOnConditionOnce,conditions,conditionMetSprite)
     {
         this.inputType = inputType;
         this.healAmount = healAmount;
         this.limitedUses = limitedUses;
         this.uses = uses;
+        this.usedSprite = usedSprite;
     }
 
     public override Effect clone()
     {
-        return new HealEffect(trigger,triggerOnConditionOnce,conditions,inputType,healAmount,limitedUses,uses);
+        return new HealEffect(trigger,triggerOnConditionOnce,conditions,conditionMetSprite,inputType,healAmount,limitedUses,uses,usedSprite);
     }
 
     public override void apply()
@@ -239,38 +258,47 @@ public enum triggers
         if (item == null) return;
 
         float finalHealAmount = healAmount * item.level;
+        int maxHp;
+        int healVal;
+        Action<int> Heal;
 
-        Debug.Log($"[HEAL EFFECT] Owner item = {item.name}, item.level = {item.level}");
+        //Debug.Log($"[HEAL EFFECT] Owner item = {item.name}, item.level = {item.level}");
 
+        //get the correct hp & healFunction then get the correct heal amount
         if (combatSystem != null && combatSystem.player != null)
         {
-            switch (inputType)
-            {
-                case InputType.percentage:
-                    combatSystem.player.HealCurrentHp(Mathf.FloorToInt(combatSystem.player.MaxHp * finalHealAmount / 100));
-                    Debug.Log($"<color=green>healing {Mathf.FloorToInt(combatSystem.player.MaxHp * finalHealAmount / 100)} hp out of {combatSystem.player.MaxHp}</color>");
-                    break;
-                case InputType.flat:
-                    combatSystem.player.HealCurrentHp(Mathf.FloorToInt(finalHealAmount));
-                    Debug.Log($"<color=green>healing {finalHealAmount}</color>");
-                    break;
-            }
-            if(limitedUses) uses--;
+            maxHp = combatSystem.player.MaxHp;
+            Heal = (amount) => combatSystem.player.HealCurrentHp(amount);
         }
         else
         {
-            switch (inputType)
-            {
-                case InputType.percentage:
-                    GameManager.instance.playerStatus.HealCurrentHp(Mathf.FloorToInt(combatSystem.player.MaxHp * finalHealAmount / 100));
-                    Debug.Log($"<color=green>healing {Mathf.FloorToInt(combatSystem.player.MaxHp * finalHealAmount / 100)} hp out of {combatSystem.player.MaxHp}</color>");
-                    break;
-                case InputType.flat:
-                    GameManager.instance.playerStatus.HealCurrentHp(Mathf.FloorToInt(finalHealAmount));
-                    Debug.Log($"<color=green>healing {finalHealAmount}</color>");
-                    break;
-            }
-            if (limitedUses) uses--;
+            maxHp = GameManager.instance.playerStatus.MaxHp;
+            Heal = (amount) => GameManager.instance.playerStatus.HealCurrentHp(amount);
+        }
+
+        switch (inputType)
+        {
+            case InputType.percentage:
+                healVal = Mathf.FloorToInt(maxHp * finalHealAmount / 100);
+                break;
+            case InputType.flat:
+                healVal = Mathf.FloorToInt(finalHealAmount);
+                break;
+            default:
+                healVal = 0;
+                break;
+        }
+
+        //heal and decrement uses
+        Heal(healVal);
+        Debug.Log($"<color=green>healing {healVal} hp out of {maxHp}</color>");
+
+        if (limitedUses) uses--;
+
+        if (uses<=0 && usedSprite != null)
+        {
+            item.changeSprite(usedSprite);
+            Debug.Log("<color=purple>sprite changed</color>");
         }
     }
 
@@ -284,7 +312,7 @@ public enum triggers
     [SerializeField] private BuffableStats statType;
     AdditionModifier<BuffableStats> mod;
 
-    public BuffStatEffect(triggers trigger, bool triggerOnConditionOnce, Conditions[] conditions, InputType inputType, float buffAmount, BuffableStats statType, AdditionModifier<BuffableStats> mod) : base(trigger,triggerOnConditionOnce,conditions)
+    public BuffStatEffect(triggers trigger, bool triggerOnConditionOnce, Conditions[] conditions, Sprite conditionMetSprite, InputType inputType, float buffAmount, BuffableStats statType, AdditionModifier<BuffableStats> mod) : base(trigger,triggerOnConditionOnce,conditions, conditionMetSprite)
     {
         this.inputType = inputType;
         this.buffAmount = buffAmount;
@@ -294,7 +322,7 @@ public enum triggers
 
     public override Effect clone()
     {
-        return new BuffStatEffect(trigger,triggerOnConditionOnce,conditions,inputType,buffAmount,statType,mod);
+        return new BuffStatEffect(trigger,triggerOnConditionOnce,conditions,conditionMetSprite,inputType,buffAmount,statType,mod);
     }
 
     public override void apply()
@@ -392,7 +420,7 @@ public class WeaponStats
         set => _weaponStats = value;
     }
 
-    public WeaponSpawnEffect(triggers trigger, bool triggerOnConditionOnce, Conditions[] conditions, string weaponName, int baseAttackDamage, int baseAttackSpeed, int baseAttackVariance, Sprite weaponSprite, CombatAnimationClip animationClip, string attackSfxName): base(trigger, triggerOnConditionOnce, conditions)
+    public WeaponSpawnEffect(triggers trigger, bool triggerOnConditionOnce, Conditions[] conditions, Sprite conditionMetSprite, string weaponName, int baseAttackDamage, int baseAttackSpeed, int baseAttackVariance, Sprite weaponSprite, CombatAnimationClip animationClip, string attackSfxName): base(trigger, triggerOnConditionOnce, conditions, conditionMetSprite)
     {
         this.weaponName = weaponName;
         this.baseAttackDamage = baseAttackDamage;
@@ -405,7 +433,7 @@ public class WeaponStats
 
     public override Effect clone()
     {
-        return new WeaponSpawnEffect(trigger, triggerOnConditionOnce, conditions, weaponName, baseAttackDamage, baseAttackSpeed, baseAttackVariance, weaponSprite, animationClip, attackSfxName);        
+        return new WeaponSpawnEffect(trigger, triggerOnConditionOnce, conditions, conditionMetSprite, weaponName, baseAttackDamage, baseAttackSpeed, baseAttackVariance, weaponSprite, animationClip, attackSfxName);        
     }
 
     public CombatComponentData OnPrepareBattleComponent()
@@ -435,7 +463,7 @@ public class AdjacentWeaponBoosterEffect : Effect
     // Track which weapons have which modifier applied by this booster
     private Dictionary<Item, AdditionModifier<BuffableWeaponStats>> activeModifiers = new Dictionary<Item, AdditionModifier<BuffableWeaponStats>>();
 
-    public AdjacentWeaponBoosterEffect(triggers trigger, bool triggerOnConditionOnce, Conditions[] conditions, BuffableWeaponStats statType, InputType inputType, int buffAmount):base(trigger, triggerOnConditionOnce, conditions)
+    public AdjacentWeaponBoosterEffect(triggers trigger, bool triggerOnConditionOnce, Conditions[] conditions, Sprite conditionMetSprite, BuffableWeaponStats statType, InputType inputType, int buffAmount):base(trigger, triggerOnConditionOnce, conditions, conditionMetSprite)
     {
         this.statType = statType;
         this.inputType = inputType;
@@ -444,7 +472,7 @@ public class AdjacentWeaponBoosterEffect : Effect
 
     public override Effect clone()
     {
-        return new AdjacentWeaponBoosterEffect(trigger,triggerOnConditionOnce,conditions,statType,inputType,buffAmount);
+        return new AdjacentWeaponBoosterEffect(trigger,triggerOnConditionOnce,conditions,conditionMetSprite,statType,inputType,buffAmount);
     }
 
     public override void apply()

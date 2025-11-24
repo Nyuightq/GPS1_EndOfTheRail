@@ -18327,9 +18327,9 @@ MonoBehaviour:
   itemSpawn: {fileID: 1370236390757358858, guid: 8c2f567f71b3a814fa5c27c0e4f7bf57, type: 3}
   startingItems:
   - {fileID: 11400000, guid: 5d5ed91e3b4b5e541a7dab091f198e02, type: 2}
-  - {fileID: 11400000, guid: 7f5e6c7fef8eb6349bb1e30b30066a2f, type: 2}
-  - {fileID: 11400000, guid: 7f5e6c7fef8eb6349bb1e30b30066a2f, type: 2}
-  - {fileID: 11400000, guid: 7f5e6c7fef8eb6349bb1e30b30066a2f, type: 2}
+  - {fileID: 11400000, guid: 93c80f1e8b624c247b45a87254dc271d, type: 2}
+  - {fileID: 11400000, guid: 93c80f1e8b624c247b45a87254dc271d, type: 2}
+  - {fileID: 11400000, guid: 93c80f1e8b624c247b45a87254dc271d, type: 2}
   currentInventoryState: 0
   currentCost: 0
   equippedItems: []

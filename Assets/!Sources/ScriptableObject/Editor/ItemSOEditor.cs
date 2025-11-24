@@ -28,7 +28,7 @@ public class ItemSOEditor : Editor
         item.itemDescription = EditorGUILayout.TextArea(item.itemDescription, GUILayout.Height(60));
         item.itemSprite = (Sprite)EditorGUILayout.ObjectField("Item Sprite", item.itemSprite, typeof(Sprite), false);
         item.mandatoryItem = EditorGUILayout.Toggle("Mandatory Item", item.mandatoryItem);
-        item.itemEffectPrefab = (GameObject)EditorGUILayout.ObjectField("Item Effect", item.itemEffectPrefab, typeof(GameObject), false);
+        //item.itemEffectPrefab = (GameObject)EditorGUILayout.ObjectField("Item Effect", item.itemEffectPrefab, typeof(GameObject), false);
         item.itemWidth = Mathf.Max(1, EditorGUILayout.IntField("Item Width", item.itemWidth));
         item.itemHeight = Mathf.Max(1, EditorGUILayout.IntField("Item Height", item.itemHeight));
 
