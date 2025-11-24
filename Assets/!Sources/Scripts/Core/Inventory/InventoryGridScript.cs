@@ -368,65 +368,41 @@ public class InventoryGridScript : MonoBehaviour
         }
     }
 
-    public void AddItem(GameObject item, ItemSO itemData)
+    public void AddItem(GameObject itemPrefab, ItemSO itemData)
     {
-        Vector2 canvasTopLeft = GetTopLeftGrid();
-        
+        Debug.Log("starting placement search");
+
+        Vector2Int? foundPos = FindFreeSpace(itemData);
+
+        if (foundPos == null)
+        {
+            Debug.Log("No valid placement found!");
+            return;
+        }
+
+        Vector2Int pos = foundPos.Value;
+        Debug.Log("valid spot found!");
+
+        // Calculate anchor position of item centre
         int itemWidth = itemData.itemWidth;
         int itemHeight = itemData.itemHeight;
+        Vector2 origin = GetLocalPosGrid(new Vector2(pos.x, pos.y));
+        Vector2 itemCentre = origin + new Vector2(itemWidth * 8f - 8f, -itemHeight * 8f + 8f);
 
-        ItemShapeCell[,] itemShape = itemData.GetShapeGrid();
+        // Spawn new item
+        GameObject newItem = Instantiate(itemPrefab, inventoryRect);
+        Item itemScript = newItem.GetComponent<Item>();
+        itemScript.itemData = itemData;
 
-        Debug.Log("starting placement search");
-        for (int x = 0; x<inventoryWidth; x++)
-        {
-            for (int y = 0; y < inventoryHeight; y++) 
-            {
-                bool canPlace = true;
-                for (int cellX = 0; cellX < itemWidth; cellX++) 
-                {
-                    for (int cellY = 0; cellY < itemHeight; cellY++)
-                    {
-                        int checkX = x + cellX;
-                        int checkY = y + cellY;
+        RectTransform itemRect = newItem.GetComponent<RectTransform>();
+        itemRect.anchoredPosition = itemCentre;
 
-                        if (checkX >= inventoryWidth || checkY >= inventoryHeight)
-                        {
-                            canPlace = false;
-                            break;
-                        }
+        ItemDragManager dragScript = newItem.GetComponent<ItemDragManager>();
+        StartCoroutine(AttachNextFrame(dragScript));
 
-                        if (itemShape[cellX,cellY].filled && inventoryGrid[cellX + x, cellY + y].item != null)
-                        {
-                            canPlace = false;
-                            break;
-                        }
-                    }
-                    if (!canPlace) break;
-                }
-
-                if (canPlace) 
-                {
-                    Debug.Log("valid spot found!");
-                    Vector2 origin = GetLocalPosGrid(new Vector2(x,y));
-                    Vector2 itemCentre = origin + new Vector2(itemWidth * 8f - 8f, -itemHeight * 8f + 8f);
-
-                    GameObject newItem = Instantiate(item, inventoryRect);
-                    Item itemScript = newItem.GetComponent<Item>();
-                    itemScript.itemData = itemData;
-
-                    RectTransform itemRect = newItem.GetComponent<RectTransform>();
-                    itemRect.anchoredPosition = itemCentre;
-                    ItemDragManager dragScript = newItem.GetComponent<ItemDragManager>();
-
-                    StartCoroutine(AttachNextFrame(dragScript));
-
-                    Debug.Log("placed!");
-                    return;
-                }
-            }
-        }
+        Debug.Log("placed!");
     }
+
 
     public void DeleteItems ()
     {
@@ -571,6 +547,58 @@ public class InventoryGridScript : MonoBehaviour
     }
 
     #region Helper Functions
+
+    /// <summary>
+    /// Searches the inventory grid for a valid placement location for an item.
+    /// Returns the top-left cell position, or null if no valid spot is found.
+    /// </summary>
+    public Vector2Int? FindFreeSpace(ItemSO itemData)
+    {
+        int itemWidth = itemData.itemWidth;
+        int itemHeight = itemData.itemHeight;
+        ItemShapeCell[,] itemShape = itemData.GetShapeGrid();
+
+        for (int x = 0; x < inventoryWidth; x++)
+        {
+            for (int y = 0; y < inventoryHeight; y++)
+            {
+                bool canPlace = true;
+
+                for (int cellX = 0; cellX < itemWidth; cellX++)
+                {
+                    for (int cellY = 0; cellY < itemHeight; cellY++)
+                    {
+                        int checkX = x + cellX;
+                        int checkY = y + cellY;
+
+                        // Out of bounds
+                        if (checkX >= inventoryWidth || checkY >= inventoryHeight)
+                        {
+                            canPlace = false;
+                            break;
+                        }
+
+                        // Filled cell must be empty in inventory
+                        if (itemShape[cellX, cellY].filled &&
+                            inventoryGrid[checkX, checkY].item != null)
+                        {
+                            canPlace = false;
+                            break;
+                        }
+                    }
+                    if (!canPlace) break;
+                }
+
+                if (canPlace)
+                    return new Vector2Int(x, y);
+            }
+        }
+
+        return null; // no valid placement found
+    }
+
+
+
     /// <summary>
     /// Gets the Local Coordinate position of the grid cell (ex: 230,100) based on array coordinates
     /// </summary>
