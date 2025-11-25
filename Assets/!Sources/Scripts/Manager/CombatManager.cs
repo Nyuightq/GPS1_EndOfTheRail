@@ -272,7 +272,7 @@ public class CombatManager : MonoBehaviour
 
     public void EndCombat(bool playerWon, int remainHp)
     {
-        GameStateManager.Instance.playerStatus.UpdateCurrentHp(remainHp);
+        // GameStateManager.Instance.playerStatus.UpdateCurrentHp(remainHp);
         combatSystem.HideEventPanel(() => OnCombatClosed?.Invoke());
         combatSystem.onBattleEnd -= EndCombat;
     }

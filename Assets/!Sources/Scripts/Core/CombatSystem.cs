@@ -156,14 +156,35 @@ public class CombatSystem : UI_BaseEventPanel
 
     private void HandleTrainHealthUpdate(CombatEntity value, int damage)
     {
-        _trainHealthText.text = player.CurrentHp.ToString() + "/" + player.MaxHp.ToString();
-        _trainHealthSlider.value = (float) player.CurrentHp / player.MaxHp;
+        int targetHp = player.CurrentHp;
+        int maxHp = player.MaxHp;
+
+        float duration = 0.3f;
 
         SoundManager.Instance.PlaySFX("SFX_Train_TakeDamage");
         _panelRect.anchoredPosition = _panelOriginalPos;
         _panelRect
                 .DOShakeAnchorPos(0.2f, new Vector2(4f, 0f), 10, 90f, false, true)
                 .SetEase(Ease.InOutBack);
+
+        // Animate slider + text
+        _trainHealthSlider.DOKill(); // stop previous animations
+
+        float startHpRatio = _trainHealthSlider.value;
+        float targetHpRatio = (float)targetHp / maxHp;
+
+        _trainHealthSlider
+            .DOValue(targetHpRatio, duration)
+            .SetEase(Ease.Linear)
+            .OnUpdate(() =>
+            {
+                int displayedHp = Mathf.RoundToInt(_trainHealthSlider.value * maxHp);
+                _trainHealthText.text = displayedHp + "/" + maxHp;
+            })
+            .OnComplete(() =>
+            {
+                _trainHealthText.text = targetHp + "/" + maxHp;
+            });
     }
 
     private void ValidateEndCondition()

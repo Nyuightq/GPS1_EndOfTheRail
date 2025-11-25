@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using DG.Tweening;
 public class DayCountSlider : MonoBehaviour
 {
     [Header("References")]
@@ -30,27 +31,28 @@ public class DayCountSlider : MonoBehaviour
 
         DayCountText();
     }
-
     private void Update()
     {
         if (dayCycle == null || progressSlider == null)
-        {
             return;
-        }
 
         // Determine max tiles for current phase
         float maxTiles = (dayCycle.CurrentTime == DayCycleScript.TimeState.Day)
             ? dayCycle.DayLength + dayCycle.DayLengthMod
             : dayCycle.NightLength;
 
-        //Clamp the tiles moved
         float tilesMoved = Mathf.Clamp(dayCycle.TilesMoved, 0, maxTiles);
 
-        //Update the slider based on tiles moved
         progressSlider.maxValue = maxTiles;
-        progressSlider.value = tilesMoved;
-
-        //Increase the counter by 1 after tiles reached the day count
+        // --- DOTWEEN APPLY  ----------------------------------------
+        // Animate slider value
+        if (!Mathf.Approximately(progressSlider.value, tilesMoved))
+        {
+            progressSlider.DOKill();
+            progressSlider.DOValue(tilesMoved, 0.25f)
+                .SetEase(Ease.OutCubic);
+        }
+        // ------------------------------------------------------------
         if (dayCycle.CurrentTime == DayCycleScript.TimeState.Day && !dayCount)
         {
             currentDay = dayCycle.GetDay();
@@ -58,12 +60,12 @@ public class DayCountSlider : MonoBehaviour
             DayCountText();
         }
 
-        //Reset counting when the day starts
         if (dayCycle.CurrentTime == DayCycleScript.TimeState.Night)
         {
             dayCount = false;
         }
     }
+
 
     private void DayCountText()
     {
