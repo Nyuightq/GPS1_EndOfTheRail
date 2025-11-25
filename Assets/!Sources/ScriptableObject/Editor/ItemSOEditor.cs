@@ -1,10 +1,11 @@
 #if UNITY_EDITOR
-using UnityEditor;
-using UnityEngine;
 using System;
 using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
+using UnityEditor;
+using UnityEngine;
 
 [CustomEditor(typeof(ItemSO))]
 public class ItemSOEditor : Editor
@@ -22,17 +23,16 @@ public class ItemSOEditor : Editor
 
         ItemSO item = (ItemSO)target;
 
-        // Draw basic item fields
+        // ----------------- Basic Fields -----------------
         item.itemName = EditorGUILayout.TextField("Item Name", item.itemName);
-          EditorGUILayout.LabelField("Item Description", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("Item Description", EditorStyles.boldLabel);
         item.itemDescription = EditorGUILayout.TextArea(item.itemDescription, GUILayout.Height(60));
         item.itemSprite = (Sprite)EditorGUILayout.ObjectField("Item Sprite", item.itemSprite, typeof(Sprite), false);
         item.mandatoryItem = EditorGUILayout.Toggle("Mandatory Item", item.mandatoryItem);
-        //item.itemEffectPrefab = (GameObject)EditorGUILayout.ObjectField("Item Effect", item.itemEffectPrefab, typeof(GameObject), false);
         item.itemWidth = Mathf.Max(1, EditorGUILayout.IntField("Item Width", item.itemWidth));
         item.itemHeight = Mathf.Max(1, EditorGUILayout.IntField("Item Height", item.itemHeight));
 
-        // Draw item shape grid
+        // ----------------- Item Shape Grid -----------------
         if (item.itemWidth > 0 && item.itemHeight > 0)
         {
             EditorGUILayout.Space();
@@ -51,7 +51,7 @@ public class ItemSOEditor : Editor
             }
         }
 
-        // --- Effects section ---
+        // ----------------- Effects Section -----------------
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Effects", EditorStyles.boldLabel);
 
@@ -65,9 +65,11 @@ public class ItemSOEditor : Editor
 
             EditorGUILayout.BeginVertical("box");
             string typeName = effect == null ? "None" : effect.GetType().Name;
-            EditorGUILayout.LabelField("Effect " + index + ": " + typeName);
+            EditorGUILayout.LabelField($"Effect {index}: {typeName}", EditorStyles.boldLabel);
 
-            if (GUILayout.Button("Select Effect Type"))
+            // Buttons
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Change Type", GUILayout.Width(120)))
             {
                 GenericMenu menu = new GenericMenu();
                 Type[] effectTypes = AppDomain.CurrentDomain.GetAssemblies()
@@ -80,7 +82,8 @@ public class ItemSOEditor : Editor
                     Type effectType = t;
                     menu.AddItem(new GUIContent(effectType.Name), false, () =>
                     {
-                        item.effects[index] = (Effect)Activator.CreateInstance(effectType);
+                        Undo.RecordObject(item, "Change Effect Type");
+                        item.effects[index] = CreateInstanceWithDefaults(effectType) as Effect;
                         EditorUtility.SetDirty(item);
                     });
                 }
@@ -88,28 +91,52 @@ public class ItemSOEditor : Editor
                 menu.ShowAsContext();
             }
 
-            if (effect != null)
-                DrawFields(effect, "Effect Fields", item);
-
-            if (GUILayout.Button("Remove Effect"))
+            if (GUILayout.Button("Remove Effect", GUILayout.Width(80)))
             {
-                List<Effect> temp = new List<Effect>(item.effects);
-                temp.RemoveAt(index);
-                item.effects = temp.ToArray();
+                Undo.RecordObject(item, "Remove Effect");
+                List<Effect> tmp = new List<Effect>(item.effects);
+                tmp.RemoveAt(index);
+                item.effects = tmp.ToArray();
                 EditorUtility.SetDirty(item);
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.EndVertical();
                 break;
+            }
+            EditorGUILayout.EndHorizontal();
+
+            // Draw effect fields
+            if (effect != null)
+            {
+                DrawFields(effect, "Effect Fields", item);
             }
 
             EditorGUILayout.EndVertical();
             EditorGUILayout.Space();
         }
 
+        // Add new Effect
         if (GUILayout.Button("Add Effect"))
         {
-            List<Effect> temp = new List<Effect>(item.effects);
-            temp.Add(null);
-            item.effects = temp.ToArray();
-            EditorUtility.SetDirty(item);
+            GenericMenu menu = new GenericMenu();
+            Type[] effectTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(a => a.GetTypes())
+                .Where(t => t.IsSubclassOf(typeof(Effect)) && !t.IsAbstract)
+                .ToArray();
+
+            foreach (var t in effectTypes)
+            {
+                Type effectType = t;
+                menu.AddItem(new GUIContent(effectType.Name), false, () =>
+                {
+                    Undo.RecordObject(item, "Add Effect");
+                    List<Effect> temp = new List<Effect>(item.effects);
+                    temp.Add(CreateInstanceWithDefaults(effectType) as Effect);
+                    item.effects = temp.ToArray();
+                    EditorUtility.SetDirty(item);
+                });
+            }
+
+            menu.ShowAsContext();
         }
 
         if (GUI.changed)
@@ -128,36 +155,56 @@ public class ItemSOEditor : Editor
         foreach (var f in fields)
         {
             object value = f.GetValue(obj);
+            Type fieldType = f.FieldType;
 
-            if (f.FieldType == typeof(int))
-                f.SetValue(obj, EditorGUILayout.IntField(f.Name, (int)value));
-            else if (f.FieldType == typeof(float))
-                f.SetValue(obj, EditorGUILayout.FloatField(f.Name, (float)value));
-            else if (f.FieldType == typeof(bool))
-                f.SetValue(obj, EditorGUILayout.Toggle(f.Name, (bool)value));
-            else if (f.FieldType == typeof(string))
-                f.SetValue(obj, EditorGUILayout.TextField(f.Name, (string)value));
-            else if (f.FieldType.IsEnum)
+            // Conditions[] special handling
+            if (typeof(Conditions[]).IsAssignableFrom(fieldType))
             {
-                Enum currentEnum = (Enum)value;
-                Enum newEnum = EditorGUILayout.EnumPopup(f.Name, currentEnum);
-                f.SetValue(obj, newEnum);
-            }
-            else if (typeof(UnityEngine.Object).IsAssignableFrom(f.FieldType))
-            {
-                UnityEngine.Object newObj = EditorGUILayout.ObjectField(f.Name, (UnityEngine.Object)value, f.FieldType, true);
-                f.SetValue(obj, newObj);
-            }
-            else if (typeof(Conditions[]).IsAssignableFrom(f.FieldType))
-            {
+                EditorGUILayout.LabelField(ObjectNames.NicifyVariableName(f.Name), EditorStyles.boldLabel);
                 Conditions[] arr = value as Conditions[] ?? new Conditions[0];
-                arr = DrawConditionsArray(arr, f.Name, targetObj);
+                arr = DrawConditionsArray(arr, ObjectNames.NicifyVariableName(f.Name), targetObj);
                 f.SetValue(obj, arr);
+                continue; // skip EndHorizontal for this field
+            }
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(ObjectNames.NicifyVariableName(f.Name), GUILayout.Width(150));
+
+            if (fieldType == typeof(int))
+            {
+                int v = (int)(value ?? 0);
+                f.SetValue(obj, EditorGUILayout.IntField(v));
+            }
+            else if (fieldType == typeof(float))
+            {
+                float v = (float)(value ?? 0f);
+                f.SetValue(obj, EditorGUILayout.FloatField(v));
+            }
+            else if (fieldType == typeof(bool))
+            {
+                bool v = (bool)(value ?? false);
+                f.SetValue(obj, EditorGUILayout.Toggle(v));
+            }
+            else if (fieldType == typeof(string))
+            {
+                string v = (string)(value ?? string.Empty);
+                f.SetValue(obj, EditorGUILayout.TextField(v));
+            }
+            else if (fieldType.IsEnum)
+            {
+                Enum currentEnum = (Enum)(value ?? Enum.GetValues(fieldType).GetValue(0));
+                f.SetValue(obj, EditorGUILayout.EnumPopup(currentEnum));
+            }
+            else if (typeof(UnityEngine.Object).IsAssignableFrom(fieldType))
+            {
+                f.SetValue(obj, EditorGUILayout.ObjectField((UnityEngine.Object)value, fieldType, true));
             }
             else
             {
-                EditorGUILayout.LabelField(f.Name + ": (type not supported in inspector)");
+                EditorGUILayout.LabelField($"(Unsupported: {fieldType.Name})");
             }
+
+            EditorGUILayout.EndHorizontal();
         }
     }
 
@@ -172,9 +219,10 @@ public class ItemSOEditor : Editor
             string typeName = cond == null ? "None" : cond.GetType().Name;
 
             EditorGUILayout.BeginVertical("box");
-            EditorGUILayout.LabelField("Condition " + i + ": " + typeName);
+            EditorGUILayout.LabelField($"Condition {i}: {typeName}", EditorStyles.boldLabel);
 
-            if (GUILayout.Button("Select Condition Type"))
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Change Type", GUILayout.Width(120)))
             {
                 GenericMenu menu = new GenericMenu();
                 Type[] condTypes = AppDomain.CurrentDomain.GetAssemblies()
@@ -187,7 +235,7 @@ public class ItemSOEditor : Editor
                     Type condType = t;
                     menu.AddItem(new GUIContent(condType.Name), false, () =>
                     {
-                        arr[index] = (Conditions)Activator.CreateInstance(condType);
+                        arr[index] = CreateInstanceWithDefaults(condType) as Conditions;
                         EditorUtility.SetDirty(targetObj);
                     });
                 }
@@ -195,17 +243,20 @@ public class ItemSOEditor : Editor
                 menu.ShowAsContext();
             }
 
-            if (cond != null)
-                DrawFields(cond, "Condition Fields", targetObj);
-
-            if (GUILayout.Button("Remove Condition"))
+            if (GUILayout.Button("Remove", GUILayout.Width(80)))
             {
-                List<Conditions> temp = new List<Conditions>(arr);
-                temp.RemoveAt(index);
-                arr = temp.ToArray();
+                List<Conditions> tmp = new List<Conditions>(arr);
+                tmp.RemoveAt(index);
+                arr = tmp.ToArray();
                 EditorUtility.SetDirty(targetObj);
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.EndVertical();
                 break;
             }
+            EditorGUILayout.EndHorizontal();
+
+            if (cond != null)
+                DrawFields(cond, "Condition Fields", targetObj);
 
             EditorGUILayout.EndVertical();
             EditorGUILayout.Space();
@@ -213,13 +264,45 @@ public class ItemSOEditor : Editor
 
         if (GUILayout.Button("Add Condition"))
         {
-            List<Conditions> temp = new List<Conditions>(arr);
-            temp.Add(null);
-            arr = temp.ToArray();
+            List<Conditions> tmp = new List<Conditions>(arr);
+            tmp.Add(null);
+            arr = tmp.ToArray();
             EditorUtility.SetDirty(targetObj);
         }
 
         return arr;
+    }
+
+    private object CreateInstanceWithDefaults(Type t)
+    {
+        object obj = FormatterServices.GetUninitializedObject(t);
+
+        var fields = t.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+            .Where(f => f.IsPublic || f.GetCustomAttribute<SerializeField>() != null);
+
+        foreach (var f in fields)
+        {
+            Type fType = f.FieldType;
+            object defaultValue = null;
+
+            if (fType.IsValueType && !fType.IsEnum)
+                defaultValue = Activator.CreateInstance(fType);
+            else if (fType.IsEnum)
+                defaultValue = Enum.GetValues(fType).GetValue(0);
+            else if (typeof(UnityEngine.Object).IsAssignableFrom(fType))
+                defaultValue = null;
+            else if (fType == typeof(string))
+                defaultValue = string.Empty;
+            else if (fType.IsArray)
+                defaultValue = Array.CreateInstance(fType.GetElementType(), 0);
+            else
+                defaultValue = null;
+
+            try { f.SetValue(obj, defaultValue); }
+            catch (Exception ex) { Debug.LogWarning($"Could not set default for field {f.Name} on {t.Name}: {ex.Message}"); }
+        }
+
+        return obj;
     }
 }
 #endif
