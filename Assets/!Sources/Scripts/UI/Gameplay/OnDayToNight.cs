@@ -44,8 +44,8 @@ public class OnDayToNight : MonoBehaviour
         float progression = tilesMoved / maxTiles;
 
         //Start the tweening process at 3/4 of the day
-        //which is 75% of the day is progressed
-        if (!dayToNightTween && progression >= 0.75f &&
+        //which is 65% of the day is progressed
+        if (!dayToNightTween && progression >= 0.65f &&
             dayCycle.CurrentTime == DayCycleScript.TimeState.Day)
         {
             //Day to night (this is visually progression, not tween)
@@ -76,7 +76,7 @@ public class OnDayToNight : MonoBehaviour
         float nightToDayDuration = 4f;
 
         //Night to day
-        if (!nightToDayTween && progression >= 0.75f &&
+        if (!nightToDayTween && progression >= 0.65f &&
             dayCycle.CurrentTime == DayCycleScript.TimeState.Night)
         {
             nightToDayTween = true;

@@ -16,7 +16,7 @@ public class OnTrainLight : MonoBehaviour
     [SerializeField] private float orbNightAlpha = 0.627f;
 
     [Header("Transition Duration")]
-    [SerializeField] private float transitionDuration = 3f;
+    [SerializeField] private float transitionDuration = 1.5f;
 
     private SpriteRenderer orbRenderer;
     private bool trainLightTween = false;
@@ -62,8 +62,11 @@ public class OnTrainLight : MonoBehaviour
             lastPhase = dayCycle.CurrentTime;
         }
 
-        // Only start tween at 85%
-        if (progression < 0.85f)
+        // Only start tween at 70%
+        if (progression < 0.70f)
+            return;
+
+        if (skipInProgress)
             return;
 
         // ---- LIGHT TWEEN ----
@@ -94,7 +97,7 @@ public class OnTrainLight : MonoBehaviour
             .SetTarget(trainLight.gameObject);
 
             // --- ORB Tween (your shorter duration for going back to day) ---
-            float orbDuration = isDay ? transitionDuration : 0.25f;
+            //float orbDuration = isDay ? transitionDuration : 0.15f;
 
             DOTween.To(
                 () => orbRenderer.color.a,
@@ -104,25 +107,35 @@ public class OnTrainLight : MonoBehaviour
                     orbRenderer.color = c;
                 },
                 targetAlpha,
-                orbDuration
+                transitionDuration
             )
             .SetEase(isDay ? Ease.InOutSine : Ease.Linear)
             .SetTarget(orbRenderer.gameObject);
         }
     }
 
+    private bool skipInProgress = false;
     public void ForceResetToDay()
     {
+        skipInProgress = true;
+
         DOTween.Kill(trainLight.gameObject);
         DOTween.Kill(orbRenderer.gameObject);
 
+        // Set light to day intensity
         trainLight.intensity = dayIntensity;
 
-        var c = orbRenderer.color;
-        c.a = orbDayAlpha;
-        orbRenderer.color = c;
+        // Set orb alpha to day alpha
+        if (orbRenderer != null)
+        {
+            var c = orbRenderer.color;
+            c.a = orbDayAlpha; // <- use day alpha, not 0f
+            orbRenderer.color = c;
+        }
 
         trainLightTween = false;
         trainOrbTween = false;
+
+        skipInProgress = false;
     }
 }

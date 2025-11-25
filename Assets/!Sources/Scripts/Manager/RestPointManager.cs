@@ -56,6 +56,10 @@ public class RestPointManager : MonoBehaviour
         // Find OnTrainLight if not assigned
         if (trainLightController == null)
             trainLightController = FindFirstObjectByType<OnTrainLight>();
+
+        // Find PlayerStatusManager if not assigned
+        if (playerStatusManager == null)
+        playerStatusManager = FindFirstObjectByType<PlayerStatusManager>();
         
         HideAll();
     }
@@ -88,11 +92,7 @@ public class RestPointManager : MonoBehaviour
         // Auto-skip night if enabled and currently day time
         if (skipNightOnRestPoint && dayCycleScript != null)
         {
-            if (dayCycleScript.CurrentTime == DayCycleScript.TimeState.Day)
-            {
-                Debug.Log("[Editor Feature] Auto-skipping night on rest point");
-                SkipNightImmediate();
-            }
+            SkipToNextDay();
         }
         
         Debug.Log("Entered Rest Point - Heal Button Available");
@@ -155,62 +155,29 @@ public class RestPointManager : MonoBehaviour
         HideConfirmPanel();
     }
 
-    private void SkipNightImmediate()
+    private void SkipToNextDay()
     {
-        if (dayCycleScript == null)
-            return;
+        if (dayCycleScript == null) return;
 
-        // Check if it's day time
-        if (dayCycleScript.CurrentTime != DayCycleScript.TimeState.Day)
+        // Determine how many tiles to move to end the current phase
+        int requiredTiles = 0;
+        if (dayCycleScript.CurrentTime == DayCycleScript.TimeState.Day)
         {
-            Debug.LogWarning("Can only skip night during day time!");
-            return;
+            requiredTiles = dayCycleScript.DayLength + dayCycleScript.DayLengthMod;
+        }
+        else // Night
+        {
+            requiredTiles = dayCycleScript.NightLength + dayCycleScript.DayLengthMod;
         }
 
-        Debug.Log($"[Editor] Skipping night - Fast forwarding to Day {dayCycleScript.GetDay() + 1}");
-
-        // Set tiles moved to the day length to trigger night transition
-        int requiredTiles = dayCycleScript.DayLength + dayCycleScript.DayLengthMod;
+        // Move tiles to force the phase to the next day
         dayCycleScript.setTilesMoved(requiredTiles);
 
-        // Wait one frame for night to start, then immediately end it
-        StartCoroutine(SkipNightCoroutine());
-    }
+        // Immediately reset lights and orb
+        dayNightController?.ForceResetToDay();
+        trainLightController?.ForceResetToDay();
 
-    private System.Collections.IEnumerator SkipNightCoroutine()
-    {
-        // Wait for one frame to let the day->night transition happen
-        yield return null;
-        
-        // Check if we're now in night phase
-        if (dayCycleScript.CurrentTime == DayCycleScript.TimeState.Night)
-        {
-            // Immediately end the night by setting tiles moved to night length
-            dayCycleScript.setTilesMoved(dayCycleScript.NightLength);
-
-            // Reset lights
-            dayNightController?.ForceResetToDay();
-            trainLightController?.ForceResetToDay();
-
-            /*// Force light intensity back to day
-            if (dayNightController != null)
-            {
-                dayNightController.ForceResetToDay();
-            }
-
-            // Force train light intensity and alpha back to day
-            if (trainLightController != null)
-            {
-                trainLightController.ForceResetToDay();
-            }
-            */
-            
-            Debug.Log("[Editor] Night skipped - Starting new day with lighting reset");
-        }
-        else
-        {
-            Debug.LogWarning("Failed to skip night - not in night phase");
-        }
+        Debug.Log("[Editor] Skipped to next day and reset lighting");
     }
 
     private void ShowConfirmPanel(string description, bool canAfford)
