@@ -19,7 +19,8 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
 
     public Vector2 topLeftCellPos { get; private set; }
     private Vector2 dragDir;
-    private bool dragging, mouseOnItem;
+    public bool dragging { get; private set; }
+    private bool mouseOnItem;
     public Vector2 TopLeftCellPos => topLeftCellPos;
     public Vector2 EquippedPos => equippedPos;
     public bool IsHovered => mouseOnItem;
@@ -82,12 +83,10 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
         switch (itemScript.state)
         {
             case Item.itemState.equipped:
-                foreach (GameObject shapeCell in itemScript.shape) 
-                    shapeCell.SetActive(false);
+                itemScript.ShowPreview(true);
                 break;
             case Item.itemState.unequipped:
-                foreach (GameObject shapeCell in itemScript.shape) 
-                    shapeCell.SetActive(true);
+                if (!mouseOnItem || !dragging) itemScript.ShowPreview(false); else itemScript.ShowPreview(true);
                 break;
         }
     }
@@ -137,7 +136,7 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
         if (mouseOnItem && GameStateManager.CurrentPhase != Phase.Combat)
         {
             dragging = true;
-            
+
             if (topLeftCellPos != null && itemScript.state == Item.itemState.equipped)
             {
                 inventoryGridScript.MarkCells(

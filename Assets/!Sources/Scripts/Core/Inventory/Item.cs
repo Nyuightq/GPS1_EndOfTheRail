@@ -3,6 +3,7 @@
 // Author: User
 // Description: -
 // --------------------------------------------------------------
+using DG.Tweening;
 using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -43,6 +44,9 @@ public class Item : MonoBehaviour
         get => baseLevel;
         set => baseLevel = Mathf.Clamp(value, 1, maxLevel);
     }
+
+    private Quaternion baseRotation = Quaternion.identity;
+    private Tween shakeTween;
 
     #region Unity LifeCycle
     private void OnEnable()
@@ -87,10 +91,6 @@ public class Item : MonoBehaviour
                     OnEquip += effect.apply;
                     OnAdjacentEquip += effect.apply;
                     break;
-                //case triggers.OnConditionTriggerOnce:
-                //    OnConditionTriggerOnce += effect.apply;
-                //    OnBattleEnd += effect.remove;
-                //    break;
                 case triggers.OnBattleStart:
                     OnBattleStart += effect.apply;
                     OnBattleEnd += effect.remove;
@@ -110,7 +110,6 @@ public class Item : MonoBehaviour
             if (effect.triggerOnConditionOnce) OnBattleEnd += effect.ResetTriggered;
         }
 
-
         //Get the item Shape 2D Array 
         itemShape = itemData.GetShapeGrid();
 
@@ -120,16 +119,7 @@ public class Item : MonoBehaviour
             itemRect = GetComponent<RectTransform>();
             itemRect.sizeDelta = spriteRectTransform.sizeDelta;
         }
-
-        //if (itemEffect == null && itemData.itemEffectPrefab != null)
-        //{
-        //    var effectObj = Instantiate(itemData.itemEffectPrefab, transform);
-        //    itemEffect = effectObj.GetComponent<ItemEffect>();
-        //}
-
-        //Ensure that the sprite child and the actual object size is equal
         
-
         GeneratePreview();
         spriteRectTransform.SetAsLastSibling();
         GetComponent<RectTransform>().SetAsLastSibling();
@@ -138,7 +128,29 @@ public class Item : MonoBehaviour
 
     private void Update()
     {
-        if(state == itemState.equipped) OnUpdate?.Invoke();
+        if (state == itemState.equipped)
+        {
+            OnUpdate?.Invoke();
+        }
+
+        if(state != itemState.equipped && GetComponent<ItemDragManager>().dragging == false)
+        {
+            if(shakeTween == null)
+            {
+                Vector3 shakeStrength = new Vector3(0f, 0f, 2f);
+                float duration = 0.5f;
+                shakeTween = spriteRectTransform.DOShakeRotation(duration, shakeStrength,10,90,false).SetLoops(-1,LoopType.Restart);
+            }
+        }
+        else
+        {
+            if (shakeTween != null && shakeTween.IsActive())
+            {
+                shakeTween.Kill();
+                shakeTween = null;
+                spriteRectTransform.localRotation = baseRotation; // reset rotation
+            }
+        }
     }
 
     private void GeneratePreview()
@@ -179,6 +191,14 @@ public class Item : MonoBehaviour
         spriteRectTransform.SetAsLastSibling();
     }
 
+    public void ShowPreview(bool showPreview)
+    {
+        foreach (GameObject cellPreview in shape)
+        {
+            cellPreview.SetActive(showPreview);
+        }
+    }
+
     public void RotateShape(ItemShapeCell[,] currentItemShape)
     {
         int shapeHeight = currentItemShape.GetLength(1);
@@ -196,7 +216,8 @@ public class Item : MonoBehaviour
         
         RefreshShape(rotatedShape);
 
-        spriteRectTransform.localRotation *= Quaternion.Euler(0, 0, -90f);
+        baseRotation *= Quaternion.Euler(0, 0, -90f);
+        spriteRectTransform.localRotation = baseRotation;
 
         //resize item rect to match rotated sprite
         RectTransform itemRect = GetComponent<RectTransform>();
