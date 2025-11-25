@@ -106,6 +106,10 @@ public class ConnectRails : MonoBehaviour
 
     public void changeRail(Vector3Int tilePos,Vector2 direction, bool incoming)
     {
+        // If position don't have rail, return to avoid Error message.
+        gridScript.railDataMap.TryGetValue(tilePos, out RailData rd);
+        if(rd == null) return;
+
         if (gridScript.railDataMap[tilePos].railType == RailData.railTypes.normal)
         {
             RailData currentRail;

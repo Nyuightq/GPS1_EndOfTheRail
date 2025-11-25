@@ -35,6 +35,7 @@ public class GameStateManager : MonoBehaviour
     public PlayerStatusManager playerStatus;
     private Phase _phase = Phase.Plan;
     private bool _pause = false;
+    public bool IsPausing => _pause;
     [SerializeField] private bool _isInitial = false;
     // private int _scraps;
     public static Phase CurrentPhase => Instance._phase;
@@ -139,7 +140,7 @@ public class GameStateManager : MonoBehaviour
         Instance._phase = phase;
         Instance.PhaseModulesController();
     }
-
+    
     private void PhaseModulesController()
     {
         //if (_cameraManager == null) _cameraManager = Object.FindObjectOfType<CameraManager>();

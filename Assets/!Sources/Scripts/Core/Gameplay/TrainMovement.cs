@@ -181,10 +181,11 @@ public class TrainMovement : MonoBehaviour
 
                 if (lerpMovement)
                 {
-                    transform.position = Vector3.Lerp(transform.position, targetTilePos, lerpAmount * Time.deltaTime * 50f * OnSpeedToggle.SpeedMultiplier);
+                    float speedFactor = lerpAmount * Time.deltaTime * 50f * OnSpeedToggle.SpeedMultiplier;
+                    transform.position = Vector3.Lerp(transform.position, targetTilePos, speedFactor);
 
-                    float x = Util.Approach(transform.position.x, targetTilePos.x, 0.001f);
-                    float y = Util.Approach(transform.position.y, targetTilePos.y, 0.001f);
+                    float x = Util.Approach(transform.position.x, targetTilePos.x, 0.001f * OnSpeedToggle.SpeedMultiplier);
+                    float y = Util.Approach(transform.position.y, targetTilePos.y, 0.001f * OnSpeedToggle.SpeedMultiplier);
                     transform.position = new Vector2(x, y);
                 }
                 else

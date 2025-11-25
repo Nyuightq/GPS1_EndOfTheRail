@@ -15,7 +15,9 @@ public class OnPausePlay : MonoBehaviour
 
     private bool _isToggled = false;
     private bool _isPaused = false;
+    private bool _isOnSettings = false;
     public bool IsPaused => _isPaused;
+    public bool IsOnSettings => _isOnSettings;
     public delegate void OnTogglePauseEvent(bool isPausing);
     public event OnTogglePauseEvent onTogglePauseEvent;
 
@@ -47,6 +49,7 @@ public class OnPausePlay : MonoBehaviour
 
     public void OnSettingButton(bool pausing = true)
     {
+        GameStateManager.SetPause(pausing);
         if (_isToggled == false)
         {
             _isPaused = pausing;
@@ -74,7 +77,7 @@ public class OnPausePlay : MonoBehaviour
 
     private void PauseProcess()
     {
-        bool PAUSETIME = true;
+        bool PAUSETIME = false;
 
         if (_isPaused)
         {

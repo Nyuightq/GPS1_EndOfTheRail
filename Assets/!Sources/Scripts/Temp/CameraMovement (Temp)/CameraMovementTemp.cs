@@ -96,6 +96,7 @@ public class CameraMovementTemp : MonoBehaviour
         if (Input.GetKey(KeyCode.D)) moveX = 1f;
 
         moveDirection = new Vector3(moveX, moveY, 0f).normalized;
+        if (GameStateManager.Instance.IsPausing) moveDirection = new Vector3(0f, 0f, 0f).normalized;
     }
 
     private void MoveCamera()

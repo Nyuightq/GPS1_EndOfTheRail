@@ -119,6 +119,8 @@ public class WinLoseManager : MonoBehaviour
             trainMovement = FindFirstObjectByType<TrainMovement>();
             if (trainMovement != null)
                 Debug.Log($"[WinLoseManager] Found TrainMovement: {trainMovement.name}");
+            // else
+            //     Debug.LogWarning("[WinLoseManager] TrainMovement not found!");
         }
         
         if (playerStatus == null)
