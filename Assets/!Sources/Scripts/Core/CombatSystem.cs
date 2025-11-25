@@ -74,12 +74,8 @@ public class CombatSystem : UI_BaseEventPanel
     {
         isBattling = true;
         GameStateManager.SetPhase(Phase.Combat);
-
-        //trigger battle start effects
-        foreach(GameObject item in GameManager.instance.inventoryScript.equippedItems)
-        {
-            item.GetComponent<Item>().TriggerEffectBattleStart();
-        }
+        DeleteUnequippedItems();
+        StartCoroutine(DelayedBattleStartEffects());
     }
 
     // Update is called once per frame
@@ -160,14 +156,35 @@ public class CombatSystem : UI_BaseEventPanel
 
     private void HandleTrainHealthUpdate(CombatEntity value, int damage)
     {
-        _trainHealthText.text = player.CurrentHp.ToString() + "/" + player.MaxHp.ToString();
-        _trainHealthSlider.value = (float) player.CurrentHp / player.MaxHp;
+        int targetHp = player.CurrentHp;
+        int maxHp = player.MaxHp;
+
+        float duration = 0.3f;
 
         SoundManager.Instance.PlaySFX("SFX_Train_TakeDamage");
         _panelRect.anchoredPosition = _panelOriginalPos;
         _panelRect
                 .DOShakeAnchorPos(0.2f, new Vector2(4f, 0f), 10, 90f, false, true)
                 .SetEase(Ease.InOutBack);
+
+        // Animate slider + text
+        _trainHealthSlider.DOKill(); // stop previous animations
+
+        float startHpRatio = _trainHealthSlider.value;
+        float targetHpRatio = (float)targetHp / maxHp;
+
+        _trainHealthSlider
+            .DOValue(targetHpRatio, duration)
+            .SetEase(Ease.Linear)
+            .OnUpdate(() =>
+            {
+                int displayedHp = Mathf.RoundToInt(_trainHealthSlider.value * maxHp);
+                _trainHealthText.text = displayedHp + "/" + maxHp;
+            })
+            .OnComplete(() =>
+            {
+                _trainHealthText.text = targetHp + "/" + maxHp;
+            });
     }
 
     private void ValidateEndCondition()
@@ -271,5 +288,27 @@ public class CombatSystem : UI_BaseEventPanel
     {
         yield return new WaitForSeconds(0.35f);
         rewardPanelRef.Setup(amount, onRewardComplete);
+    }
+
+    private IEnumerator DelayedBattleStartEffects()
+    {
+        yield return null; // wait 1 frame so Start() finishes
+
+        foreach (GameObject item in GameManager.instance.inventoryScript.equippedItems)
+        {
+            item.GetComponent<Item>().TriggerEffectBattleStart();
+        }
+    }
+
+    private void DeleteUnequippedItems()
+    {
+        Item[] items = FindObjectsByType<Item>(FindObjectsSortMode.None);
+        foreach(Item item in items)
+        {
+            if(!GameManager.instance.inventoryScript.equippedItems.Contains(item.gameObject))
+            {
+                item.PrepareDeletion();
+            }
+        }
     }
 }

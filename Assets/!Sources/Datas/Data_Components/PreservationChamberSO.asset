@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 068edb241815e8b48bae3bd0df376ff4, type: 3}
   m_Name: PreservationChamberSO
   m_EditorClassIdentifier: 
-  itemSprite: {fileID: 21300000, guid: 8c0f6d1e78f2e4c4f8affdf76c4ed3dc, type: 3}
+  itemSprite: {fileID: 21300000, guid: 8d006bfa286751648ad675a4d7a0865a, type: 3}
   itemName: Preservation Chamber
+  itemDescription: 
   mandatoryItem: 0
   itemWidth: 1
   itemHeight: 2
   effects:
   - rid: 6451219851714232418
-  itemEffectPrefab: {fileID: 0}
   itemShape:
   - filled: 1
   - filled: 1
@@ -33,6 +33,7 @@ MonoBehaviour:
         triggerOnConditionOnce: 0
         conditions:
         - rid: 6451219851714232419
+        conditionMetSprite: {fileID: 21300000, guid: 8c0f6d1e78f2e4c4f8affdf76c4ed3dc, type: 3}
         inputType: 1
         buffAmount: 2
         statType: 2

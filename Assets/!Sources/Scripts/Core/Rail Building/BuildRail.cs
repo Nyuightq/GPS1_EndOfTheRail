@@ -334,7 +334,6 @@ public class BuildRails : MonoBehaviour
     {
         // Put SFX - RailOnDelete_Success here. (Only play this RailOnDelete sfx if there is rail being deleted, 
         // Don't repeat it instantly if this action deleted multiple rail at once.)
-
         Vector3Int lastTile = tilePos;
 
         if (!gridScript.railDataMap.ContainsKey(lastTile)) return;
@@ -349,7 +348,6 @@ public class BuildRails : MonoBehaviour
         // record IncomingDirection（ComingFromDirection）
         Vector3Int? previousRail = GetSingleConnectedRail(lastTile, true);
         Vector3Int? nextRail = GetSingleConnectedRail(lastTile, false);
-        // Debug.Log("Origin " + lastTile + " PreviousRail: " + previousRail + " NextRail: " + nextRail);
 
         // delete last Rail Tile
         GameManager.DestroyTile(lastTile);
@@ -360,7 +358,7 @@ public class BuildRails : MonoBehaviour
         {
             Vector3Int nextRailVector3Int = (Vector3Int)nextRail;
             RailData checkingRail = gridScript.railDataMap[nextRailVector3Int];
-            bool isNextRailSpecial = checkingRail.railType == RailData.railTypes.rest || checkingRail.railType == RailData.railTypes.end;
+            bool isNextRailSpecial = !(checkingRail.railType == RailData.railTypes.normal);
 
             if (isNextRailSpecial)
             {
@@ -375,13 +373,10 @@ public class BuildRails : MonoBehaviour
             }
         }
 
-        //Debug.Log($"Deleted tile: {lastTile}");
-
         // Use ComingFromDirection to find previous tile connected to deleted tile
         if (previousRail.HasValue)
         {
             _lastBuiltRail = previousRail;
-            //Debug.Log($"_lastBuiltRail set to previous connected tile: {_lastBuiltRail}");
         }
         else
         {

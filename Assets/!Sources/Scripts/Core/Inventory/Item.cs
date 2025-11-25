@@ -3,10 +3,12 @@
 // Author: User
 // Description: -
 // --------------------------------------------------------------
+using DG.Tweening;
 using System;
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 
 public class Item : MonoBehaviour
@@ -43,6 +45,11 @@ public class Item : MonoBehaviour
         set => baseLevel = Mathf.Clamp(value, 1, maxLevel);
     }
 
+    private Quaternion baseRotation = Quaternion.identity;
+    private Tween shakeTween;
+
+    public bool flaggedForDeletion;
+
     #region Unity LifeCycle
     private void OnEnable()
     {
@@ -51,7 +58,7 @@ public class Item : MonoBehaviour
 
     #region event invokers
     public void TriggerEffectUnequip() { OnUnequip?.Invoke(); }
-    public void TriggerEffectAdjacentEquip() { OnAdjacentEquip?.Invoke(); }
+    public void TriggerEffectAdjacentEquip(){ if (this != null) OnAdjacentEquip?.Invoke(); }
     public void TriggerEffectEquip() { OnEquip?.Invoke();  }
     //public void TriggerEffectConditionOnce() { OnConditionTriggerOnce?.Invoke(); }
     public void TriggerEffectUpdate() { OnUpdate?.Invoke(); }
@@ -63,11 +70,17 @@ public class Item : MonoBehaviour
 
     private void Start()
     {
-        effects = itemData.effects;
+        effects = new Effect[itemData.effects.Length];
+        for (int i = 0; i < itemData.effects.Length; i++)
+        {
+            // Create a copy of each effect (you'll need a Clone() method in Effect)
+            effects[i] = itemData.effects[i].clone();
+            effects[i].owner = this; // assign this Item as the owner
+        }
 
         foreach (Effect effect in effects)
         {
-            effect.owner = this;
+            //effect.owner = this;
             switch (effect.trigger)
             {
                 case triggers.OnUpdate:
@@ -80,10 +93,6 @@ public class Item : MonoBehaviour
                     OnEquip += effect.apply;
                     OnAdjacentEquip += effect.apply;
                     break;
-                //case triggers.OnConditionTriggerOnce:
-                //    OnConditionTriggerOnce += effect.apply;
-                //    OnBattleEnd += effect.remove;
-                //    break;
                 case triggers.OnBattleStart:
                     OnBattleStart += effect.apply;
                     OnBattleEnd += effect.remove;
@@ -103,26 +112,16 @@ public class Item : MonoBehaviour
             if (effect.triggerOnConditionOnce) OnBattleEnd += effect.ResetTriggered;
         }
 
-
         //Get the item Shape 2D Array 
         itemShape = itemData.GetShapeGrid();
 
         if (itemData != null && itemData.itemSprite != null)
         {
-            sprite.sprite = itemData.itemSprite;
+            changeSprite(itemData.itemSprite);
+            itemRect = GetComponent<RectTransform>();
+            itemRect.sizeDelta = spriteRectTransform.sizeDelta;
         }
-
-        if (itemEffect == null && itemData.itemEffectPrefab != null)
-        {
-            var effectObj = Instantiate(itemData.itemEffectPrefab, transform);
-            itemEffect = effectObj.GetComponent<ItemEffect>();
-        }
-
-        //Ensure that the sprite child and the actual object size is equal
-        sprite.SetNativeSize();
-        itemRect = GetComponent<RectTransform>();
-        itemRect.sizeDelta = spriteRectTransform.sizeDelta;
-
+        
         GeneratePreview();
         spriteRectTransform.SetAsLastSibling();
         GetComponent<RectTransform>().SetAsLastSibling();
@@ -131,7 +130,29 @@ public class Item : MonoBehaviour
 
     private void Update()
     {
-        if(state == itemState.equipped) OnUpdate?.Invoke();
+        if (state == itemState.equipped)
+        {
+            OnUpdate?.Invoke();
+        }
+
+        if(state != itemState.equipped && GetComponent<ItemDragManager>().dragging == false)
+        {
+            if(shakeTween == null)
+            {
+                Vector3 shakeStrength = new Vector3(0f, 0f, 2f);
+                float duration = 0.5f;
+                shakeTween = spriteRectTransform.DOShakeRotation(duration, shakeStrength,10,90,false).SetLoops(-1,LoopType.Restart);
+            }
+        }
+        else
+        {
+            if (shakeTween != null && shakeTween.IsActive())
+            {
+                shakeTween.Kill();
+                shakeTween = null;
+                spriteRectTransform.localRotation = baseRotation; // reset rotation
+            }
+        }
     }
 
     private void GeneratePreview()
@@ -172,6 +193,14 @@ public class Item : MonoBehaviour
         spriteRectTransform.SetAsLastSibling();
     }
 
+    public void ShowPreview(bool showPreview)
+    {
+        foreach (GameObject cellPreview in shape)
+        {
+            cellPreview.SetActive(showPreview);
+        }
+    }
+
     public void RotateShape(ItemShapeCell[,] currentItemShape)
     {
         int shapeHeight = currentItemShape.GetLength(1);
@@ -189,7 +218,8 @@ public class Item : MonoBehaviour
         
         RefreshShape(rotatedShape);
 
-        spriteRectTransform.localRotation *= Quaternion.Euler(0, 0, -90f);
+        baseRotation *= Quaternion.Euler(0, 0, -90f);
+        spriteRectTransform.localRotation = baseRotation;
 
         //resize item rect to match rotated sprite
         RectTransform itemRect = GetComponent<RectTransform>();
@@ -210,4 +240,37 @@ public class Item : MonoBehaviour
         GeneratePreview();
         Debug.Log("REFRESHED!");
     }
+
+    public void changeSprite(Sprite newSprite)
+    {
+        sprite.sprite = newSprite;
+        sprite.SetNativeSize();
+    }
+
+    public void PrepareDeletion()
+    {
+        if (flaggedForDeletion) return;
+        flaggedForDeletion = true;
+
+        float fadeDuration = 0.5f;
+
+        sprite.color = Color.red;
+        Tween fadeTween = sprite.DOFade(0, fadeDuration);
+        fadeTween.OnComplete(OnDeletionComplete);
+    }
+
+    private void OnDeletionComplete()
+    {
+        OnEquip = null;
+        OnUnequip = null;
+        OnBattleStart = null;
+        OnBattleEnd = null;
+        OnUpdate = null;
+        OnBattleUpdate = null;
+        OnAdjacentEquip = null;
+        OnDayStart = null;
+
+        Destroy(gameObject);
+    }
+    
 }

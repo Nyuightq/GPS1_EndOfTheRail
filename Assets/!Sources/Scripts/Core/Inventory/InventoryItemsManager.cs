@@ -20,15 +20,28 @@ public class InventoryItemManager : MonoBehaviour
 
     void Update()
     {
-        // do OnUpdate() to each item.
-        foreach (GameObject item in _inventory.equippedItems)
+        // Remove destroyed or null items first
+        for (int i = _inventory.equippedItems.Count - 1; i >= 0; i--)
         {
-            Item thisItem = item.GetComponent<Item>();
-            if(thisItem.itemEffect != null)
-            thisItem.itemEffect.OnUpdate();
+            GameObject itemObj = _inventory.equippedItems[i];
+            if (itemObj == null)   // destroyed Unity object
+            {
+                _inventory.equippedItems.RemoveAt(i);
+                continue;
+            }
+
+            Item item = itemObj.GetComponent<Item>();
+            if (item == null)      // component missing or destroyed
+            {
+                _inventory.equippedItems.RemoveAt(i);
+                continue;
+            }
+
+            if (item.itemEffect != null)
+                item.itemEffect.OnUpdate();
         }
     }
-    
+
     // This function is called by CombatManager.cs when intialize combat components.
     // List of CombatComponentEntity should be change return a set of data. (Not scriptable object)
     public List<CombatComponentData> PrepareBattleComponents()
@@ -38,6 +51,8 @@ public class InventoryItemManager : MonoBehaviour
 
         foreach (GameObject item in _inventory.equippedItems)
         {
+            if (item == null) continue;
+
             Item thisItem = item.GetComponent<Item>();
             foreach(Effect effect in thisItem.effects)
             {

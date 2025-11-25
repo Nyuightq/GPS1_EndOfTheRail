@@ -7,24 +7,39 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
+using DG.Tweening;
+using UnityEditorInternal;
 
 public class UI_PlayerStatus : MonoBehaviour
 {
     [Header("Scraps Component")]
     [SerializeField] private TMP_Text scrapsText;
+
     [Header("Health Component")]
     [SerializeField] private Slider hpSlider;
     [SerializeField] private TMP_Text hpText;
-    // [SerializeField] private TMP_Text currentHpText;
-    // [SerializeField] private TMP_Text maxHpText;
 
     [Header("Crystal Component")]
     [SerializeField] private Slider crystalHpSlider;
     [SerializeField] private TMP_Text crystalHpText;
-    // [SerializeField] private TMP_Text currentCrystalHpText;
-    // [SerializeField] private TMP_Text maxCrystalHpText;
+
     [Header("Script Component")]
     [SerializeField] private PlayerStatusManager playerStatus;
+
+    private int _t_currentHp = 0;
+    private int _t_currentScraps = 0;
+    private int _t_currentCrystalHp = 0;
+    private RectTransform _rectScraps;
+
+    private Coroutine hpRoutine;
+    private Coroutine scrapsRoutine;
+    private Coroutine crystalRoutine;
+
+    private void Start()
+    {
+        _rectScraps = scrapsText.GetComponentInParent<RectTransform>();
+    }
 
     private void OnEnable()
     {
@@ -33,7 +48,7 @@ public class UI_PlayerStatus : MonoBehaviour
             Debug.LogWarning("UI_PlayerStatus.cs: StatsGroup's PlayerStatusManager is not referenced.");
             return;
         }
-        
+
         playerStatus.OnHpChanged += UpdateHpUI;
         playerStatus.OnScrapsChanged += UpdateScrapsUI;
         playerStatus.OnCrystalHpChanged += UpdateCrystalHpUI;
@@ -42,34 +57,117 @@ public class UI_PlayerStatus : MonoBehaviour
     private void OnDisable()
     {
         if (playerStatus == null)
-        {
-            Debug.LogWarning("UI_PlayerStatus.cs: StatsGroup's PlayerStatusManager is not referenced.");
             return;
-        }
-        
+
         playerStatus.OnHpChanged -= UpdateHpUI;
         playerStatus.OnScrapsChanged -= UpdateScrapsUI;
         playerStatus.OnCrystalHpChanged -= UpdateCrystalHpUI;
     }
-    
-    private void UpdateScrapsUI(int currentScraps)
+
+    // ---------------------------
+    // SCRAPS
+    // ---------------------------
+    private void UpdateScrapsUI(int newScraps)
     {
-        scrapsText.text = currentScraps.ToString();
+        if (scrapsRoutine != null) StopCoroutine(scrapsRoutine);
+        scrapsRoutine = StartCoroutine(AnimateScraps(newScraps));
     }
 
-    private void UpdateHpUI(int currentHp, int maxHp)
+    private IEnumerator AnimateScraps(int target)
+    {
+        int start = _t_currentScraps;
+        float duration = 0.3f;
+        float t = 0;
+
+        // Define the quick pulse animation parameters
+        float pulseScale = 1.15f; // Scale up to 115%
+        float pulseDuration = 0.04f; // Very fast pulse
+
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            int transitionValue = Mathf.RoundToInt(Mathf.Lerp(start, target, t / duration));
+            if (transitionValue != _t_currentScraps)
+            {
+                _t_currentScraps = transitionValue;
+                scrapsText.text = _t_currentScraps.ToString();
+
+                // --- Repeated DoTween Pulse ---
+                // Stop any previous scale animation that might be running.
+                // DO NOT DOKill the entire RectTransform, as that would stop the number transition's original jump if it were running.
+                _rectScraps.DOKill(); // Kills only tweens created on this object with the 'true' parameter (optional, but cleaner)
+                _rectScraps.localScale = Vector3.one;
+                
+                // 1. Scale Up quickly
+                _rectScraps.DOScale(pulseScale, pulseDuration)
+                    .SetEase(Ease.OutCirc)
+                    .OnComplete(() =>
+                {
+                    // 4. Simultaneously Scale Back Down and Move Back Down
+                    _rectScraps.DOScale(1f, pulseDuration)
+                        .SetEase(Ease.InCirc);
+                });
+                // ------------------------------
+            }
+            yield return null;
+        }
+        _t_currentScraps = target;
+        scrapsText.text = target.ToString();
+        _rectScraps.DOScale(1f, pulseDuration);
+    }
+
+    // ---------------------------
+    // HP
+    // ---------------------------
+    private void UpdateHpUI(int newHp, int maxHp)
     {
         hpSlider.maxValue = maxHp;
-        hpSlider.value = currentHp;
+        AnimateHp(newHp, maxHp);
+    }
+    private void AnimateHp(int target, int maxHp)
+    {
+        float duration = 0.3f;
+        hpSlider.DOKill();
 
-        hpText.text = currentHp + "/" + maxHp;
+        hpSlider.DOValue(target, duration)
+            .SetEase(Ease.Linear)
+            .OnUpdate(() =>
+            {
+                _t_currentCrystalHp = Mathf.RoundToInt(hpSlider.value);
+                hpText.text = _t_currentCrystalHp + "/" + maxHp;
+            })
+            .OnComplete(() =>
+            {
+                _t_currentCrystalHp = target;
+                hpText.text = target + "/" + maxHp;
+            });
     }
 
-    private void UpdateCrystalHpUI(int currentHp, int maxHp)
+    // ---------------------------
+    // CRYSTAL HP
+    // ---------------------------
+    private void UpdateCrystalHpUI(int newHp, int maxHp)
     {
         crystalHpSlider.maxValue = maxHp;
-        crystalHpSlider.value = currentHp;
+        AnimateCrystalHp(newHp, maxHp);
+    }
 
-        crystalHpText.text = currentHp + "/" + maxHp;
+    private void AnimateCrystalHp(int target, int maxHp)
+    {
+        float duration = 0.3f;
+        crystalHpSlider.DOKill();
+
+        crystalHpSlider.DOValue(target, duration)
+            .SetEase(Ease.Linear)
+            .OnUpdate(() =>
+            {
+                _t_currentCrystalHp = Mathf.RoundToInt(crystalHpSlider.value);
+                crystalHpText.text = _t_currentCrystalHp + "/" + maxHp;
+            })
+            .OnComplete(() =>
+            {
+                _t_currentCrystalHp = target;
+                crystalHpText.text = target + "/" + maxHp;
+            });
     }
 }

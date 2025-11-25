@@ -26,6 +26,8 @@ public class CombatPlayerEntity : CombatEntity
     {
         _hp += amount;
         _hp = Mathf.Clamp(_hp, 0, _maxHp);
+        
+        updateUI();
         playerStatus.UpdateCurrentHp(_hp);
         combatEntityUI?.UpdateHealthBar(_hp * 1.0f, _maxHp * 1.0f);
     }

@@ -97,6 +97,7 @@ public class CombatEntity : MonoBehaviour
     public void updateUI()
     {
         combatEntityUI?.UpdateHealthBar(_hp*1.0f, _maxHp*1.0f);
+        OnTakeDamage?.Invoke(this, 0);
     }
 
     // Return true when target is getting killed in this hit.
