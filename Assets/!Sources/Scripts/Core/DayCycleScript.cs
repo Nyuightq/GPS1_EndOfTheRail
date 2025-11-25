@@ -1,7 +1,9 @@
 // --------------------------------------------------------------
 // Creation Date: 2025-10-12
+// Modified: 2025-11-23
 // Author: -
 // Description: Handles day/night transitions, UI overlay, and night encounters
+//              Now uses EnemyNumberEncounterData to determine spawn counts
 // --------------------------------------------------------------
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,7 +26,10 @@ public class DayCycleScript : MonoBehaviour
     [Header("Event Settings")]
     [SerializeField] private Tilemap eventTilemap;
     [SerializeField] private EncounterTile encounterTileSO;
-    [SerializeField, Range(0f, 1f)] private float globalSpawnChance = 0.3f;
+    
+    [Header("Enemy Encounter Data")]
+    [SerializeField] private EnemyNumberEncounterData enemyEncounterData;
+    
     public int GetDay() => day;
 
     [SerializeField] private Transform playerTrain;
@@ -63,6 +68,11 @@ public class DayCycleScript : MonoBehaviour
     {
         if (uiImageA != null) uiA_DayPos = uiImageA.anchoredPosition;
         if (uiImageB != null) uiB_DayPos = uiImageB.anchoredPosition;
+        
+        if (enemyEncounterData == null)
+        {
+            Debug.LogWarning("[DayCycleScript] EnemyNumberEncounterData not assigned! Please assign it in the inspector.");
+        }
     }
 
     private void Update()
@@ -172,7 +182,11 @@ public class DayCycleScript : MonoBehaviour
             return;
         }
 
-        int spawned = 0;
+        // Determine how many encounters to spawn based on the ScriptableObject data
+        int targetEncounterCount = GetTargetEncounterCount();
+        
+        // Convert HashSet to List for easier random selection
+        List<Vector3Int> availableTiles = new List<Vector3Int>();
         foreach (var pos in aheadTiles)
         {
             if (!grid.railAtPos(pos)) continue;
@@ -182,21 +196,42 @@ public class DayCycleScript : MonoBehaviour
             TileBase currentTile = eventTilemap.GetTile(pos);
             if (currentTile is EventTile) continue;
 
-            float roll = Random.value;
-            float finalChance = encounterTileSO.spawnChance * globalSpawnChance;
-            if (roll <= finalChance)
-            {
-                eventTilemap.SetTile(pos, encounterTileSO.tileVisual);
-                spawned++;
-            }
+            availableTiles.Add(pos);
         }
 
-        Debug.Log($"SpawnNightEncounters: spawned {spawned} encounters on {aheadTiles.Count} tiles ahead.");
+        if (availableTiles.Count == 0)
+        {
+            Debug.LogWarning("No valid tiles available for encounter spawning.");
+            return;
+        }
+
+        // Spawn the exact number of encounters determined by the data
+        int spawned = 0;
+        int attemptsLeft = Mathf.Min(targetEncounterCount, availableTiles.Count);
+        
+        while (spawned < targetEncounterCount && availableTiles.Count > 0 && attemptsLeft > 0)
+        {
+            int randomIndex = Random.Range(0, availableTiles.Count);
+            Vector3Int pos = availableTiles[randomIndex];
+            
+            eventTilemap.SetTile(pos, encounterTileSO.tileVisual);
+            spawned++;
+            
+            // Remove this tile from available tiles to avoid duplicates
+            availableTiles.RemoveAt(randomIndex);
+            attemptsLeft--;
+        }
+
+        Debug.Log($"SpawnNightEncounters (Day {day}): spawned {spawned}/{targetEncounterCount} encounters on {aheadTiles.Count} tiles ahead.");
     }
 
     private void SpawnEncountersOnTiles(RailGridScript grid)
     {
-        int spawned = 0;
+        // Determine how many encounters to spawn
+        int targetEncounterCount = GetTargetEncounterCount();
+        
+        // Collect all valid tiles
+        List<Vector3Int> availableTiles = new List<Vector3Int>();
         foreach (var kvp in grid.railDataMap)
         {
             Vector3Int pos = kvp.Key;
@@ -206,16 +241,49 @@ public class DayCycleScript : MonoBehaviour
                 TileBase currentTile = eventTilemap.GetTile(pos);
                 if (currentTile is EventTile) continue;
 
-                float roll = Random.value;
-                float finalChance = encounterTileSO.spawnChance * globalSpawnChance;
-                if (roll <= finalChance)
-                {
-                    eventTilemap.SetTile(pos, encounterTileSO.tileVisual);
-                    spawned++;
-                }
+                availableTiles.Add(pos);
             }
         }
-        Debug.Log($"SpawnEncountersOnTiles: Spawned {spawned} globally.");
+
+        if (availableTiles.Count == 0)
+        {
+            Debug.LogWarning("No valid tiles available for encounter spawning.");
+            return;
+        }
+
+        // Spawn encounters up to the target count
+        int spawned = 0;
+        int attemptsLeft = Mathf.Min(targetEncounterCount, availableTiles.Count);
+        
+        while (spawned < targetEncounterCount && availableTiles.Count > 0 && attemptsLeft > 0)
+        {
+            int randomIndex = Random.Range(0, availableTiles.Count);
+            Vector3Int pos = availableTiles[randomIndex];
+            
+            eventTilemap.SetTile(pos, encounterTileSO.tileVisual);
+            spawned++;
+            
+            availableTiles.RemoveAt(randomIndex);
+            attemptsLeft--;
+        }
+
+        Debug.Log($"SpawnEncountersOnTiles (Day {day}): Spawned {spawned}/{targetEncounterCount} globally.");
+    }
+
+    /// <summary>
+    /// Gets the target number of encounters to spawn based on the current day and ScriptableObject data.
+    /// </summary>
+    private int GetTargetEncounterCount()
+    {
+        if (enemyEncounterData == null)
+        {
+            Debug.LogWarning("[DayCycleScript] EnemyEncounterData is null, defaulting to 2 encounters.");
+            return 2;
+        }
+
+        int count = enemyEncounterData.GetRandomEnemyCount(day);
+        Debug.Log($"[DayCycleScript] Day {day}: Target encounter count = {count}");
+        return count;
     }
 
     private void ClearNightEncounters()

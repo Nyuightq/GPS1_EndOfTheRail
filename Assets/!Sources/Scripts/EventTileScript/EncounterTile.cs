@@ -1,7 +1,8 @@
 // --------------------------------------------------------------
 // Creation Date: 2025-10-13 00:03
+// Modified: 2025-11-23
 // Author: ZQlie
-// Description: -
+// Description: Event tile that triggers combat encounters
 // --------------------------------------------------------------
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -11,9 +12,6 @@ public class EncounterTile : EventTile
 {
     [Header("Visuals")]
     public Tile tileVisual; // Drag a Tile asset for this Encounter tile
-
-    [Header("Spawn Settings")]
-    [Range(0f, 1f)] public float spawnChance = 0.25f; // chance per tile each night
 
     private static Tilemap eventTilemap;
     private static Vector3Int? lastEncounterTilePos;
@@ -56,7 +54,6 @@ public class EncounterTile : EventTile
         if (CombatManager.Instance != null)
         {
             CombatManager.Instance.StartCombat(CombatManager.CombatType.Encounter);
-
 
             // Subscribe once to combat end event
             CombatManager.OnCombatClosed -= DeleteEncounterTile;

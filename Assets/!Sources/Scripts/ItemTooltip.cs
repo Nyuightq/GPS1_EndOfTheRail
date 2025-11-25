@@ -224,7 +224,7 @@ public class ItemTooltip : MonoBehaviour
         {
             int damage = Convert.ToInt32(baseDamageField.GetValue(effect) ?? 0);
             int actualDamage = damage * _currentItem.level;
-            desc.AppendLine($"<color=#C23753>Base Damage: {actualDamage}</color>");
+            desc.AppendLine($"<color=#C23753>Damage: {actualDamage}</color>");
         }
 
         if (baseSpeedField != null)

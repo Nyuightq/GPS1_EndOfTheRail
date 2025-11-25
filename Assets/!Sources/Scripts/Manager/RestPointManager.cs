@@ -1,7 +1,8 @@
 // --------------------------------------------------------------
 // Creation Date: 2025-10-22 23:55
+// Modified: 2025-11-25
 // Author: ZQlie
-// Description: Manages rest point interactions including healing and optional night skip
+// Description: Manages rest point interactions including healing and optional night/day skip
 // --------------------------------------------------------------
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,9 +25,11 @@ public class RestPointManager : MonoBehaviour
     [SerializeField] private int healAmount = 20;
     [SerializeField] private int scrapCost = 10;
     
-    [Header("Skip Night Settings (Editor Only)")]
+    [Header("Skip Time Settings (Editor Only)")]
     [SerializeField] private bool skipNightOnRestPoint = false;
-    [Tooltip("If enabled, night will be automatically skipped when entering a rest point during day time")]
+    [Tooltip("If enabled, night will be automatically skipped when entering a rest point during night time")]
+    [SerializeField] private bool skipDayOnRestPoint = false;
+    [Tooltip("If enabled, day will be automatically skipped when entering a rest point during day time")]
     [SerializeField] private OnDayToNight dayNightController;
     [SerializeField] private OnTrainLight trainLightController;
     
@@ -81,17 +84,37 @@ public class RestPointManager : MonoBehaviour
         
         isOnRestPoint = true;
         trainMovement = train;
-        
+
+        //----------Debug for tileMoevd = 0 when enter rest point-------------
+        if (dayCycleScript != null)
+        {
+            int tiles = dayCycleScript.getTilesMoved();
+            if (tiles == 0)
+            {
+                Debug.Log("[RestPoint] tilesMoved == 0 on entering rest point (start of time phase).");
+            }
+            else
+            {
+                Debug.Log($"[RestPoint] tilesMoved on enter = {tiles}");
+            }
+        }
+        //----------Debug for tileMoevd = 0 when enter rest point-------------
+
         if (healPromptButton != null)
             healPromptButton.gameObject.SetActive(true);
         
-        // Auto-skip night if enabled and currently day time
-        if (skipNightOnRestPoint && dayCycleScript != null)
+        // Auto-skip time based on current state
+        if (dayCycleScript != null)
         {
-            if (dayCycleScript.CurrentTime == DayCycleScript.TimeState.Day)
+            if (dayCycleScript.CurrentTime == DayCycleScript.TimeState.Night && skipNightOnRestPoint)
             {
                 Debug.Log("[Editor Feature] Auto-skipping night on rest point");
-                SkipNightImmediate();
+                SkipToNextDay();
+            }
+            else if (dayCycleScript.CurrentTime == DayCycleScript.TimeState.Day && skipDayOnRestPoint)
+            {
+                Debug.Log("[Editor Feature] Auto-skipping day on rest point");
+                SkipToNextDay();
             }
         }
         
@@ -155,62 +178,112 @@ public class RestPointManager : MonoBehaviour
         HideConfirmPanel();
     }
 
-    private void SkipNightImmediate()
+    /// <summary>
+    /// Skips the current time phase (day or night) and fast forwards to the next day.
+    /// Works for both day->night->day and night->day transitions.
+    /// </summary>
+    private void SkipToNextDay()
     {
         if (dayCycleScript == null)
-            return;
-
-        // Check if it's day time
-        if (dayCycleScript.CurrentTime != DayCycleScript.TimeState.Day)
         {
-            Debug.LogWarning("Can only skip night during day time!");
+            Debug.LogWarning("DayCycleScript not found!");
             return;
         }
 
-        Debug.Log($"[Editor] Skipping night - Fast forwarding to Day {dayCycleScript.GetDay() + 1}");
+        DayCycleScript.TimeState currentState = dayCycleScript.CurrentTime;
+        int currentDay = dayCycleScript.GetDay();
 
-        // Set tiles moved to the day length to trigger night transition
-        int requiredTiles = dayCycleScript.DayLength + dayCycleScript.DayLengthMod;
-        dayCycleScript.setTilesMoved(requiredTiles);
+        Debug.Log($"[Editor] Starting skip from {currentState} (Day {currentDay})");
 
-        // Wait one frame for night to start, then immediately end it
-        StartCoroutine(SkipNightCoroutine());
+        if (currentState == DayCycleScript.TimeState.Day)
+        {
+            // Skip day -> transition to night -> immediately skip night -> arrive at next day
+            StartCoroutine(SkipDayToNextDay(currentDay));
+        }
+        else // Night
+        {
+            // Skip night -> transition to next day
+            StartCoroutine(SkipNightToNextDay(currentDay));
+        }
     }
 
-    private System.Collections.IEnumerator SkipNightCoroutine()
+    private System.Collections.IEnumerator SkipDayToNextDay(int startDay)
     {
-        // Wait for one frame to let the day->night transition happen
-        yield return null;
+        // Step 1: Fast forward day to trigger night transition
+        int requiredTiles = dayCycleScript.DayLength + dayCycleScript.DayLengthMod;
+        dayCycleScript.setTilesMoved(requiredTiles);
         
-        // Check if we're now in night phase
+        Debug.Log($"[Editor] Fast forwarding day (set tiles to {requiredTiles})");
+
+        // Wait for the day->night transition to complete
+        yield return null;
+        yield return null; // Extra frame for safety
+        
+        // Step 2: Verify we're in night, then immediately skip night
         if (dayCycleScript.CurrentTime == DayCycleScript.TimeState.Night)
         {
-            // Immediately end the night by setting tiles moved to night length
-            dayCycleScript.setTilesMoved(dayCycleScript.NightLength);
-
-            // Reset lights
-            dayNightController?.ForceResetToDay();
-            trainLightController?.ForceResetToDay();
-
-            /*// Force light intensity back to day
-            if (dayNightController != null)
-            {
-                dayNightController.ForceResetToDay();
-            }
-
-            // Force train light intensity and alpha back to day
-            if (trainLightController != null)
-            {
-                trainLightController.ForceResetToDay();
-            }
-            */
+            Debug.Log("[Editor] Day->Night transition complete, now skipping night");
             
-            Debug.Log("[Editor] Night skipped - Starting new day with lighting reset");
+            // Immediately end the night
+            dayCycleScript.setTilesMoved(dayCycleScript.NightLength);
+            
+            // Wait for night->day transition
+            yield return null;
+            yield return null;
+            
+            // Reset lights to day state
+            ResetLightsToDay();
+            
+            int newDay = dayCycleScript.GetDay();
+            Debug.Log($"[Editor] Day skip complete - Advanced from Day {startDay} to Day {newDay}");
         }
         else
         {
-            Debug.LogWarning("Failed to skip night - not in night phase");
+            Debug.LogWarning("[Editor] Failed to transition to night!");
         }
+    }
+
+    private System.Collections.IEnumerator SkipNightToNextDay(int startDay)
+    {
+        // Fast forward night to trigger day transition
+        dayCycleScript.setTilesMoved(dayCycleScript.NightLength);
+        
+        Debug.Log($"[Editor] Fast forwarding night (set tiles to {dayCycleScript.NightLength})");
+        
+        // Wait for the night->day transition to complete
+        yield return null;
+        yield return null; // Extra frame for safety
+        
+        // Verify we're in day state
+        if (dayCycleScript.CurrentTime == DayCycleScript.TimeState.Day)
+        {
+            // Reset lights to day state
+            ResetLightsToDay();
+            
+            int newDay = dayCycleScript.GetDay();
+            Debug.Log($"[Editor] Night skip complete - Advanced from Day {startDay} to Day {newDay}");
+        }
+        else
+        {
+            Debug.LogWarning("[Editor] Failed to transition to day!");
+        }
+    }
+
+    private void ResetLightsToDay()
+    {
+        // Force light intensity back to day
+        if (dayNightController != null)
+        {
+            dayNightController.ForceResetToDay();
+        }
+
+        // Force train light intensity and alpha back to day
+        if (trainLightController != null)
+        {
+            trainLightController.ForceResetToDay();
+        }
+        
+        Debug.Log("[Editor] Lights reset to day state");
     }
 
     private void ShowConfirmPanel(string description, bool canAfford)

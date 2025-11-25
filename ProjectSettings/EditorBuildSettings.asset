@@ -13,11 +13,14 @@ EditorBuildSettings:
     guid: ebac6a8ce83b0ff4296b990dc559cbe6
   - enabled: 0
     path: Assets/!Sources/Scenes/GameplayLevel.unity
-    guid: 2e1a5f88e04b50a439922d2e2828b441
-  - enabled: 1
+    guid: 66be1a89e13519c458f88a037c329990
+  - enabled: 0
     path: Assets/!Sources/Scenes/TestPurpose/[HuiSeng] GameplayLevel.unity
     guid: a025f9506e647d3478f55b8e671e6095
   - enabled: 1
+    path: Assets/!Sources/Scenes/TestPurpose/[ZQ] GameplayLevel.unity
+    guid: c0fbcb574db3b014eabd67ccdbd98c1a
+  - enabled: 0
     path: Assets/!Sources/Scenes/ResultScene.unity
     guid: b8bfc7eea3911114d8b07771f911ab22
   m_configObjects:

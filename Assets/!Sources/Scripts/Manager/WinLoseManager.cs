@@ -1,14 +1,15 @@
 // --------------------------------------------------------------
 // Creation Date: 2025-10-31
-// Description: Handles win/lose conditions and triggers transitions
+// Description: Handles win/lose conditions - shows in-scene results
 // --------------------------------------------------------------
+
+// Add counter for successful merge
+// Pending counter for Item Acquired
+// Perhaps Scraps Spended for Expanding Inventory + Scraps Spended for buying items + total scraps acquired
+
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
-#if UNITY_EDITOR
-using UnityEditor.SceneManagement;
-#endif
 
 public class WinLoseManager : MonoBehaviour
 {
@@ -19,45 +20,81 @@ public class WinLoseManager : MonoBehaviour
     [SerializeField] private DayCycleScript dayCycle;
     [SerializeField] private CombatManager combatManager;
     
-    [Header("Data")]
-    [SerializeField] private RunStatsData runStatsData; // Reference to ScriptableObject
+    [Header("Result Panels")]
+    [SerializeField] private GameObject winPanel;
+    [SerializeField] private GameObject losePanel;
+    
+    [Header("Inventory Canvas")]
+    [SerializeField] private Canvas inventoryCanvas; // Reference to the InventoryCanvas
+    [SerializeField] private RectTransform winPanelInventoryAnchor; // Anchor point in Win Panel
+    [SerializeField] private RectTransform losePanelInventoryAnchor; // Anchor point in Lose Panel
+    [SerializeField] private bool showInventoryInResults = true; // Toggle inventory display
+    
+    [Header("Action Buttons")]
+    [SerializeField] private UnityEngine.UI.Button replayButtonWin;
+    [SerializeField] private UnityEngine.UI.Button replayButtonLose;
+    [SerializeField] private UnityEngine.UI.Button mainMenuButtonWin;
+    [SerializeField] private UnityEngine.UI.Button mainMenuButtonLose;
+    
+    [Header("Win Panel Stats Text")]
+    [SerializeField] private TMPro.TextMeshProUGUI winHpText;
+    [SerializeField] private TMPro.TextMeshProUGUI winCrystalHpText;
+    [SerializeField] private TMPro.TextMeshProUGUI winScrapsText;
+    [SerializeField] private TMPro.TextMeshProUGUI winDaysText;
+    [SerializeField] private TMPro.TextMeshProUGUI winCombatsText;
+
+    [Header("Lose Panel Stats Text")]
+    [SerializeField] private TMPro.TextMeshProUGUI loseReasonText;
+    [SerializeField] private TMPro.TextMeshProUGUI loseScrapsText;
+    [SerializeField] private TMPro.TextMeshProUGUI loseDaysText;
+    [SerializeField] private TMPro.TextMeshProUGUI loseCombatsText;
 
     [Header("Scene Settings")]
-    [SerializeField] private string resultSceneName = "ResultScene"; // Change this to your actual scene name
-    [SerializeField] private float transitionDelay = 1f;
-    // [SerializeField] private bool useEditorSceneLoading = true; // Enable for editor testing without Build Settings
+    [SerializeField] private string mainMenuSceneName = "MainMenu";
 
     [Header("Game State")]
     public bool isGameOver = false;
 
     private bool _initialized = false;
+    private RectTransform inventoryRectTransform;
+    private Transform inventoryOriginalParent;
+    private Vector3 inventoryOriginalPosition;
+    private Vector3 inventoryOriginalScale;
+    private int inventoryOriginalSortingOrder;
 
     private IEnumerator Start()
     {
         yield return null; // Wait one frame for dynamic objects to spawn
         _initialized = true;
 
-        // if (replayButtonWin != null)
-        //     replayButtonWin.onClick.AddListener(ReloadScene);
-        // if (replayButtonLose != null)
-        //     replayButtonLose.onClick.AddListener(ReloadScene);
+        // Hide all panels initially
+        if (winPanel != null) winPanel.SetActive(false);
+        if (losePanel != null) losePanel.SetActive(false);
 
-        // if (winPanel != null) winPanel.SetActive(false);
-        // if (losePanel != null) losePanel.SetActive(false);
+        // Store inventory canvas original state
+        if (inventoryCanvas != null)
+        {
+            inventoryRectTransform = inventoryCanvas.GetComponent<RectTransform>();
+            if (inventoryRectTransform != null)
+            {
+                inventoryOriginalParent = inventoryRectTransform.parent;
+                inventoryOriginalPosition = inventoryRectTransform.localPosition;
+                inventoryOriginalScale = inventoryRectTransform.localScale;
+                inventoryOriginalSortingOrder = inventoryCanvas.sortingOrder;
+                Debug.Log("[WinLoseManager] Stored inventory canvas original state");
+            }
+        }
 
-        // Try to auto-assign runtime-spawned references
-        // if (trainMovement == null)
-        //     trainMovement = FindFirstObjectByType<TrainMovement>();
-        // if (playerStatus == null)
-        //     playerStatus = FindFirstObjectByType<PlayerStatusManager>();
-        // if (gridManager == null)
-        //     gridManager = FindFirstObjectByType<RailGridScript>();
+        // Setup action buttons
+        if (replayButtonWin != null)
+            replayButtonWin.onClick.AddListener(ReloadScene);
+        if (replayButtonLose != null)
+            replayButtonLose.onClick.AddListener(ReloadScene);
+        if (mainMenuButtonWin != null)
+            mainMenuButtonWin.onClick.AddListener(LoadMainMenu);
+        if (mainMenuButtonLose != null)
+            mainMenuButtonLose.onClick.AddListener(LoadMainMenu);
 
-        // if (trainMovement == null)
-        //     Debug.LogWarning("WinLoseManager could not find TrainMovement at start.");
-        // else
-        //     Debug.Log($"TrainMovement assigned: {trainMovement.name}");
-        // Auto-assign runtime-spawned references
         TryAssignReferences();
     }
 
@@ -82,8 +119,6 @@ public class WinLoseManager : MonoBehaviour
             trainMovement = FindFirstObjectByType<TrainMovement>();
             if (trainMovement != null)
                 Debug.Log($"[WinLoseManager] Found TrainMovement: {trainMovement.name}");
-            else
-                Debug.LogWarning("[WinLoseManager] TrainMovement not found!");
         }
         
         if (playerStatus == null)
@@ -91,8 +126,6 @@ public class WinLoseManager : MonoBehaviour
             playerStatus = FindFirstObjectByType<PlayerStatusManager>();
             if (playerStatus != null)
                 Debug.Log($"[WinLoseManager] Found PlayerStatusManager: {playerStatus.name}");
-            else
-                Debug.LogWarning("[WinLoseManager] PlayerStatusManager not found!");
         }
         
         if (gridManager == null)
@@ -100,8 +133,6 @@ public class WinLoseManager : MonoBehaviour
             gridManager = FindFirstObjectByType<RailGridScript>();
             if (gridManager != null)
                 Debug.Log($"[WinLoseManager] Found RailGridScript: {gridManager.name}");
-            else
-                Debug.LogWarning("[WinLoseManager] RailGridScript not found!");
         }
         
         if (dayCycle == null)
@@ -125,12 +156,10 @@ public class WinLoseManager : MonoBehaviour
 
         if (playerStatus.Hp <= 0)
         {
-            Debug.Log("Player Lost! Reason: Player HP reached 0.");
             TriggerLose("HP reached 0");
         }
         else if (playerStatus.CrystalHp <= 0)
         {
-            Debug.Log("Player Lost! Reason: Crystal HP reached 0.");
             TriggerLose("Crystal HP reached 0");
         }
     }
@@ -140,19 +169,16 @@ public class WinLoseManager : MonoBehaviour
         if (trainMovement == null || gridManager == null) return;
 
         Grid grid = gridManager.GetComponent<Grid>();
-        if (grid == null)
-        {
-            Debug.LogWarning("No Grid component found on RailGridScript GameObject.");
-            return;
-        }
+        if (grid == null) return;
 
         Vector3Int currentTile = grid.WorldToCell(trainMovement.transform.position);
         RailData currentRail = gridManager.GetRailAtPos(currentTile);
 
         if (currentRail != null && currentRail.railType == RailData.railTypes.end)
         {
-            if (playerStatus != null &&
-                playerStatus.Hp > 0 && playerStatus.CrystalHp > 0)
+            if (playerStatus != null && 
+                playerStatus.Hp > 0 && 
+                playerStatus.CrystalHp > 0)
             {
                 TriggerWin();
             }
@@ -166,13 +192,17 @@ public class WinLoseManager : MonoBehaviour
         isGameOver = true;
         Time.timeScale = 0f;
 
-        Debug.Log("Win triggered! Saving stats and transitioning...");
+        Debug.Log("Player Won! Showing Win Panel...");
 
-        // Save run stats
-        SaveCurrentRunStats(true, "");
+        // Display win panel with stats
+        DisplayWinStats();
+        
+        if (winPanel != null) winPanel.SetActive(true);
+        if (losePanel != null) losePanel.SetActive(false);
 
-        // Transition to result scene
-        StartCoroutine(TransitionToResultScene());
+        // Attach inventory to win panel
+        if (showInventoryInResults)
+            AttachInventoryToPanel(winPanelInventoryAnchor);
     }
 
     private void TriggerLose(string reason = "Unknown")
@@ -184,79 +214,213 @@ public class WinLoseManager : MonoBehaviour
         if (trainMovement != null)
             trainMovement.enabled = false;
 
-        Debug.Log($"Player Lost! Reason: {reason}");
-        GameStateManager.SetPhase(Phase.Lose);
-
-        // Save run stats
-        SaveCurrentRunStats(false, reason);
-
+        Debug.Log($"Player Lost! Reason: {reason}. Showing Lose Panel...");
         Time.timeScale = 0f;
 
-        // Transition to result scene
-        StartCoroutine(TransitionToResultScene());
+        // Display lose panel with stats
+        DisplayLoseStats(reason);
+        
+        if (winPanel != null) winPanel.SetActive(false);
+        if (losePanel != null) losePanel.SetActive(true);
+
+        // Attach inventory to lose panel
+        if (showInventoryInResults)
+            AttachInventoryToPanel(losePanelInventoryAnchor);
     }
 
-    private void SaveCurrentRunStats(bool won, string loseReason)
+    private void DisplayWinStats()
     {
-        if (runStatsData == null)
-        {
-            Debug.LogWarning("RunStatsData ScriptableObject is not assigned! Cannot save stats.");
-            return;
-        }
-
-        if (playerStatus == null)
-        {
-            Debug.LogWarning("PlayerStatusManager is null! Cannot save stats.");
-            return;
-        }
+        if (playerStatus == null) return;
 
         int days = dayCycle != null ? dayCycle.GetDay() : 0;
         int totalCombats = combatManager != null ? 
             (combatManager.totalCombatsFaced + combatManager.totalEncountersFaced) : 0;
 
-        runStatsData.SaveRunStats(
-            playerStatus.Hp,
-            playerStatus.MaxHp,
-            playerStatus.CrystalHp,
-            playerStatus.MaxCrystalHp,
-            playerStatus.Scraps,
-            days,
-            totalCombats,
-            0, // encounters (if tracked separately)
-            won,
-            loseReason
-        );
+        if (winHpText != null)
+            winHpText.text = $"HP: {playerStatus.Hp}/{playerStatus.MaxHp}";
+        
+        if (winCrystalHpText != null)
+            winCrystalHpText.text = $"Crystal HP: {playerStatus.CrystalHp}/{playerStatus.MaxCrystalHp}";
+        
+        if (winScrapsText != null)
+            winScrapsText.text = $"Scraps: {playerStatus.Scraps}";
+        
+        if (winDaysText != null)
+            winDaysText.text = $"Days Survived: {days}";
+        
+        if (winCombatsText != null)
+            winCombatsText.text = $"Combats Faced: {totalCombats}";
+
+        Debug.Log($"[WinLoseManager] Win stats displayed - Days: {days}, Combats: {totalCombats}");
     }
 
-    private IEnumerator TransitionToResultScene()
+    private void DisplayLoseStats(string reason)
     {
-        Debug.Log($"Transitioning to '{resultSceneName}' in {transitionDelay} seconds...");
+        if (playerStatus == null) return;
 
-        float elapsed = 0f;
-        while (elapsed < transitionDelay)
+        int days = dayCycle != null ? dayCycle.GetDay() : 0;
+        int totalCombats = combatManager != null ? 
+            (combatManager.totalCombatsFaced + combatManager.totalEncountersFaced) : 0;
+
+        if (loseReasonText != null)
+            loseReasonText.text = $"Reason: {reason}";
+        
+        if (loseScrapsText != null)
+            loseScrapsText.text = $"Scraps: {playerStatus.Scraps}";
+        
+        if (loseDaysText != null)
+            loseDaysText.text = $"Days Survived: {days}";
+        
+        if (loseCombatsText != null)
+            loseCombatsText.text = $"Combats Faced: {totalCombats}";
+
+        Debug.Log($"[WinLoseManager] Lose stats displayed - Reason: {reason}, Days: {days}");
+    }
+
+    /// <summary>
+    /// Attaches the inventory canvas to a specific anchor point in the result panel
+    /// </summary>
+    private void AttachInventoryToPanel(RectTransform anchorPoint)
+    {
+        if (inventoryCanvas == null || inventoryRectTransform == null || anchorPoint == null)
         {
-            elapsed += Time.unscaledDeltaTime;
-            yield return null;
+            Debug.LogWarning("[WinLoseManager] Cannot attach inventory - missing references");
+            return;
         }
 
-        Time.timeScale = 1f;
+        // Reparent inventory to the anchor point
+        inventoryRectTransform.SetParent(anchorPoint, false);
         
-        if (!string.IsNullOrEmpty(resultSceneName))
+        // Reset local position/scale to match anchor
+        inventoryRectTransform.localPosition = Vector3.zero;
+        inventoryRectTransform.localScale = Vector3.one;
+        
+        // Ensure inventory canvas is visible and on top
+        inventoryCanvas.gameObject.SetActive(true);
+        inventoryCanvas.sortingOrder = 100; // High value to ensure visibility
+        
+        Debug.Log($"[WinLoseManager] Inventory canvas attached to {anchorPoint.name}");
+    }
+
+    /// <summary>
+    /// Restores inventory canvas to its original parent and state
+    /// </summary>
+    private void RestoreInventoryCanvas()
+    {
+        if (inventoryCanvas == null || inventoryRectTransform == null || inventoryOriginalParent == null)
         {
-            try
-            {
-                SceneManager.LoadScene(resultSceneName);
-                Debug.Log($"Loading result scene: {resultSceneName}");
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError($"Failed to load scene '{resultSceneName}': {e.Message}");
-                Debug.LogError("Make sure the scene is added to Build Settings (File → Build Settings → Add Open Scenes)");
-            }
+            Debug.LogWarning("[WinLoseManager] Cannot restore inventory - missing original state");
+            return;
+        }
+
+        inventoryRectTransform.SetParent(inventoryOriginalParent, false);
+        inventoryRectTransform.localPosition = inventoryOriginalPosition;
+        inventoryRectTransform.localScale = inventoryOriginalScale;
+        inventoryCanvas.sortingOrder = inventoryOriginalSortingOrder;
+        
+        Debug.Log("[WinLoseManager] Inventory canvas restored to original state");
+    }
+
+    private void ReloadScene()
+    {
+        Debug.Log("[WinLoseManager] Reloading scene for new game...");
+
+        // Restore inventory canvas before cleanup
+        RestoreInventoryCanvas();
+
+        // Clean up ALL singleton managers before reload
+        CleanupAllManagers();
+
+        // Reset timescale
+        Time.timeScale = 1f;
+
+        // Reload current scene
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    private void LoadMainMenu()
+    {
+        Debug.Log("[WinLoseManager] Loading main menu...");
+        
+        // Restore inventory canvas before cleanup
+        RestoreInventoryCanvas();
+        
+        CleanupAllManagers();
+        Time.timeScale = 1f;
+
+        if (!string.IsNullOrEmpty(mainMenuSceneName))
+        {
+            SceneManager.LoadScene(mainMenuSceneName);
         }
         else
         {
-            Debug.LogError("Result scene name not set in WinLoseManager!");
+            Debug.LogWarning("[WinLoseManager] Main menu scene name not set!");
         }
+    }
+
+    private void CleanupAllManagers()
+    {
+        Debug.Log("[WinLoseManager] Cleaning up all singleton managers...");
+
+        // Destroy all singleton managers to ensure clean reload
+        if (CombatManager.Instance != null)
+        {
+            Destroy(CombatManager.Instance.gameObject);
+            Debug.Log("[WinLoseManager] Destroyed CombatManager");
+        }
+
+        if (GameStateManager.Instance != null)
+        {
+            Destroy(GameStateManager.Instance.gameObject);
+            Debug.Log("[WinLoseManager] Destroyed GameStateManager");
+        }
+
+        if (RewardManager.Instance != null)
+        {
+            Destroy(RewardManager.Instance.gameObject);
+            Debug.Log("[WinLoseManager] Destroyed RewardManager");
+        }
+
+        if (TransactionManager.Instance != null)
+        {
+            Destroy(TransactionManager.Instance.gameObject);
+            Debug.Log("[WinLoseManager] Destroyed TransactionManager");
+        }
+
+        if (ChurchManager.Instance != null)
+        {
+            Destroy(ChurchManager.Instance.gameObject);
+            Debug.Log("[WinLoseManager] Destroyed ChurchManager");
+        }
+
+        if (EngineerManager.Instance != null)
+        {
+            Destroy(EngineerManager.Instance.gameObject);
+            Debug.Log("[WinLoseManager] Destroyed EngineerManager");
+        }
+
+        if (SoundManager.Instance != null)
+        {
+            Destroy(SoundManager.Instance.gameObject);
+            Debug.Log("[WinLoseManager] Destroyed SoundManager");
+        }
+
+        // Add any other singleton managers here
+        // if (InventoryItemManager.Instance != null) { Destroy(...); }
+
+        Debug.Log("[WinLoseManager] All managers cleaned up successfully");
+    }
+
+    private void OnDestroy()
+    {
+        // Clean up button listeners
+        if (replayButtonWin != null)
+            replayButtonWin.onClick.RemoveListener(ReloadScene);
+        if (replayButtonLose != null)
+            replayButtonLose.onClick.RemoveListener(ReloadScene);
+        if (mainMenuButtonWin != null)
+            mainMenuButtonWin.onClick.RemoveListener(LoadMainMenu);
+        if (mainMenuButtonLose != null)
+            mainMenuButtonLose.onClick.RemoveListener(LoadMainMenu);
     }
 }

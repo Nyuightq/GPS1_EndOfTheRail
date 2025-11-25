@@ -35,4 +35,3 @@ MonoBehaviour:
   m_Flags: 1
   m_ColliderType: 1
   tileVisual: {fileID: 11400000}
-  spawnChance: 0.5

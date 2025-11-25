@@ -70,8 +70,6 @@ public class InventoryGridScript : MonoBehaviour
     private float canvasWidth;
     private float canvasHeight;
 
-    
-    
 
 
     public InventoryState CurrentInventoryState
