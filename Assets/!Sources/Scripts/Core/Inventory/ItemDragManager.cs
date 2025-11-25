@@ -19,6 +19,7 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
 
     public Vector2 topLeftCellPos { get; private set; }
     private Vector2 dragDir;
+    public bool canDrag;
     public bool dragging { get; private set; }
     private bool mouseOnItem;
     public Vector2 TopLeftCellPos => topLeftCellPos;
@@ -55,6 +56,11 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
         InputManager.OnLeftClick -= LeftClick;
         InputManager.OnLeftRelease -= LeftRelease;
         InputManager.OnRightClick -= RightClick;
+    }
+
+    public void OnDestroy()
+    {
+        tooltip.Hide();
     }
 
     public void Update()
@@ -133,15 +139,24 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
 
     private void LeftClick()
     {
-        if (mouseOnItem && GameStateManager.CurrentPhase != Phase.Combat)
+        if (mouseOnItem && GameStateManager.CurrentPhase != Phase.Combat && !itemScript.flaggedForDeletion)
+        {
+            canDrag = true;
+        }
+        else
+        {
+            canDrag = false;
+        }
+
+        if (canDrag)
         {
             dragging = true;
 
             if (topLeftCellPos != null && itemScript.state == Item.itemState.equipped)
             {
                 inventoryGridScript.MarkCells(
-                    Vector2Int.FloorToInt(topLeftCellPos), 
-                    itemScript.itemShape, 
+                    Vector2Int.FloorToInt(topLeftCellPos),
+                    itemScript.itemShape,
                     null
                 );
                 itemScript.state = Item.itemState.unequipped;

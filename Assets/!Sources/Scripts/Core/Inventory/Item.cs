@@ -48,6 +48,8 @@ public class Item : MonoBehaviour
     private Quaternion baseRotation = Quaternion.identity;
     private Tween shakeTween;
 
+    public bool flaggedForDeletion;
+
     #region Unity LifeCycle
     private void OnEnable()
     {
@@ -56,7 +58,7 @@ public class Item : MonoBehaviour
 
     #region event invokers
     public void TriggerEffectUnequip() { OnUnequip?.Invoke(); }
-    public void TriggerEffectAdjacentEquip() { OnAdjacentEquip?.Invoke(); }
+    public void TriggerEffectAdjacentEquip(){ if (this != null) OnAdjacentEquip?.Invoke(); }
     public void TriggerEffectEquip() { OnEquip?.Invoke();  }
     //public void TriggerEffectConditionOnce() { OnConditionTriggerOnce?.Invoke(); }
     public void TriggerEffectUpdate() { OnUpdate?.Invoke(); }
@@ -244,4 +246,31 @@ public class Item : MonoBehaviour
         sprite.sprite = newSprite;
         sprite.SetNativeSize();
     }
+
+    public void PrepareDeletion()
+    {
+        if (flaggedForDeletion) return;
+        flaggedForDeletion = true;
+
+        float fadeDuration = 0.5f;
+
+        sprite.color = Color.red;
+        Tween fadeTween = sprite.DOFade(0, fadeDuration);
+        fadeTween.OnComplete(OnDeletionComplete);
+    }
+
+    private void OnDeletionComplete()
+    {
+        OnEquip = null;
+        OnUnequip = null;
+        OnBattleStart = null;
+        OnBattleEnd = null;
+        OnUpdate = null;
+        OnBattleUpdate = null;
+        OnAdjacentEquip = null;
+        OnDayStart = null;
+
+        Destroy(gameObject);
+    }
+    
 }

@@ -286,7 +286,7 @@ public class CombatSystem : UI_BaseEventPanel
         {
             if(!GameManager.instance.inventoryScript.equippedItems.Contains(item.gameObject))
             {
-                Destroy(item.gameObject);
+                item.PrepareDeletion();
             }
         }
     }
