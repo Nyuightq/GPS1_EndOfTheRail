@@ -59,6 +59,10 @@ public class RestPointManager : MonoBehaviour
         // Find OnTrainLight if not assigned
         if (trainLightController == null)
             trainLightController = FindFirstObjectByType<OnTrainLight>();
+
+        // Find PlayerStatusManager if not assigned
+        if (playerStatusManager == null)
+        playerStatusManager = FindFirstObjectByType<PlayerStatusManager>();
         
         HideAll();
     }
