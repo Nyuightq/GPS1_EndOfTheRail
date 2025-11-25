@@ -69,6 +69,7 @@ public class InventoryGridScript : MonoBehaviour
     private float cellSize = GameManager.cellSize;
     private float canvasWidth;
     private float canvasHeight;
+    private OnPausePlay pauseState;
 
     
     
@@ -131,6 +132,7 @@ public class InventoryGridScript : MonoBehaviour
     //slight delay for start so i can properly generate the grid
     private IEnumerator Start()
     {
+        pauseState = FindFirstObjectByType<OnPausePlay>();
         canvasWidth = inventoryRect.rect.width;
         canvasHeight = inventoryRect.rect.height;
         CurrentInventoryState = InventoryState.normal;
@@ -168,7 +170,7 @@ public class InventoryGridScript : MonoBehaviour
         
         //Debug.Log($"Local mouse: {mouse}, success={success}");
 
-        if (inventoryGrid != null)
+        if (inventoryGrid != null && pauseState.IsOnSettings == false)
         {
             Vector2Int cellPos = GetCellAtPos(mouseBottomLeft);
             EnlargeOnHover(cellPos);
