@@ -2733,6 +2733,10 @@ PrefabInstance:
       propertyPath: slot2.slotAnchor
       value: 
       objectReference: {fileID: 9201123138169694167}
+    - target: {fileID: 5534164070626002141, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: slot3.slotAnchor
+      value: 
+      objectReference: {fileID: 1306296630942289438}
     - target: {fileID: 7030176318696570325, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: runStatsData
       value: 
