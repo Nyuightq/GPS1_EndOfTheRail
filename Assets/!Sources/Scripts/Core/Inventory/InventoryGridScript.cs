@@ -380,7 +380,7 @@ public class InventoryGridScript : MonoBehaviour
             return;
         }
 
-        Vector2Int pos = foundPos.Value;
+        Vector2Int pos = (Vector2Int)foundPos;
         Debug.Log("valid spot found!");
 
         // Calculate anchor position of item centre

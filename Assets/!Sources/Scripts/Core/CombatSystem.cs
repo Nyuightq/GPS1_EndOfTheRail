@@ -74,7 +74,7 @@ public class CombatSystem : UI_BaseEventPanel
     {
         isBattling = true;
         GameStateManager.SetPhase(Phase.Combat);
-
+        DeleteUnequippedItems();
         StartCoroutine(DelayedBattleStartEffects());
     }
 
@@ -297,6 +297,18 @@ public class CombatSystem : UI_BaseEventPanel
         foreach (GameObject item in GameManager.instance.inventoryScript.equippedItems)
         {
             item.GetComponent<Item>().TriggerEffectBattleStart();
+        }
+    }
+
+    private void DeleteUnequippedItems()
+    {
+        Item[] items = FindObjectsByType<Item>(FindObjectsSortMode.None);
+        foreach(Item item in items)
+        {
+            if(!GameManager.instance.inventoryScript.equippedItems.Contains(item.gameObject))
+            {
+                item.PrepareDeletion();
+            }
         }
     }
 }

@@ -19,7 +19,9 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
 
     public Vector2 topLeftCellPos { get; private set; }
     private Vector2 dragDir;
-    private bool dragging, mouseOnItem;
+    public bool canDrag;
+    public bool dragging { get; private set; }
+    private bool mouseOnItem;
     public Vector2 TopLeftCellPos => topLeftCellPos;
     public Vector2 EquippedPos => equippedPos;
     public bool IsHovered => mouseOnItem;
@@ -56,6 +58,11 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
         InputManager.OnRightClick -= RightClick;
     }
 
+    public void OnDestroy()
+    {
+        tooltip.Hide();
+    }
+
     public void Update()
     {
         if(dragging)
@@ -82,12 +89,10 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
         switch (itemScript.state)
         {
             case Item.itemState.equipped:
-                foreach (GameObject shapeCell in itemScript.shape) 
-                    shapeCell.SetActive(false);
+                itemScript.ShowPreview(true);
                 break;
             case Item.itemState.unequipped:
-                foreach (GameObject shapeCell in itemScript.shape) 
-                    shapeCell.SetActive(true);
+                if (!mouseOnItem || !dragging) itemScript.ShowPreview(false); else itemScript.ShowPreview(true);
                 break;
         }
     }
@@ -134,15 +139,24 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
 
     private void LeftClick()
     {
-        if (mouseOnItem && GameStateManager.CurrentPhase != Phase.Combat)
+        if (mouseOnItem && GameStateManager.CurrentPhase != Phase.Combat && !itemScript.flaggedForDeletion)
+        {
+            canDrag = true;
+        }
+        else
+        {
+            canDrag = false;
+        }
+
+        if (canDrag)
         {
             dragging = true;
-            
+
             if (topLeftCellPos != null && itemScript.state == Item.itemState.equipped)
             {
                 inventoryGridScript.MarkCells(
-                    Vector2Int.FloorToInt(topLeftCellPos), 
-                    itemScript.itemShape, 
+                    Vector2Int.FloorToInt(topLeftCellPos),
+                    itemScript.itemShape,
                     null
                 );
                 itemScript.state = Item.itemState.unequipped;

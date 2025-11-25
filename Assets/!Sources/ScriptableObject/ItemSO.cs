@@ -25,7 +25,7 @@ public class ItemSO : ScriptableObject
 
     [SerializeReference] public Effect[] effects;
 
-    public GameObject itemEffectPrefab;
+    //public GameObject itemEffectPrefab;
 
     [SerializeField] private ItemShapeCell[] itemShape;
 

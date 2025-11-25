@@ -18324,13 +18324,10 @@ MonoBehaviour:
   spawnMargin: 5
   itemSpawn: {fileID: 1370236390757358858, guid: 8c2f567f71b3a814fa5c27c0e4f7bf57, type: 3}
   startingItems:
-  - {fileID: 11400000, guid: a147a81c1b63d4647bab7e37d625e0b3, type: 2}
-  - {fileID: 11400000, guid: a147a81c1b63d4647bab7e37d625e0b3, type: 2}
-  - {fileID: 11400000, guid: a147a81c1b63d4647bab7e37d625e0b3, type: 2}
-  - {fileID: 11400000, guid: c29b2a83e033e204caa16b7e796341b6, type: 2}
-  - {fileID: 11400000, guid: c29b2a83e033e204caa16b7e796341b6, type: 2}
-  - {fileID: 11400000, guid: c29b2a83e033e204caa16b7e796341b6, type: 2}
-  - {fileID: 11400000, guid: b210a5f8f71120044a4da9fc512b9cfb, type: 2}
+  - {fileID: 11400000, guid: 5d5ed91e3b4b5e541a7dab091f198e02, type: 2}
+  - {fileID: 11400000, guid: 93c80f1e8b624c247b45a87254dc271d, type: 2}
+  - {fileID: 11400000, guid: 93c80f1e8b624c247b45a87254dc271d, type: 2}
+  - {fileID: 11400000, guid: 93c80f1e8b624c247b45a87254dc271d, type: 2}
   currentInventoryState: 0
   currentCost: 0
   equippedItems: []
