@@ -17,6 +17,7 @@ public class DayCycleScript : MonoBehaviour
     [SerializeField] private int tilesMoved = 0;
     [SerializeField] private int day = 0;
     [SerializeField] private TimeState currentTime = TimeState.Day;
+    [SerializeField] private int totalTilesMovedAllTime = 0;
 
     [Header("Cycle Settings")]
     [SerializeField] private int dayLength = 20;
@@ -56,11 +57,15 @@ public class DayCycleScript : MonoBehaviour
         tilesMoved = Mathf.Max(0, val); // Prevent negative values
     }
     
-    public void addTilesMoved(int val) 
-    { 
-        tilesMoved += val;
-        tilesMoved = Mathf.Max(0, tilesMoved); // Prevent negative values
-    }
+public void addTilesMoved(int val) 
+{ 
+    tilesMoved += val;
+    tilesMoved = Mathf.Max(0, tilesMoved);
+    
+    // ADD THESE LINES
+    totalTilesMovedAllTime += val;
+    totalTilesMovedAllTime = Mathf.Max(0, totalTilesMovedAllTime);
+}
     
     public int getTilesMoved() { return tilesMoved; }
 
@@ -73,6 +78,11 @@ public class DayCycleScript : MonoBehaviour
         {
             Debug.LogWarning("[DayCycleScript] EnemyNumberEncounterData not assigned! Please assign it in the inspector.");
         }
+    }
+
+    public int GetTotalTilesMovedAllTime() 
+    { 
+        return totalTilesMovedAllTime; 
     }
 
     private void Update()

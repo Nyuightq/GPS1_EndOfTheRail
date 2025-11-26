@@ -36,18 +36,22 @@ public class WinLoseManager : MonoBehaviour
     [SerializeField] private UnityEngine.UI.Button mainMenuButtonWin;
     [SerializeField] private UnityEngine.UI.Button mainMenuButtonLose;
     
-    [Header("Win Panel Stats Text")]
-    [SerializeField] private TMPro.TextMeshProUGUI winHpText;
-    [SerializeField] private TMPro.TextMeshProUGUI winCrystalHpText;
-    [SerializeField] private TMPro.TextMeshProUGUI winScrapsText;
-    [SerializeField] private TMPro.TextMeshProUGUI winDaysText;
-    [SerializeField] private TMPro.TextMeshProUGUI winCombatsText;
+[Header("Win Panel Stats Text")]
+[SerializeField] private TMPro.TextMeshProUGUI winHpText;
+[SerializeField] private TMPro.TextMeshProUGUI winCrystalHpText;
+[SerializeField] private TMPro.TextMeshProUGUI winScrapsText;
+[SerializeField] private TMPro.TextMeshProUGUI winDaysText;
+[SerializeField] private TMPro.TextMeshProUGUI winCombatsText;
+[SerializeField] private TMPro.TextMeshProUGUI winTotalScrapsText;
+[SerializeField] private TMPro.TextMeshProUGUI winTotalTilesText;
 
-    [Header("Lose Panel Stats Text")]
-    [SerializeField] private TMPro.TextMeshProUGUI loseReasonText;
-    [SerializeField] private TMPro.TextMeshProUGUI loseScrapsText;
-    [SerializeField] private TMPro.TextMeshProUGUI loseDaysText;
-    [SerializeField] private TMPro.TextMeshProUGUI loseCombatsText;
+[Header("Lose Panel Stats Text")]
+[SerializeField] private TMPro.TextMeshProUGUI loseReasonText;
+[SerializeField] private TMPro.TextMeshProUGUI loseScrapsText;
+[SerializeField] private TMPro.TextMeshProUGUI loseDaysText;
+[SerializeField] private TMPro.TextMeshProUGUI loseCombatsText;
+[SerializeField] private TMPro.TextMeshProUGUI loseTotalScrapsText;
+[SerializeField] private TMPro.TextMeshProUGUI loseTotalTilesText; 
 
     [Header("Scene Settings")]
     [SerializeField] private string mainMenuSceneName = "MainMenu";
@@ -158,11 +162,11 @@ public class WinLoseManager : MonoBehaviour
 
         if (playerStatus.Hp <= 0)
         {
-            TriggerLose("HP reached 0");
+            TriggerLose("Train Destroyed");
         }
         else if (playerStatus.CrystalHp <= 0)
         {
-            TriggerLose("Crystal HP reached 0");
+            TriggerLose("Crystal crumbled");
         }
     }
 
@@ -230,79 +234,100 @@ public class WinLoseManager : MonoBehaviour
             AttachInventoryToPanel(losePanelInventoryAnchor);
     }
 
-    private void DisplayWinStats()
+private void DisplayWinStats()
+{
+    if (playerStatus == null) return;
+
+    int days = dayCycle != null ? dayCycle.GetDay() : 0;
+    int totalCombats = combatManager != null ? 
+        (combatManager.totalCombatsFaced + combatManager.totalEncountersFaced) : 0;
+    int totalTilesMoved = dayCycle != null ? dayCycle.GetTotalTilesMovedAllTime() : 0;
+    int totalScrapsAcquired = playerStatus.TotalScrapsAcquired; // ADD THIS LINE
+
+    if (winHpText != null)
+        winHpText.text = $"HP: {playerStatus.Hp}/{playerStatus.MaxHp}";
+    
+    if (winCrystalHpText != null)
+        winCrystalHpText.text = $"Crystal HP: {playerStatus.CrystalHp}/{playerStatus.MaxCrystalHp}";
+    
+    if (winScrapsText != null)
+        winScrapsText.text = $"Leftover Scraps: {playerStatus.Scraps}";
+    
+    // MODIFY THIS BLOCK
+    if (winTotalScrapsText != null)
+        winTotalScrapsText.text = $"Total Scraps Acquired: {totalScrapsAcquired}";
+    
+    // ADD THIS BLOCK
+    if (winTotalTilesText != null)
+        winTotalTilesText.text = $"Total Tiles Moved: {totalTilesMoved}";
+    
+    if (winDaysText != null)
+        winDaysText.text = $"Days Survived: {days}";
+    
+    if (winCombatsText != null)
+        winCombatsText.text = $"Combats Faced: {totalCombats}";
+
+    Debug.Log($"[WinLoseManager] Win stats - Days: {days}, Combats: {totalCombats}, Tiles: {totalTilesMoved}, Scraps: {totalScrapsAcquired}");
+}
+
+
+private void DisplayLoseStats(string reason)
+{
+    if (playerStatus == null) return;
+
+    int days = dayCycle != null ? dayCycle.GetDay() : 0;
+    int totalCombats = combatManager != null ? 
+        (combatManager.totalCombatsFaced + combatManager.totalEncountersFaced) : 0;
+    int totalTilesMoved = dayCycle != null ? dayCycle.GetTotalTilesMovedAllTime() : 0;
+    int totalScrapsAcquired = playerStatus.TotalScrapsAcquired; // ADD THIS LINE
+
+    if (loseReasonText != null)
+        loseReasonText.text = $"{reason}";
+    
+    if (loseScrapsText != null)
+        loseScrapsText.text = $"Leftover Scraps: {playerStatus.Scraps}";
+    
+    // MODIFY THIS BLOCK
+    if (loseTotalScrapsText != null)
+        loseTotalScrapsText.text = $"Total Scraps Acquired: {totalScrapsAcquired}";
+    
+    // ADD THIS BLOCK
+    if (loseTotalTilesText != null)
+        loseTotalTilesText.text = $"Total Tiles Moved: {totalTilesMoved}";
+    
+    if (loseDaysText != null)
+        loseDaysText.text = $"Days Survived: {days}";
+    
+    if (loseCombatsText != null)
+        loseCombatsText.text = $"Combats Faced: {totalCombats}";
+
+    Debug.Log($"[WinLoseManager] Lose stats - Reason: {reason}, Days: {days}, Tiles: {totalTilesMoved}, Scraps: {totalScrapsAcquired}");
+}
+
+/// <summary>
+/// Attaches the inventory canvas to a specific anchor point in the result panel
+/// </summary>
+private void AttachInventoryToPanel(RectTransform anchorPoint)
+{
+    if (inventoryCanvas == null || inventoryRectTransform == null || anchorPoint == null)
     {
-        if (playerStatus == null) return;
-
-        int days = dayCycle != null ? dayCycle.GetDay() : 0;
-        int totalCombats = combatManager != null ? 
-            (combatManager.totalCombatsFaced + combatManager.totalEncountersFaced) : 0;
-
-        if (winHpText != null)
-            winHpText.text = $"HP: {playerStatus.Hp}/{playerStatus.MaxHp}";
-        
-        if (winCrystalHpText != null)
-            winCrystalHpText.text = $"Crystal HP: {playerStatus.CrystalHp}/{playerStatus.MaxCrystalHp}";
-        
-        if (winScrapsText != null)
-            winScrapsText.text = $"Scraps: {playerStatus.Scraps}";
-        
-        if (winDaysText != null)
-            winDaysText.text = $"Days Survived: {days}";
-        
-        if (winCombatsText != null)
-            winCombatsText.text = $"Combats Faced: {totalCombats}";
-
-        Debug.Log($"[WinLoseManager] Win stats displayed - Days: {days}, Combats: {totalCombats}");
+        Debug.LogWarning("[WinLoseManager] Cannot attach inventory - missing references");
+        return;
     }
 
-    private void DisplayLoseStats(string reason)
-    {
-        if (playerStatus == null) return;
-
-        int days = dayCycle != null ? dayCycle.GetDay() : 0;
-        int totalCombats = combatManager != null ? 
-            (combatManager.totalCombatsFaced + combatManager.totalEncountersFaced) : 0;
-
-        if (loseReasonText != null)
-            loseReasonText.text = $"Reason: {reason}";
-        
-        if (loseScrapsText != null)
-            loseScrapsText.text = $"Scraps: {playerStatus.Scraps}";
-        
-        if (loseDaysText != null)
-            loseDaysText.text = $"Days Survived: {days}";
-        
-        if (loseCombatsText != null)
-            loseCombatsText.text = $"Combats Faced: {totalCombats}";
-
-        Debug.Log($"[WinLoseManager] Lose stats displayed - Reason: {reason}, Days: {days}");
-    }
-
-    /// <summary>
-    /// Attaches the inventory canvas to a specific anchor point in the result panel
-    /// </summary>
-    private void AttachInventoryToPanel(RectTransform anchorPoint)
-    {
-        if (inventoryCanvas == null || inventoryRectTransform == null || anchorPoint == null)
-        {
-            Debug.LogWarning("[WinLoseManager] Cannot attach inventory - missing references");
-            return;
-        }
-
-        // Reparent inventory to the anchor point
-        inventoryRectTransform.SetParent(anchorPoint, false);
-        
-        // Reset local position/scale to match anchor
-        inventoryRectTransform.localPosition = Vector3.zero;
-        inventoryRectTransform.localScale = Vector3.one;
-        
-        // Ensure inventory canvas is visible and on top
-        inventoryCanvas.gameObject.SetActive(true);
-        inventoryCanvas.sortingOrder = 100; // High value to ensure visibility
-        
-        Debug.Log($"[WinLoseManager] Inventory canvas attached to {anchorPoint.name}");
-    }
+    // Reparent inventory to the anchor point
+    inventoryRectTransform.SetParent(anchorPoint, false);
+    
+    // Reset local position and apply scaled size (0.8 for margin)
+    inventoryRectTransform.localPosition = Vector3.zero;
+    inventoryRectTransform.localScale = new Vector3(0.8f, 0.8f, 1f);
+    
+    // Ensure inventory canvas is visible and on top
+    inventoryCanvas.gameObject.SetActive(true);
+    inventoryCanvas.sortingOrder = 100; // High value to ensure visibility
+    
+    Debug.Log($"[WinLoseManager] Inventory canvas attached to {anchorPoint.name} with 0.8 scale");
+}
 
     /// <summary>
     /// Restores inventory canvas to its original parent and state

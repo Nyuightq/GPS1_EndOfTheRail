@@ -16,6 +16,7 @@ public enum BuffableStats
 public class PlayerStatusManager : MonoBehaviour
 {
     [SerializeField] private int _scraps = 0;
+    [SerializeField] private int _totalScrapsAcquired = 0;
     [SerializeField] private int _hp = 0;
     [SerializeField] private int _baseMaxHp = 0;
     [SerializeField] private int _crystalHp = 0;
@@ -46,6 +47,7 @@ public class PlayerStatusManager : MonoBehaviour
         }
     }
     public int Scraps => _scraps;
+    public int TotalScrapsAcquired => _totalScrapsAcquired; 
     public int CrystalHp => _crystalHp;
     public int MaxCrystalHp => _maxCrystalHp;
     public int Defense
@@ -129,15 +131,16 @@ public class PlayerStatusManager : MonoBehaviour
         return false;
     }
     
-    public void RewardScraps(int value)
+public void RewardScraps(int value)
+{
+    if (value < 0)
     {
-        if (value < 0)
-        {
-            Debug.LogWarning("RewardScraps(int value): cannot accept negative value");
-            return;
-        }
-
-        _scraps += value;
-        OnScrapsChanged?.Invoke(_scraps);
+        Debug.LogWarning("RewardScraps(int value): cannot accept negative value");
+        return;
     }
+
+    _scraps += value;
+    _totalScrapsAcquired += value;
+    OnScrapsChanged?.Invoke(_scraps);
+}
 }

@@ -541,31 +541,7 @@ public class EngineerManager : MonoBehaviour
         Vector2 targetPos = dragManager.EquippedPos;
         Vector2Int topLeftCell = Vector2Int.FloorToInt(dragManager.TopLeftCellPos);
 
-        Debug.Log($"[EngineerManager] Restoring to equippedPos: {targetPos}, topLeftCell: {topLeftCell}");
-
-        
-        itemRect.anchoredPosition = targetPos;
-        bool originalSpaceFree = itemObject.GetComponent<ItemDragManager>().AttachToInventory();
-
-        if (!originalSpaceFree)
-        {
-            Vector2? pos = inventoryGrid.FindFreeSpace(itemObject.GetComponent<Item>().itemData);
-            if (pos.HasValue)
-            {
-                
-                Vector2 origin = inventoryGrid.GetLocalPosGrid(new Vector2(pos.Value.x, pos.Value.y));
-                ItemSO itemData = itemObject.GetComponent<Item>().itemData;
-                Vector2 itemCentre = origin + new Vector2(itemData.itemWidth * 8f - 8f, -itemData.itemHeight * 8f + 8f);
-                targetPos = itemCentre;
-            }
-            else
-            {
-                itemRect.anchoredPosition = startAnchored;
-                yield break;
-            }
-        }
-
-        // Tween to target position
+        // Tween to position
         float elapsed = 0f;
         while (elapsed < tweenDuration)
         {
@@ -574,14 +550,14 @@ public class EngineerManager : MonoBehaviour
             itemRect.anchoredPosition = Vector2.Lerp(startAnchored, targetPos, t);
             yield return null;
         }
+        itemRect.anchoredPosition = targetPos;
 
         // Re-mark cells
         if (inventoryGrid != null)
         {
-            itemObject.GetComponent<ItemDragManager>().AttachToInventory();
-            //inventoryGrid.MarkCells(topLeftCell, itemScript.itemShape, itemObject);
-            //itemScript.state = Item.itemState.equipped;
-            //itemScript.TriggerEffectEquip();
+            inventoryGrid.MarkCells(topLeftCell, itemScript.itemShape, itemObject);
+            itemScript.state = Item.itemState.equipped;
+            itemScript.TriggerEffectEquip();
         }
 
         Debug.Log($"[EngineerManager] Restored {itemScript.itemData.itemName} to inventory");
