@@ -99,7 +99,7 @@ public abstract class Effect
     {
         this.trigger = trigger;
         this.triggerOnConditionOnce = triggerOnConditionOnce;
-        this.conditions = conditions;
+        this.conditions = CloneConditions(conditions);
         this.conditionMetSprite = conditionMetSprite;
     }
 
@@ -151,6 +151,19 @@ public abstract class Effect
         }
 
         return true;
+    }
+
+    protected Conditions[] CloneConditions(Conditions[] oldCondition)
+    {
+        Conditions[] conditionsCloned = new Conditions[oldCondition.Length];
+        for (int i = 0; i < oldCondition.Length; i++)
+        {
+            if (oldCondition[i] != null)
+            {
+                conditionsCloned[i] = oldCondition[i].clone();
+            }
+        }
+        return conditionsCloned;
     }
 
     public void ResetTriggered() { hasTriggered = false; }
@@ -285,7 +298,10 @@ public class BuffStatEffect : Effect
 
     public override void remove()
     {
-        mod.Dispose();
+        if (mod != null)
+        {
+            mod.Dispose();
+        }
     }
 }
 // ----- SPAWN WEAPON EFFECT ----- 
