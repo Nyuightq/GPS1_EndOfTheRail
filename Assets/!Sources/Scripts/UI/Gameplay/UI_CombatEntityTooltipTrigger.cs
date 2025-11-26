@@ -24,6 +24,7 @@ public class UI_CombatEntityTooltipTrigger : MonoBehaviour, IPointerEnterHandler
     public void OnPointerEnter(PointerEventData eventData)
     {
         tooltip.Show(entity);
+        SoundManager.Instance.PlaySFX("SFX_CombatEntity_OnHover");
     }
 
     public void OnPointerExit(PointerEventData eventData)
