@@ -30,8 +30,6 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
     private Vector2 equippedPos;
     private bool firstEquip = true;
 
-    InputActionMap playerActionMap;
-
     #region Unity LifeCycle
     private void Start()
     {
@@ -103,9 +101,10 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
     {
         mouseOnItem = true;
 
-        if (tooltip != null)
+        if (tooltip != null && !dragging)
         {
             tooltip.Show(itemScript);
+            SoundManager.Instance.PlaySFX("SFX_Component_OnHover");
         }
     }
 
@@ -142,6 +141,7 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
         if (mouseOnItem && GameStateManager.CurrentPhase != Phase.Combat && !itemScript.flaggedForDeletion)
         {
             canDrag = true;
+            SoundManager.Instance.PlaySFX("SFX_Component_OnDrag");
         }
         else
         {
@@ -180,12 +180,20 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
         
         dragging = false;
 
-        if (tooltip != null)
-        {
-            tooltip.Show(itemScript);
-        }
+        // if (tooltip != null)
+        // {
+        //     tooltip.Show(itemScript);
+        // }
 
         bool sucess = AttachToInventory();
+        if ( sucess )
+        {
+            SoundManager.Instance.PlaySFX("SFX_Component_OnRegistered");
+        }
+        else
+        {
+            SoundManager.Instance.PlaySFX("SFX_Component_OnRelease");
+        }
         //equipped pos defaults to 0 and 0 is largely impossible to get to at the start
         if (!sucess && !firstEquip &&  itemScript.itemData.mandatoryItem)
         {
@@ -232,6 +240,7 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
         }
 
         itemScript.RotateShape(itemScript.itemShape);
+        SoundManager.Instance.PlaySFX("SFX_Component_OnRotate");
     }
     #endregion
 
