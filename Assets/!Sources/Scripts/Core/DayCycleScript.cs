@@ -112,6 +112,7 @@ public void addTilesMoved(int val)
 
                     Debug.Log($"Day has begun! Starting day {day + 1}.");
                     
+                    // SoundManager.Instance.PlaySFX("SFX_Travel_OnSwitchDay");
                     ClearNightEncounters();
                     RestoreUIPositions();
 

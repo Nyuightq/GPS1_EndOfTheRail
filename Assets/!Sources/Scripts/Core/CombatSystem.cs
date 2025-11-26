@@ -33,11 +33,21 @@ public class CombatSystem : UI_BaseEventPanel
         if (_trainHealthSlider != null)
         {
             _trainHealthText = _trainHealthSlider.GetComponentInChildren<TextMeshProUGUI>();
+            int currentHp = GameStateManager.Instance.playerStatus.Hp;
+            int maxHp = GameStateManager.Instance.playerStatus.MaxHp;
+            _trainHealthSlider.value = (float) currentHp / maxHp;
+            _trainHealthText.text =  currentHp + "/" + maxHp;
         }
     }
 
     public void InitializeBattle(CombatPlayerEntity playerEntity, List<CombatEnemyEntity> enemyEntities, List<CombatComponentEntity> componentEntities)
     {
+        // Update HealthBar
+        int currentHp = GameStateManager.Instance.playerStatus.Hp;
+        int maxHp = GameStateManager.Instance.playerStatus.MaxHp;
+        if (_trainHealthSlider != null ) _trainHealthSlider.value = (float) currentHp / maxHp;
+        if (_trainHealthText != null ) _trainHealthText.text =  currentHp + "/" + maxHp;
+        // Update HealthBar
         if (tooltip == null) tooltip = UI_CombatTooltipDetail.Instance;
 
         player = playerEntity;
@@ -48,6 +58,9 @@ public class CombatSystem : UI_BaseEventPanel
         {
             player.OnDeath += HandleDeath;
             player.OnTakeDamage += HandleTrainHealthUpdate;
+
+            // _trainHealthSlider.value = (float) player.CurrentHp / player.MaxHp;
+            // _trainHealthText.text =  (float) player.CurrentHp + "/" + player.MaxHp;
         }
 
         foreach (var component in components)

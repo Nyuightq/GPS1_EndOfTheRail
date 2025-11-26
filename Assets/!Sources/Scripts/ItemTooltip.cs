@@ -220,11 +220,11 @@ public class ItemTooltip : MonoBehaviour
 
         
 
-        if (weaponNameField != null)
-        {
-            string weaponName = weaponNameField.GetValue(effect)?.ToString() ?? "Unknown Weapon";
-            desc.AppendLine($"<color=#FFA500><b>{weaponName}</b></color>");
-        }
+        // if (weaponNameField != null)
+        // {
+        //     string weaponName = weaponNameField.GetValue(effect)?.ToString() ?? "Unknown Weapon";
+        //     desc.AppendLine($"<color=#FFA500><b>{weaponName}</b></color>");
+        // }
 
         if (weaponStatsProperty != null)
         {
@@ -232,14 +232,20 @@ public class ItemTooltip : MonoBehaviour
 
             if (stats != null)
             {
-                
-                
-                desc.AppendLine($"<color=#C23753>Damage: {stats.AttackDamage}</color>");
+                if (stats.AttackVariance > 0)
+                {
+                    int maxAtk = stats.AttackDamage + stats.AttackVariance;
+                    int minAtk = Math.Max(stats.AttackDamage - stats.AttackVariance, 1);
+
+                    desc.AppendLine($"<color=#C23753>Damage: {minAtk}~{maxAtk}</color>");
+                }
+                else
+                {
+                    desc.AppendLine($"<color=#C23753>Damage: {stats.AttackDamage}</color>");
+                }
 
                 string colorCode = stats.AttackSpeed <= 2 ? "#C23753" : stats.AttackSpeed >= 6 ? "#EBB85B" : "#FFFFFF";
                 desc.AppendLine($"<color={colorCode}>Speed: {stats.AttackSpeed}</color>");
-
-                if (stats.AttackVariance > 0) desc.AppendLine($"<color=#88AAFF>Variance: {stats.AttackVariance}</color>");
             }
         }
 

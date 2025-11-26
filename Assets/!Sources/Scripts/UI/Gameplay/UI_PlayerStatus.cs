@@ -9,7 +9,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using DG.Tweening;
-using UnityEditorInternal;
 
 public class UI_PlayerStatus : MonoBehaviour
 {
