@@ -90,6 +90,9 @@ public class RestPointManager : MonoBehaviour
         trainMovement = train;
 
         //----------Debug for tileMoevd = 0 when enter rest point-------------
+        if (trainLightController == null)
+            trainLightController = FindFirstObjectByType<OnTrainLight>();
+            
         if (dayCycleScript != null)
         {
             int tiles = dayCycleScript.getTilesMoved();
