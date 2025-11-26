@@ -1,25 +1,23 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.UI;
 using TMPro;
 
 public class OnButtonContent : MonoBehaviour
 {
+    [Header("References")]
     [SerializeField] private GameObject CRTShaderVolume;
-
-    private bool toggleShaderOn = false;
-
-    public void Start()
-    {
-        //toggleShaderOn = true;
-        CRTShaderVolume.SetActive(ApplySavedCRT.Instance.toggleShaderOn);
-    }
+    [SerializeField] private ScriptableRendererFeature fullScreenPassRendererFeature; //assign the renderer2D fullscreen feature in here
 
     public void onShaderToggle()
     {
-        //toggleShaderOn = !toggleShaderOn;
-
-        //CRTShaderVolume.SetActive(toggleShaderOn);
-
         ApplySavedCRT.Instance.toggleShaderOn = !ApplySavedCRT.Instance.toggleShaderOn;
-        CRTShaderVolume.SetActive(ApplySavedCRT.Instance.toggleShaderOn);
+        bool isOn = ApplySavedCRT.Instance.toggleShaderOn;
+
+        if (CRTShaderVolume != null)
+            CRTShaderVolume.SetActive(isOn);
+
+        if (fullScreenPassRendererFeature != null)
+            fullScreenPassRendererFeature.SetActive(isOn);
     }
 }

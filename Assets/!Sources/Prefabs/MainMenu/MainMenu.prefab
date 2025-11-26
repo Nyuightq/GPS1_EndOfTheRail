@@ -731,6 +731,7 @@ GameObject:
   - component: {fileID: 6548796243606727089}
   - component: {fileID: 7152778158580567208}
   - component: {fileID: 5048847035361278002}
+  - component: {fileID: 82337732219109254}
   m_Layer: 5
   m_Name: CRTShaderToggle
   m_TagString: Untagged
@@ -867,8 +868,7 @@ MonoBehaviour:
   crtToggle: {fileID: 6972008193201229742}
   checkOnAudio: {fileID: 7152778158580567208}
   checkOffAudio: {fileID: 5048847035361278002}
-  normalColor: {r: 1, g: 1, b: 1, a: 1}
-  clickColor: {r: 0.84313726, g: 0.38039216, b: 0.38039216, a: 1}
+  crtToggleAnimator: {fileID: 0}
 --- !u!82 &7152778158580567208
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1063,6 +1063,28 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!95 &82337732219109254
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2383952871482242796}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: a86558f3571017749bc568a13cd04454, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &2831153258777394465
 GameObject:
   m_ObjectHideFlags: 0

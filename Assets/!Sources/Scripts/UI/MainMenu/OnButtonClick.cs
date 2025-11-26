@@ -124,7 +124,7 @@ public class OnButtonClick : MonoBehaviour
 
         if (isSideSliderOpen && creditsClicked == true)
         {
-            sideSliderAnimator.Play("SideSliderIdle", 0, 0f);
+            sideSliderAnimator.Play("SideSliderIdleAnim", 0, 0f);
 
             optionsClicked = true;
             creditsClicked = false;
@@ -178,7 +178,7 @@ public class OnButtonClick : MonoBehaviour
 
         if (isSideSliderOpen && optionsClicked == true)
         {
-            sideSliderAnimator.Play("SideSliderIdle", 0, 0f);
+            sideSliderAnimator.Play("SideSliderIdleAnim", 0, 0f);
 
             optionsClicked = false;
             creditsClicked = true;

@@ -4,28 +4,24 @@ using UnityEngine.EventSystems;
 
 public class OnCRTToggle : MonoBehaviour, IPointerClickHandler
 {
+    [Header("UI References")]
     [SerializeField] private Image crtToggle;
     [SerializeField] private AudioSource checkOnAudio;
     [SerializeField] private AudioSource checkOffAudio;
 
-    [SerializeField] private Color normalColor = new Color(255f / 255f, 255f / 255f, 255f / 255f);
-    [SerializeField] private Color clickColor = new Color(251f / 255f, 197f / 255f, 97f / 255f);
+    [Header("Toggle Animation States")]
+    [SerializeField] private Animator crtToggleAnimator;
 
     private bool isToggled = false;
 
     private void Start()
     {
-        crtToggle.color = normalColor;
+        crtToggleAnimator.Play(isToggled ? "RedButtonIdleAnim" : "GreenButtonIdleAnim", 0, 1f);
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (crtToggle != null)
-        {
-            isToggled = !isToggled;
-
-            crtToggle.color = isToggled ? clickColor : normalColor;
-        }
+        isToggled = !isToggled;
 
         if (isToggled && checkOnAudio != null)
         {
@@ -35,6 +31,14 @@ public class OnCRTToggle : MonoBehaviour, IPointerClickHandler
         {
             checkOffAudio.Play();
         }
+
+        //Play crt toggle animation based on the state
+        crtToggleAnimator.Play(isToggled ? "GreenToRedButtonAnim" : "RedToGreenButtonAnim", 0, 0f);
+    }
+
+    private void OnEnable()
+    {
+        crtToggleAnimator.Play(isToggled ? "RedButtonIdleAnim" : "GreenButtonIdleAnim", 0, 1f);
     }
 }
 
