@@ -27,6 +27,11 @@ public enum InputType
 {
     public object owner { get; set; }
 
+    public Conditions() 
+    {
+        this.owner = null;
+    }
+
     public float getValue(ConditionStatType statType)
     {
         switch (statType)
@@ -40,6 +45,7 @@ public enum InputType
         }
         return 0;
     }
+    public abstract Conditions clone();
     public abstract bool check();
 }
 
@@ -50,6 +56,18 @@ public enum InputType
     [SerializeField] float threshold;
     [Header("Only if threshold is decimal")]
     [SerializeField] ConditionStatType maxValueType;
+
+    public LessThanEqualCondition(ConditionStatType valueType, float threshold, ConditionStatType maxValueType) : base() 
+    { 
+        this.valueType = valueType;
+        this.threshold = threshold; 
+        this.maxValueType = maxValueType;
+    }
+
+    public override Conditions clone()
+    {
+        return new LessThanEqualCondition(valueType, threshold, maxValueType);
+    }
 
     public override bool check()
     {
@@ -71,6 +89,18 @@ public enum InputType
     [Header("Only if threshold is decimal")]
     [SerializeField] ConditionStatType maxValueType;
 
+    public MoreThanEqualCondition(ConditionStatType valueType, float threshold, ConditionStatType maxValueType):base()
+    {
+        this.valueType = valueType;
+        this.threshold = threshold;
+        this.maxValueType = maxValueType;
+    }
+
+    public override Conditions clone()
+    {
+        return new MoreThanEqualCondition (valueType, threshold, maxValueType);
+    }
+
     public override bool check()
     {
         float value = getValue(valueType);
@@ -91,6 +121,18 @@ public enum InputType
     [Header("Only if threshold is decimal")]
     [SerializeField] ConditionStatType maxValueType;
 
+    public EqualCondition(ConditionStatType valueType, float comparedValue, ConditionStatType maxValueType):base()
+    {
+        this.valueType = valueType;
+        this.comparedValue = comparedValue;
+        this.maxValueType = maxValueType;
+    }
+
+    public override Conditions clone()
+    {
+        return new EqualCondition(valueType, comparedValue, maxValueType);
+    }
+
     public override bool check()
     {
         float value = getValue(valueType);
@@ -110,9 +152,20 @@ public enum InputType
     [SerializeField] bool specificAdjacentItem;
     [SerializeField] ItemSO requiredAdjacentItem;
 
+    public AdjacentCondition(bool specificAdjacentItem, ItemSO requiredAdjacentItem):base()
+    {
+        this.specificAdjacentItem = specificAdjacentItem;
+        this.requiredAdjacentItem = requiredAdjacentItem;
+    }
+
+    public override Conditions clone()
+    {
+        return new AdjacentCondition (specificAdjacentItem, requiredAdjacentItem);
+    }
+
     public override bool check()
     {
-        if (owner is Item item)
+        if (owner is Item item && item != null && item.gameObject != null)
         {
             List<GameObject> adjacentList = GameManager.instance.inventoryScript.GetAdjacentComponents(Vector2Int.FloorToInt(item.GetComponent<ItemDragManager>().topLeftCellPos), item.itemShape, item.gameObject);
             if (specificAdjacentItem)
