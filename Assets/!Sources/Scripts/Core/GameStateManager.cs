@@ -37,6 +37,7 @@ public class GameStateManager : MonoBehaviour
     private bool _pause = false;
     public bool IsPausing => _pause;
     [SerializeField] private bool _isInitial = false;
+    [SerializeField] private TutorialCrystalManager _tutorialCrystalManager;
     // private int _scraps;
     public static Phase CurrentPhase => Instance._phase;
     // public int Scraps => _scraps;
@@ -54,6 +55,7 @@ public class GameStateManager : MonoBehaviour
     [SerializeField] private GameObject _asidePanel;
     private RectTransform _topPanelRect;
     private RectTransform _asidePanelRect;
+    private BuildRails _buildRails;
     private GameObject _railBuilderManager;
 
     private void Awake()
@@ -81,8 +83,8 @@ public class GameStateManager : MonoBehaviour
         if (_topPanel != null ) _topPanelRect = _topPanel.GetComponent<RectTransform>();
         if (_asidePanel != null ) _asidePanelRect = _asidePanel.GetComponent<RectTransform>();
 
-        BuildRails buildRailsObject = FindFirstObjectByType<BuildRails>();
-        if (buildRailsObject != null) _railBuilderManager = buildRailsObject.gameObject;
+        BuildRails _buildRails = FindFirstObjectByType<BuildRails>();
+        if (_buildRails != null) _railBuilderManager = _buildRails.gameObject;
 
         if (!_isInitial)
         {
@@ -96,6 +98,8 @@ public class GameStateManager : MonoBehaviour
 
             _planPhasePanel.SetActive(false);
             _planPhasePanel_2.SetActive(false);
+
+            _tutorialCrystalManager.onCloseEvent += ActivateInitialPlanPanel;
         }
     }
 
@@ -111,10 +115,17 @@ public class GameStateManager : MonoBehaviour
         
         _asidePanelRect.DOKill();
         _asidePanelRect.DOAnchorPosX(0f, duration)
-            .SetEase(Ease.OutCubic)
-            .OnComplete(() => TogglePlanPanel(true));
+            .SetEase(Ease.OutCubic);
+
+        _tutorialCrystalManager.ShowRewards();
 
         _isInitial = true;
+    }
+
+    private void ActivateInitialPlanPanel(bool value)
+    {
+        _tutorialCrystalManager.onCloseEvent -= ActivateInitialPlanPanel;
+        SetPhase(Phase.Plan);
     }
 
     /// <summary>
@@ -155,12 +166,14 @@ public class GameStateManager : MonoBehaviour
             // Enable Planning phase related UI
             // Enable Rail building and hover UI
             _railBuilderManager.SetActive(true);
+            //_buildRails.enabled = true;
             TogglePlanPanel(true);
             CameraMovementTemp.ToggleCameraFollowMode(false);
         }
         else if (_phase == Phase.Travel)
         {
             _railBuilderManager.SetActive(false);
+            //_buildRails.enabled = false;
             TogglePlanPanel(false);
             CameraMovementTemp.ToggleCameraFollowMode(true);
             // Disable camera Move
