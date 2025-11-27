@@ -48,7 +48,7 @@ public class CameraIntroSequence : MonoBehaviour
 
         // Disable player camera input for the intro.
         if (cameraMovement != null)
-            CameraMovementTemp.ToggleCameraFollowMode(false);
+            CameraMovementTemp.ToggleCameraFollowMode(true);
 
         // Disable gameplay UI immediately
         if (gameplayCanvas != null)

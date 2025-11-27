@@ -35,7 +35,7 @@ MonoBehaviour:
         - rid: 6451219851714232419
         conditionMetSprite: {fileID: 21300000, guid: 8c0f6d1e78f2e4c4f8affdf76c4ed3dc, type: 3}
         inputType: 1
-        buffAmount: 2
+        buffAmount: 1
         statType: 2
     - rid: 6451219851714232419
       type: {class: AdjacentCondition, ns: , asm: Assembly-CSharp}
