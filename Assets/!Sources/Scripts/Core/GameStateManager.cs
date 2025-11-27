@@ -6,8 +6,6 @@
 //              therefore create an actual GameManager in name [GameStateManager.cs]
 // --------------------------------------------------------------
 using DG.Tweening;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 
 /// <summary>

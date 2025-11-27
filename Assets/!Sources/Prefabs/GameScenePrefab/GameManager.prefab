@@ -32,6 +32,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 5562899804742396696}
   - {fileID: 2140410575239839991}
   - {fileID: 8514012950442004768}
   - {fileID: 8529411893428227207}
@@ -82,6 +83,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerStatus: {fileID: 4921764918400996863}
   _isInitial: 0
+  _tutorialCrystalManager: {fileID: 2715709464056133665}
   _planPhasePanel: {fileID: 0}
   _planPhasePanel_2: {fileID: 0}
   _topPanel: {fileID: 0}
@@ -99,6 +101,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scraps: 0
+  _totalScrapsAcquired: 0
   _hp: 25
   _baseMaxHp: 50
   _crystalHp: 0
@@ -231,6 +234,7 @@ MonoBehaviour:
   tilesMoved: 0
   day: 1
   currentTime: 0
+  totalTilesMovedAllTime: 0
   dayLength: 22
   nightLength: 27
   dayLengthMod: 0
@@ -644,17 +648,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   availableItems:
   - itemSO: {fileID: 11400000, guid: 93c80f1e8b624c247b45a87254dc271d, type: 2}
-    cost: 4
+    cost: 17
   - itemSO: {fileID: 11400000, guid: 7f5e6c7fef8eb6349bb1e30b30066a2f, type: 2}
-    cost: 5
+    cost: 20
   - itemSO: {fileID: 11400000, guid: 8e1b96c035b2b9343827835a3f2bd7d0, type: 2}
-    cost: 3
+    cost: 12
   - itemSO: {fileID: 11400000, guid: f3de200ed1fea48419bf05080c643993, type: 2}
-    cost: 3
+    cost: 10
   - itemSO: {fileID: 11400000, guid: b210a5f8f71120044a4da9fc512b9cfb, type: 2}
-    cost: 3
-  - itemSO: {fileID: 11400000, guid: a147a81c1b63d4647bab7e37d625e0b3, type: 2}
-    cost: 4
+    cost: 9
+  - itemSO: {fileID: 11400000, guid: 2c956f6cc3ca1a9469d9bf97231581b0, type: 2}
+    cost: 10
   transactionSlots:
   - itemSO: {fileID: 0}
     cost: 0
@@ -773,12 +777,70 @@ MonoBehaviour:
   winScrapsText: {fileID: 0}
   winDaysText: {fileID: 0}
   winCombatsText: {fileID: 0}
+  winTotalScrapsText: {fileID: 0}
+  winTotalTilesText: {fileID: 0}
   loseReasonText: {fileID: 0}
   loseScrapsText: {fileID: 0}
   loseDaysText: {fileID: 0}
   loseCombatsText: {fileID: 0}
+  loseTotalScrapsText: {fileID: 0}
+  loseTotalTilesText: {fileID: 0}
   mainMenuSceneName: MainMenu
   isGameOver: 0
+--- !u!1 &7087296217367625542
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5562899804742396696}
+  - component: {fileID: 2715709464056133665}
+  m_Layer: 0
+  m_Name: TutorialCrystalManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5562899804742396696
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7087296217367625542}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 2.7365499, y: 1.1523931, z: 0.18992952}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1718111857734153875}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2715709464056133665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7087296217367625542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb18267edb71dd04da05dbbc3eb72068, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  availableRewards:
+  - {fileID: 11400000, guid: 5d5ed91e3b4b5e541a7dab091f198e02, type: 2}
+  rewardSlots:
+  - itemSO: {fileID: 0}
+    anchorPoint: {fileID: 0}
+    nameText: {fileID: 0}
+  rewardUIPanel: {fileID: 0}
+  rewardContainer: {fileID: 0}
+  tweenDuration: 0.2
+  enforceSpawnBounds: 1
 --- !u!1 &7243295537337820235
 GameObject:
   m_ObjectHideFlags: 0
@@ -836,6 +898,7 @@ MonoBehaviour:
   skipDayOnRestPoint: 1
   dayNightController: {fileID: 0}
   trainLightController: {fileID: 0}
+  RestPointCount: 0
 --- !u!1 &8666137023644008668
 GameObject:
   m_ObjectHideFlags: 0

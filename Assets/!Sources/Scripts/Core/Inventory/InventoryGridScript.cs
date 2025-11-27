@@ -481,10 +481,10 @@ public class InventoryGridScript : MonoBehaviour
         if (InGrid(cellPos))
         {
             inventoryGrid[(int)cellPos.x, (int)cellPos.y].active = true;
-            foreach (InvCellData cell in inventoryGrid)
-            {
-                Destroy(cell.cellObject);
-            }
+            // foreach (InvCellData cell in inventoryGrid)
+            // {
+            //     Destroy(cell.cellObject);
+            // }
         }
         else
         {

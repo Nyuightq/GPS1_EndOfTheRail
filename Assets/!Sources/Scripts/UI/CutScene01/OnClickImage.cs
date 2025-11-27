@@ -60,10 +60,10 @@ public class OnClickImage : MonoBehaviour
 
     public void OnNarrative1()
     {
-        //narrative2.SetActive(true);
-        //narrative2Text.SetActive(true);
-        narrative4.SetActive(true);
-        narrative4Text.SetActive(true);
+        narrative2.SetActive(true);
+        narrative2Text.SetActive(true);
+        // narrative4.SetActive(true);
+        // narrative4Text.SetActive(true);
 
         narrative1.SetActive(false);
         narrative1Text.SetActive(false);
@@ -122,6 +122,6 @@ public class OnClickImage : MonoBehaviour
         transitionAnimator.Play("TransitionOutAnim", 0, 0f);
 
         yield return new WaitForSeconds(0.5f);
-        SceneManager.LoadScene("[ZQ] GameplayLevel");
+        SceneManager.LoadScene("GameplayLevel");
     }
 }

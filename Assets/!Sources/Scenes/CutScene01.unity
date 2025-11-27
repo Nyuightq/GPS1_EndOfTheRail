@@ -717,6 +717,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Narratives
       objectReference: {fileID: 0}
+    - target: {fileID: 1072145657655635253, guid: e3498019719a43347b076fd158309b3e, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 9edcc1ae467b807439370388ea107f97, type: 3}
     - target: {fileID: 2978368230804045222, guid: e3498019719a43347b076fd158309b3e, type: 3}
       propertyPath: m_Camera
       value: 
@@ -813,6 +817,10 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1778967723}
+    - target: {fileID: 6181722570006314552, guid: e3498019719a43347b076fd158309b3e, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 9edcc1ae467b807439370388ea107f97, type: 3}
     - target: {fileID: 8106264058531242278, guid: e3498019719a43347b076fd158309b3e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
