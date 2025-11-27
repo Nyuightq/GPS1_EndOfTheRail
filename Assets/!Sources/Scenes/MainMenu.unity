@@ -450,6 +450,14 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1227413715407136962, guid: 7490f757d97ff1249896a7fe8e365d1b, type: 3}
+      propertyPath: startMusic
+      value: MUSIC_MainMenu
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227413715407136962, guid: 7490f757d97ff1249896a7fe8e365d1b, type: 3}
+      propertyPath: musicTracks.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227413715407136962, guid: 7490f757d97ff1249896a7fe8e365d1b, type: 3}
       propertyPath: soundEffects.Array.size
       value: 39
       objectReference: {fileID: 0}
@@ -457,6 +465,26 @@ PrefabInstance:
       propertyPath: musicTracks.Array.data[0].clip
       value: 
       objectReference: {fileID: 8300000, guid: d1463501745abf548a65792f66b361c2, type: 3}
+    - target: {fileID: 1227413715407136962, guid: 7490f757d97ff1249896a7fe8e365d1b, type: 3}
+      propertyPath: musicTracks.Array.data[1].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 7b788f9d446b8af4ea65838c5119cce7, type: 3}
+    - target: {fileID: 1227413715407136962, guid: 7490f757d97ff1249896a7fe8e365d1b, type: 3}
+      propertyPath: musicTracks.Array.data[1].loop
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227413715407136962, guid: 7490f757d97ff1249896a7fe8e365d1b, type: 3}
+      propertyPath: musicTracks.Array.data[1].name
+      value: MUSIC_MainMenu
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227413715407136962, guid: 7490f757d97ff1249896a7fe8e365d1b, type: 3}
+      propertyPath: musicTracks.Array.data[1].pitch
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227413715407136962, guid: 7490f757d97ff1249896a7fe8e365d1b, type: 3}
+      propertyPath: musicTracks.Array.data[1].volume
+      value: 0.7
+      objectReference: {fileID: 0}
     - target: {fileID: 1227413715407136962, guid: 7490f757d97ff1249896a7fe8e365d1b, type: 3}
       propertyPath: soundEffects.Array.data[20].clip
       value: 

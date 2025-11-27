@@ -44,6 +44,7 @@ public class SoundManager : MonoBehaviour
     private Dictionary<string, Sound> soundDictionary = new Dictionary<string, Sound>();
     private Dictionary<string, Sound> musicDictionary = new Dictionary<string, Sound>();
     private string currentMusicTrack = "";
+    [SerializeField] private string startMusic;
 
     private void Awake()
     {
@@ -63,7 +64,7 @@ public class SoundManager : MonoBehaviour
 
     private void Start()
     {
-        Instance.PlayMusic("MUSIC_Gameplay");
+        Instance.PlayMusic(startMusic);
     }
 
     private void InitializeAudio()

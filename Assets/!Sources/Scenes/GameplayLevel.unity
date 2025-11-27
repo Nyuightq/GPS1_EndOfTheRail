@@ -143,6 +143,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1227413715407136962, guid: 7490f757d97ff1249896a7fe8e365d1b, type: 3}
+      propertyPath: startMusic
+      value: MUSIC_Gameplay
+      objectReference: {fileID: 0}
     - target: {fileID: 1686780300493267439, guid: 7490f757d97ff1249896a7fe8e365d1b, type: 3}
       propertyPath: m_LocalPosition.x
       value: -10.1459875
