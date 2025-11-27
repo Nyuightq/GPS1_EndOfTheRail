@@ -235,7 +235,7 @@ GameObject:
   - component: {fileID: 7307845020827095779}
   - component: {fileID: 7538922567300985469}
   - component: {fileID: -8296277831885255952}
-  - component: {fileID: -8151532567853045820}
+  - component: {fileID: 3106216700952844573}
   m_Layer: 5
   m_Name: TrainOverworld Updated
   m_TagString: Player
@@ -479,7 +479,7 @@ MonoBehaviour:
   trainRight: {fileID: 21300000, guid: da81a729a7d13524eae0656b07349d60, type: 3}
   trainDown: {fileID: 21300000, guid: 6fe314e675d1ae94eae03bf8a4f1cb5b, type: 3}
   spriteRenderer: {fileID: 2181377489751129838}
---- !u!114 &-8151532567853045820
+--- !u!114 &3106216700952844573
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -488,13 +488,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 5765065582379823760}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ac613718a5d15943a6c0673c9a3633b, type: 3}
+  m_Script: {fileID: 11500000, guid: aa6edc81eaedc8f47824e670a03d4610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   carriagePrefab: {fileID: 5765065582379823760, guid: 9af10d79f06f78a4b886b61f98085596, type: 3}
-  trainHead: {fileID: 926543073869935309}
-  carriageSpacing: 10
-  slotsPerCarriage: 12
-  positionHistorySize: 50
-  carriageRight: {fileID: 21300000, guid: da81a729a7d13524eae0656b07349d60, type: 3}
-  carriageDown: {fileID: 21300000, guid: 6fe314e675d1ae94eae03bf8a4f1cb5b, type: 3}
+  numberOfCarriages: 3
