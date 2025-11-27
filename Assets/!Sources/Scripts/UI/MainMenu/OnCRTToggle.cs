@@ -25,11 +25,11 @@ public class OnCRTToggle : MonoBehaviour, IPointerClickHandler
 
         if (isToggled && checkOnAudio != null)
         {
-            checkOnAudio.Play();
+            checkOffAudio.Play();
         }
         else if (!isToggled && checkOffAudio != null)
         {
-            checkOffAudio.Play();
+            checkOnAudio.Play();
         }
 
         //Play crt toggle animation based on the state

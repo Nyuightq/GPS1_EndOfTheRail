@@ -1,10 +1,19 @@
 fileFormatVersion: 2
-guid: d2eaee0ea8ab1c648bfea4d026e9fb73
+guid: d7607ff5ce7da7d43aede4f5056cdd1a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -873183471929879148
-    second: frame_4_delay-0.1s_0
+      213: 7084697486638873615
+    second: BG_gameTitle_0
+  - first:
+      213: 9060096438258424689
+    second: BG_gameTitle_1
+  - first:
+      213: -2853383480696334385
+    second: BG_gameTitle_2
+  - first:
+      213: -7507848810739469270
+    second: BG_gameTitle_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
