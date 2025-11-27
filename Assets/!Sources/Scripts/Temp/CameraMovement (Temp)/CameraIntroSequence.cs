@@ -1,5 +1,5 @@
 using UnityEngine;
-using DG.Tweening;
+using System.Collections;
 
 public class CameraIntroSequence : MonoBehaviour
 {
@@ -7,7 +7,7 @@ public class CameraIntroSequence : MonoBehaviour
     [SerializeField] private CameraMovementTemp cameraMovement;
     [SerializeField] private RailGridScript railGrid;
     [SerializeField] private BuildRails buildRail;
-    private GameObject _railBuilderManager;
+    [SerializeField] private GameObject _railBuilderManager;
 
     [Header("UI Settings")]
     [Tooltip("Main gameplay Canvas that should be disabled during intro.")]
@@ -21,11 +21,11 @@ public class CameraIntroSequence : MonoBehaviour
     [Tooltip("How long the camera stays at start before giving control to the player.")]
     [SerializeField] private float holdTimeAtStart = 1.5f;
 
-    [Header("Zoom Settings")]
-    [Tooltip("How much to zoom in when focusing (smaller = closer).")]
-    [SerializeField] private float zoomedSize = 3.5f;
-    [Tooltip("Speed of zoom in/out transitions.")]
-    [SerializeField] private float zoomSpeed = 2f;
+    // [Header("Zoom Settings")]
+    // [Tooltip("How much to zoom in when focusing (smaller = closer).")]
+    // [SerializeField] private float zoomedSize = 3.5f;
+    // [Tooltip("Speed of zoom in/out transitions.")]
+    // [SerializeField] private float zoomSpeed = 2f;
 
     private Camera cam;
     private float originalSize;
@@ -41,7 +41,7 @@ public class CameraIntroSequence : MonoBehaviour
         if (buildRail == null)
             buildRail = FindFirstObjectByType<BuildRails>();
 
-        if (buildRail != null) _railBuilderManager = buildRail.gameObject;
+        if (buildRail != null && _railBuilderManager != null) _railBuilderManager = buildRail.gameObject;
 
         cam = Camera.main;
         originalSize = cam.orthographicSize;
@@ -56,65 +56,65 @@ public class CameraIntroSequence : MonoBehaviour
 
         _railBuilderManager.SetActive(false);
 
-        RunIntro();
+        StartCoroutine(IntroSequence());
     }
 
-    private void RunIntro()
+    private IEnumerator IntroSequence()
     {
-        // Ensure start/end are valid
-        if (railGrid.startPoint == new Vector3Int(500, 500, 500) ||
-            railGrid.endPoint == new Vector3Int(500, 500, 500))
-        {
-            Debug.LogWarning("RailGrid start/end not initialized.");
-            return;
-        }
+        // Wait for railGrid to initialize start/end (avoid using Vector3Int.zero if you use a different default)
+        yield return new WaitUntil(() => railGrid != null &&
+            railGrid.startPoint != new Vector3Int(500, 500, 500) &&
+            railGrid.endPoint != new Vector3Int(500, 500, 500));
 
         Vector3 endWorld = railGrid.snapToGrid(railGrid.endPoint);
         Vector3 startWorld = railGrid.snapToGrid(railGrid.startPoint);
 
-        // Clamp initial position
-        Vector3 endPos = ClampPositionWithCamera(endWorld);
-        Vector3 startPos = ClampPositionWithCamera(startWorld);
+        // --- STEP 1: Focus on END with zoom-in ---
+        cam.transform.position = ClampPositionWithCamera(endWorld);
+        // --- STEP 3: Pan END -> START ---
+        yield return StartCoroutine(PanToPosition(new Vector3(startWorld.x, startWorld.y, cam.transform.position.z), moveDuration));
 
-        // Force camera to end position first
-        cam.transform.position = new Vector3(endPos.x, endPos.y, -10f);
-
-        // ---- DOTWEEN SEQUENCE ----
-        Sequence seq = DOTween.Sequence();
-
-        // STEP 1: Hold on end
-        seq.AppendInterval(holdTimeAtEnd);
-
-        // STEP 2: Move END -> START
-        seq.Append(
-            cam.transform.DOMove(new Vector3(startPos.x, startPos.y, -10f), moveDuration)
-            .SetEase(Ease.InOutSine)
-        );
-
-        // STEP 3: Enable gameplay UI
-        seq.AppendCallback(() =>
+        // --- STEP 4: Enable UI Canvas once movement is done ---
+        if (gameplayCanvas != null)
         {
-            if (gameplayCanvas != null)
-            {
-                gameplayCanvas.enabled = true;
-                GameStateManager.Instance.InitialGeneralUI();
-            }
-        });
+            gameplayCanvas.enabled = true;
+            GameStateManager.Instance.InitialGeneralUI();
+        }
 
-        // STEP 4: Hold at start
-        seq.AppendInterval(holdTimeAtStart);
+        yield return new WaitForSeconds(holdTimeAtStart);
+        // --- STEP 7: Re-enable normal camera movement ---
+        CameraMovementTemp.ToggleCameraFollowMode(false);
+        this.enabled = false;
+    }
 
-        // STEP 5: Re-enable camera input
-        seq.AppendCallback(() =>
+    // Pan while clamping each frame using CameraMovementTemp's ClampToBounds
+    private IEnumerator PanToPosition(Vector3 targetPosition, float duration)
+    {
+        Vector3 fromPos = cam.transform.position;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
         {
-            // CameraMovementTemp.ToggleCameraFollowMode(false);
-            this.enabled = false;
-        });
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            Vector3 candidate = Vector3.Lerp(fromPos, targetPosition, t);
+
+            if (cameraMovement != null)
+                candidate = cameraMovement.ClampToBounds(candidate);
+
+            cam.transform.position = new Vector3(candidate.x, candidate.y, cam.transform.position.z);
+            yield return null;
+        }
+
+        Vector3 final = targetPosition;
+        if (cameraMovement != null)
+            final = cameraMovement.ClampToBounds(final);
+        cam.transform.position = new Vector3(final.x, final.y, cam.transform.position.z);
     }
 
     private Vector3 ClampPositionWithCamera(Vector3 worldTarget)
     {
-        Vector3 candidate = new Vector3(worldTarget.x, worldTarget.y, -10f);
+        Vector3 candidate = new Vector3(worldTarget.x, worldTarget.y, cam.transform.position.z);
         if (cameraMovement != null)
             candidate = cameraMovement.ClampToBounds(candidate);
         return candidate;
