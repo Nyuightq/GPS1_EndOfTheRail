@@ -10724,7 +10724,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1269876921146148676
 RectTransform:
   m_ObjectHideFlags: 0
@@ -13499,7 +13499,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1322137109230392469
 RectTransform:
   m_ObjectHideFlags: 0
@@ -18359,7 +18359,6 @@ GameObject:
   - component: {fileID: 2248248503033932229}
   - component: {fileID: 4231535802960066767}
   - component: {fileID: 2409353087084581431}
-  - component: {fileID: 9194484402962505637}
   m_Layer: 0
   m_Name: GameplayMusicManager
   m_TagString: Untagged
@@ -18493,18 +18492,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &9194484402962505637
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9050324350717705938}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a2277243245a26449d6c0347d296286, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &9050712099276827940
 GameObject:
   m_ObjectHideFlags: 0

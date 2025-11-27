@@ -11,7 +11,12 @@ public class TrainCarriageController : MonoBehaviour
 {
     [Header("Carriage Settings")]
     [SerializeField] private GameObject carriagePrefab;
-    [SerializeField] private int numberOfCarriages = 3;
+    [SerializeField] private int maxCarriages = 3;
+    
+    [Header("Inventory-Based Spawning")]
+    [SerializeField] private InventoryGridScript inventoryGrid;
+    [SerializeField] private int inventorySlotsPerCarriage = 12;
+    private int lastInventorySize = 0;
     
     [Header("References")]
     private TrainMovement trainMovement;
@@ -47,17 +52,62 @@ public class TrainCarriageController : MonoBehaviour
             gridScript = trainMovement.gridManager.GetComponent<RailGridScript>();
         }
         
+        // Find inventory grid if not assigned
+        if (inventoryGrid == null)
+        {
+            inventoryGrid = FindFirstObjectByType<InventoryGridScript>();
+            if (inventoryGrid == null)
+            {
+                Debug.LogError("InventoryGridScript not found! Carriages won't spawn based on inventory.");
+            }
+        }
+        
         // Initialize position history with current position
         positionHistory.Add(transform.position);
         
-        // Spawn initial carriages
-        SpawnCarriages();
+        // Calculate initial inventory size
+        if (inventoryGrid != null)
+        {
+            lastInventorySize = inventoryGrid.inventoryWidth * inventoryGrid.inventoryHeight;
+            Debug.Log($"Initial inventory size: {lastInventorySize}");
+        }
+        
+        // Don't spawn any carriages at start - they'll spawn as inventory grows
     }
     
     /// <summary>
-    /// Spawns all carriages behind the train head on grid tiles
+    /// Checks inventory size and spawns carriages based on growth
     /// </summary>
-    private void SpawnCarriages()
+    private void CheckInventorySizeAndSpawnCarriages()
+    {
+        if (inventoryGrid == null) return;
+        
+        int currentInventorySize = inventoryGrid.inventoryWidth * inventoryGrid.inventoryHeight;
+        
+        // Check if inventory size increased
+        if (currentInventorySize > lastInventorySize)
+        {
+            int slotsAdded = currentInventorySize - lastInventorySize;
+            lastInventorySize = currentInventorySize;
+            
+            // Calculate how many carriages should exist based on total inventory size
+            int baseInventorySize = 20; // Initial size
+            int additionalSlots = currentInventorySize - baseInventorySize;
+            int targetCarriageCount = Mathf.Min(additionalSlots / inventorySlotsPerCarriage, maxCarriages);
+            
+            // Spawn carriages if we need more
+            while (carriages.Count < targetCarriageCount)
+            {
+                SpawnSingleCarriage();
+                Debug.Log($"Carriage spawned! Total carriages: {carriages.Count}/{maxCarriages}");
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Spawns a single carriage at the correct position
+    /// </summary>
+    private void SpawnSingleCarriage()
     {
         if (carriagePrefab == null)
         {
@@ -71,45 +121,57 @@ public class TrainCarriageController : MonoBehaviour
             return;
         }
         
-        Vector3Int currentTile = trainMovement.GetTilePos();
-        Vector2 backwardDirection = -trainMovement.GetForwardDirection();
+        int carriageIndex = carriages.Count;
         
-        // Spawn carriages 1 tile behind each other
-        for (int i = 0; i < numberOfCarriages; i++)
+        // Calculate spawn position based on train's current position and existing carriages
+        Vector3 spawnPos;
+        
+        if (carriageIndex == 0)
         {
-            // Calculate tile position (1 tile back for each carriage)
-            Vector3Int carriageTile = currentTile + Vector3Int.RoundToInt((Vector3)(backwardDirection * (i + 1)));
-            
-            // Get world position from grid
-            Vector3 spawnPos = gridScript.snapToGrid(carriageTile);
-            
-            // Instantiate carriage
-            GameObject carriage = Instantiate(carriagePrefab, spawnPos, Quaternion.identity);
-            carriage.transform.parent = transform.parent;
-            carriage.name = $"Carriage_{i + 1}";
-            
-            // Get or add animation controller
-            TrainAnimationController animController = carriage.GetComponent<TrainAnimationController>();
-            if (animController == null)
-            {
-                animController = carriage.AddComponent<TrainAnimationController>();
-            }
-            
-            // Set initial direction
-            animController.UpdateDirection(trainMovement.GetForwardDirection());
-            
-            carriages.Add(carriage);
-            
-            // Add initial positions to history
-            positionHistory.Add(spawnPos);
+            // First carriage spawns behind the train
+            Vector3Int currentTile = trainMovement.GetTilePos();
+            Vector2 backwardDirection = -trainMovement.GetForwardDirection();
+            Vector3Int carriageTile = currentTile + Vector3Int.RoundToInt((Vector3)(backwardDirection * 1));
+            spawnPos = gridScript.snapToGrid(carriageTile);
+        }
+        else
+        {
+            // Subsequent carriages spawn behind the last carriage
+            Vector3 lastCarriagePos = carriages[carriageIndex - 1].transform.position;
+            Vector2 backwardDirection = -trainMovement.GetForwardDirection();
+            spawnPos = lastCarriagePos + (Vector3)(backwardDirection * tileSpacing);
+            spawnPos = gridScript.snapToGrid(Vector3Int.RoundToInt(spawnPos));
         }
         
-        Debug.Log($"Spawned {numberOfCarriages} carriages with 1-tile spacing");
+        // Instantiate carriage
+        GameObject carriage = Instantiate(carriagePrefab, spawnPos, Quaternion.identity);
+        carriage.transform.parent = transform.parent;
+        carriage.name = $"Carriage_{carriageIndex + 1}";
+        
+        // Get or add animation controller
+        TrainAnimationController animController = carriage.GetComponent<TrainAnimationController>();
+        if (animController == null)
+        {
+            animController = carriage.AddComponent<TrainAnimationController>();
+        }
+        
+        // Set initial direction
+        animController.UpdateDirection(trainMovement.GetForwardDirection());
+        
+        carriages.Add(carriage);
+        
+        // Add spawn position to history
+        positionHistory.Add(spawnPos);
     }
     
     private void LateUpdate()
     {
-        if (carriages.Count == 0 || trainMovement == null) return;
+        if (trainMovement == null) return;
+        
+        // Check if inventory size has changed and spawn carriages accordingly
+        CheckInventorySizeAndSpawnCarriages();
+        
+        if (carriages.Count == 0) return;
         
         // Record train's current position every frame
         Vector3 currentTrainPos = transform.position;
@@ -239,11 +301,16 @@ public class TrainCarriageController : MonoBehaviour
     }
     
     /// <summary>
-    /// Gets the number of active carriages
+    /// Gets the current number of carriages that should exist based on inventory size
     /// </summary>
-    public int GetCarriageCount()
+    public int GetTargetCarriageCount()
     {
-        return carriages.Count;
+        if (inventoryGrid == null) return 0;
+        
+        int currentInventorySize = inventoryGrid.inventoryWidth * inventoryGrid.inventoryHeight;
+        int baseInventorySize = 20;
+        int additionalSlots = currentInventorySize - baseInventorySize;
+        return Mathf.Min(additionalSlots / inventorySlotsPerCarriage, maxCarriages);
     }
     
     /// <summary>
