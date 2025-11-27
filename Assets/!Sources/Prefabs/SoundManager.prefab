@@ -57,7 +57,7 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: SFX_RailBuilding_LinkEnded
     clip: {fileID: 8300000, guid: 642c835d78e9aaa4d8a4dae0bb385928, type: 3}
-    volume: 1
+    volume: 0.7
     pitch: 1.2
     loop: 0
     source: {fileID: 0}
@@ -112,7 +112,7 @@ MonoBehaviour:
   - name: SFX_ButtonOnCancel
     clip: {fileID: 8300000, guid: 614f0fae9ed3a654fb017cd5cfb8ce63, type: 3}
     volume: 1
-    pitch: 1.2
+    pitch: 1
     loop: 0
     source: {fileID: 0}
   - name: SFX_ButtonOnClick_2
@@ -189,19 +189,19 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: SFX_CannonAttack
     clip: {fileID: 8300000, guid: 68b3f435ee085cc478f9a860dda1bbb9, type: 3}
-    volume: 0.6
+    volume: 0.3
     pitch: 1
     loop: 0
     source: {fileID: 0}
   - name: SFX_DefaultComponentAttack
     clip: {fileID: 8300000, guid: 213ff5b0777c9ba4aa858ea0c6f82075, type: 3}
-    volume: 1
+    volume: 0.5
     pitch: 1
     loop: 0
     source: {fileID: 0}
   - name: SFX_Enemy_BiteAttack
     clip: {fileID: 8300000, guid: 1a6ca54bef415554c92f3c300e003d03, type: 3}
-    volume: 1
+    volume: 0.6
     pitch: 1
     loop: 0
     source: {fileID: 0}
@@ -213,37 +213,85 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: SFX_Enemy_SlashAttack
     clip: {fileID: 8300000, guid: 493300de8c31ad142856b20df8baba2e, type: 3}
-    volume: 1
+    volume: 0.6
     pitch: 1
     loop: 0
     source: {fileID: 0}
   - name: SFX_Enemy_TakeDamage
     clip: {fileID: 8300000, guid: 77512b172d4d6514b85a4aa508b2d584, type: 3}
-    volume: 1
+    volume: 0.6
     pitch: 1
     loop: 0
     source: {fileID: 0}
   - name: SFX_Enemy_ThrowAttack
     clip: {fileID: 8300000, guid: 93e17af555cedfe46ad1d8daa3ada2b7, type: 3}
-    volume: 1
+    volume: 0.6
     pitch: 1
     loop: 0
     source: {fileID: 0}
   - name: SFX_Train_TakeDamage
     clip: {fileID: 8300000, guid: 9755eb7054d4be6449f337bfc30f9438, type: 3}
-    volume: 1
+    volume: 0.7
     pitch: 1
     loop: 0
     source: {fileID: 0}
   - name: SFX_TurretAttack
     clip: {fileID: 8300000, guid: e693ac8d57cbec949b4e35e08e7856a8, type: 3}
-    volume: 0.6
+    volume: 0.4
     pitch: 1
     loop: 0
     source: {fileID: 0}
-  musicTracks: []
+  - name: SFX_Component_OnDrag
+    clip: {fileID: 8300000, guid: 742258340a21bee469ed2fdfee65af2a, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_Component_OnRegistered
+    clip: {fileID: 8300000, guid: ba17a66082a3ba94999d93a66faf5f36, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_Component_OnRegisteredFailed
+    clip: {fileID: 8300000, guid: 9ad06cd2b56530c43aae488dcef02f2f, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_Component_OnRotate
+    clip: {fileID: 8300000, guid: ce8ef4c0709c48a4c807f077fefce658, type: 3}
+    volume: 1
+    pitch: 0.7
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_Component_OnRelease
+    clip: {fileID: 8300000, guid: e87735dee3bb2f5409245e8df08f734c, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_Component_OnHover
+    clip: {fileID: 8300000, guid: 20de543d0260d54439e35cbc6e7dd9fc, type: 3}
+    volume: 0.9
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_CombatEntity_OnHover
+    clip: {fileID: 8300000, guid: 20de543d0260d54439e35cbc6e7dd9fc, type: 3}
+    volume: 0.9
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  musicTracks:
+  - name: MUSIC_Gameplay
+    clip: {fileID: 8300000, guid: d1463501745abf548a65792f66b361c2, type: 3}
+    volume: 0.7
+    pitch: 1
+    loop: 1
+    source: {fileID: 0}
   masterVolume: 1
-  musicVolume: 1
+  musicVolume: 0.6
   sfxVolume: 1
 --- !u!82 &2797861959186537362
 AudioSource:
