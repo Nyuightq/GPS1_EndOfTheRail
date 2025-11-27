@@ -6,8 +6,9 @@ using UnityEngine.SceneManagement;
 public class OnClickImage : MonoBehaviour
 {
     [Header("Animator")]
-    [SerializeField] private Animator transitionAnimator;
-    
+    [SerializeField] private Animator pixelBallInAnimator;
+    [SerializeField] private Animator pixelBallOutAnimator;
+
     [Header("UI References")]
     [SerializeField] private GameObject narrative1;
     [SerializeField] private GameObject narrative2;
@@ -19,7 +20,8 @@ public class OnClickImage : MonoBehaviour
     [SerializeField] private GameObject narrative3Text;
     [SerializeField] private GameObject narrative4Text;
 
-    [SerializeField] private GameObject transitionGO;
+    [SerializeField] private GameObject pixelBallIn;
+    [SerializeField] private GameObject pixelBallOut;
 
     [Header("Audio")]
     [SerializeField] private AudioSource clickAudio;
@@ -28,8 +30,10 @@ public class OnClickImage : MonoBehaviour
 
     public void Start()
     {
-        transitionAnimator.enabled = false;
-        StartCoroutine(TransitionIn());
+        pixelBallIn.SetActive(true);
+        pixelBallInAnimator.Play("PixelBallInAnim", 0, 0f);
+
+        pixelBallOut.SetActive(false);
 
         narrative1.SetActive(true);
         narrative1Text.SetActive(true);
@@ -45,25 +49,12 @@ public class OnClickImage : MonoBehaviour
         clickedAudio = false;
     }
 
-    private IEnumerator TransitionIn()
-    {
-        transitionGO.SetActive(true);
-
-        yield return new WaitForSeconds(0.1f);
-
-        transitionAnimator.enabled = true;
-        transitionAnimator.Play("TransitionInAnim", 0, 0f);
-
-        yield return new WaitForSeconds(0.5f);
-        transitionGO.SetActive(false);
-    }
-
     public void OnNarrative1()
     {
+        pixelBallIn.SetActive(false);
+        
         narrative2.SetActive(true);
         narrative2Text.SetActive(true);
-        // narrative4.SetActive(true);
-        // narrative4Text.SetActive(true);
 
         narrative1.SetActive(false);
         narrative1Text.SetActive(false);
@@ -98,11 +89,12 @@ public class OnClickImage : MonoBehaviour
 
     public void OnNarrative4()
     {
+        pixelBallOut.SetActive(true);
+        pixelBallOutAnimator.Play("PixelBallOutAnim", 0, 0f);
+
         narrative4.SetActive(true);
         narrative4Text.SetActive(true);
 
-        //narrative3.SetActive(false);
-        //narrative3Text.SetActive(false);
         narrative1.SetActive(false);
         narrative1Text.SetActive(false);
 
@@ -114,14 +106,14 @@ public class OnClickImage : MonoBehaviour
 
     private IEnumerator TransitionOutToNextScene()
     {
-        transitionGO.SetActive(true);
-
-        yield return new WaitForSeconds(0.1f);
-
-        transitionAnimator.enabled = true;
-        transitionAnimator.Play("TransitionOutAnim", 0, 0f);
-
         yield return new WaitForSeconds(0.5f);
+
+        if (SoundManager.Instance != null)
+        {
+            Destroy(SoundManager.Instance.gameObject);
+            Debug.Log("[WinLoseManager] Destroyed SoundManager");
+        }
+
         SceneManager.LoadScene("GameplayLevel");
     }
 }

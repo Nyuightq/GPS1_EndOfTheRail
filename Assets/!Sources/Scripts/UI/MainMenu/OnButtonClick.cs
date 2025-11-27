@@ -82,6 +82,7 @@ public class OnButtonClick : MonoBehaviour
     private IEnumerator WaitThenStart()
     {
         yield return new WaitForSeconds(1f);
+
         if (SoundManager.Instance != null)
         {
             Destroy(SoundManager.Instance.gameObject);
