@@ -61,6 +61,11 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        Instance.PlayMusic("MUSIC_Gameplay");
+    }
+
     private void InitializeAudio()
     {
         // Create AudioSources if not assigned
@@ -102,6 +107,7 @@ public class SoundManager : MonoBehaviour
     // Play a sound effect by name
     public void PlaySFX(string soundName)
     {
+        Debug.Log(soundName + " " + sfxVolume * masterVolume + " " + masterVolume);
         if (soundDictionary.TryGetValue(soundName, out Sound sound))
         {
             sfxSource.pitch = sound.pitch;

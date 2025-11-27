@@ -24,7 +24,7 @@ public class OnVolumeToggle : MonoBehaviour
     private void Start()
     {
         //Load saved volume
-        float savedVolume = PlayerPrefs.GetFloat(VolumePrefKey, 0f);
+        float savedVolume = PlayerPrefs.GetFloat(VolumePrefKey, 1f);
         isMuted = PlayerPrefs.GetInt(MutedPrefKey, 0) == 1;
 
         lastVolume = savedVolume;

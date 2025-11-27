@@ -82,6 +82,11 @@ public class OnButtonClick : MonoBehaviour
     private IEnumerator WaitThenStart()
     {
         yield return new WaitForSeconds(1f);
+        if (SoundManager.Instance != null)
+        {
+            Destroy(SoundManager.Instance.gameObject);
+            Debug.Log("[WinLoseManager] Destroyed SoundManager");
+        }
 
         SceneManager.LoadScene("CutScene01");
         Debug.Log("Dramatic entrance!");
@@ -92,7 +97,7 @@ public class OnButtonClick : MonoBehaviour
         if (isSideSliderOpen && optionsClicked == true)
         {
             SoundManager.Instance.PlaySFX("SFX_PanelSlideOut_2");
-            Debug.Log($"SFX_PanelSlideOut_2");
+            Debug.Log($"SFX_PanelSlideOut_2" + SoundManager.Instance != null);
             
             sideSliderAnimator.Play("CloseSideSliderAnim", 0, 0f);
 
