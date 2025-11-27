@@ -442,7 +442,7 @@ PrefabInstance:
     - target: {fileID: 1227413715407136962, guid: 7490f757d97ff1249896a7fe8e365d1b, type: 3}
       propertyPath: soundEffects.Array.data[20].clip
       value: 
-      objectReference: {fileID: 8300000, guid: 592f67f033866cb49a378ff00f976fe9, type: 3}
+      objectReference: {fileID: 8300000, guid: 222da41ebc31d834498b2e4e63e7c772, type: 3}
     - target: {fileID: 1227413715407136962, guid: 7490f757d97ff1249896a7fe8e365d1b, type: 3}
       propertyPath: soundEffects.Array.data[39].clip
       value: 
@@ -703,6 +703,46 @@ PrefabInstance:
       propertyPath: crtToggleAnimator
       value: 
       objectReference: {fileID: 1560904305}
+    - target: {fileID: 6656122051259271320, guid: 94462e6cfabd580448411bd8f2538dad, type: 3}
+      propertyPath: m_text
+      value: 'Brian Lee Zhen Chen
+
+        (Design Lead)
+
+
+        Ysaac Lo Bowie
+
+        (Tech
+        Lead)
+
+
+        Liew Zhi Qian
+
+        (Gameplay Programmer)
+
+
+        Ng
+        Hui Seng
+
+        (Gameplay Programmer)
+
+
+        Lee Chang Zhen
+
+        (Lead
+        Artist)
+
+
+        Felix Seh Jun Huang
+
+        (Game Artist)
+
+
+        Chew
+        Chye Huei
+
+        (Technical Artist)'
+      objectReference: {fileID: 0}
     - target: {fileID: 6716240409500033732, guid: 94462e6cfabd580448411bd8f2538dad, type: 3}
       propertyPath: m_RaycastTarget
       value: 0
