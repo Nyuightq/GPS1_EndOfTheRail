@@ -60,8 +60,10 @@ public class OnClickImage : MonoBehaviour
 
     public void OnNarrative1()
     {
-        narrative2.SetActive(true);
-        narrative2Text.SetActive(true);
+        //narrative2.SetActive(true);
+        //narrative2Text.SetActive(true);
+        narrative4.SetActive(true);
+        narrative4Text.SetActive(true);
 
         narrative1.SetActive(false);
         narrative1Text.SetActive(false);
@@ -99,8 +101,10 @@ public class OnClickImage : MonoBehaviour
         narrative4.SetActive(true);
         narrative4Text.SetActive(true);
 
-        narrative3.SetActive(false);
-        narrative3Text.SetActive(false);
+        //narrative3.SetActive(false);
+        //narrative3Text.SetActive(false);
+        narrative1.SetActive(false);
+        narrative1Text.SetActive(false);
 
         clickedAudio = true;
         clickAudio.Play();
