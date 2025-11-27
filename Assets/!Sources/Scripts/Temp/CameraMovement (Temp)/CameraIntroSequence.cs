@@ -7,6 +7,7 @@ public class CameraIntroSequence : MonoBehaviour
     [SerializeField] private CameraMovementTemp cameraMovement;
     [SerializeField] private RailGridScript railGrid;
     [SerializeField] private BuildRails buildRail;
+    private GameObject _railBuilderManager;
 
     [Header("UI Settings")]
     [Tooltip("Main gameplay Canvas that should be disabled during intro.")]
@@ -40,6 +41,8 @@ public class CameraIntroSequence : MonoBehaviour
         if (buildRail == null)
             buildRail = FindFirstObjectByType<BuildRails>();
 
+        if (buildRail != null) _railBuilderManager = buildRail.gameObject;
+
         cam = Camera.main;
         originalSize = cam.orthographicSize;
 
@@ -51,7 +54,7 @@ public class CameraIntroSequence : MonoBehaviour
         if (gameplayCanvas != null)
             gameplayCanvas.enabled = false;
 
-        buildRail.enabled = false;
+        _railBuilderManager.SetActive(false);
 
         RunIntro();
     }
@@ -95,7 +98,6 @@ public class CameraIntroSequence : MonoBehaviour
             {
                 gameplayCanvas.enabled = true;
                 GameStateManager.Instance.InitialGeneralUI();
-                buildRail.enabled = true;
             }
         });
 
@@ -105,7 +107,7 @@ public class CameraIntroSequence : MonoBehaviour
         // STEP 5: Re-enable camera input
         seq.AppendCallback(() =>
         {
-            CameraMovementTemp.ToggleCameraFollowMode(false);
+            // CameraMovementTemp.ToggleCameraFollowMode(false);
             this.enabled = false;
         });
     }

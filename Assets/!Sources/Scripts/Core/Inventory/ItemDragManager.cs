@@ -211,6 +211,7 @@ private void LeftRelease()
     // Handle other managers
     RewardManager.Instance?.OnItemReleased(gameObject);
     TransactionManager.Instance?.OnItemReleased(gameObject);
+    TutorialCrystalManager.Instance?.OnItemReleased(gameObject);
 }
 
     private void RightClick()
