@@ -174,48 +174,44 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
     // Only showing the updated LeftRelease() method
     // Add this to your existing ItemDragManager.cs
 
-    private void LeftRelease()
+private void LeftRelease()
+{
+    if (!dragging) return;
+    
+    dragging = false;
+
+    // Check Engineer first (higher priority when active)
+    if (EngineerManager.Instance != null && EngineerManager.Instance.IsEngineerUIActive)
     {
-        if (!dragging) return;
-        
-        dragging = false;
-
-        // if (tooltip != null)
-        // {
-        //     tooltip.Show(itemScript);
-        // }
-
-        bool sucess = AttachToInventory();
-        if ( sucess )
-        {
-            SoundManager.Instance.PlaySFX("SFX_Component_OnRegistered");
-        }
-        else
-        {
-            SoundManager.Instance.PlaySFX("SFX_Component_OnRelease");
-        }
-        //equipped pos defaults to 0 and 0 is largely impossible to get to at the start
-        if (!sucess && !firstEquip &&  itemScript.itemData.mandatoryItem)
-        {
-            // ADD THIS LINE - Critical for snap-back functionality
-            rectTransform.anchoredPosition = equippedPos;
-            AttachToInventory();
-        }
-
-        // Check Engineer first (higher priority when active)
-        if (EngineerManager.Instance != null && EngineerManager.Instance.IsEngineerUIActive)
-        {
-            EngineerManager.Instance.OnItemReleased(gameObject);
-            RemoveTemporaryCanvas();
-        }
-        else
-        {
-            AttachToInventory();
-
-            RewardManager.Instance?.OnItemReleased(gameObject);
-            TransactionManager.Instance?.OnItemReleased(gameObject);
-        }
+        // Let Engineer handle everything - don't try to attach to inventory
+        EngineerManager.Instance.OnItemReleased(gameObject);
+        RemoveTemporaryCanvas();
+        return; // EXIT HERE - don't continue with inventory logic
     }
+
+    // Only proceed with inventory attachment if NOT in engineer mode
+    bool success = AttachToInventory();
+    
+    if (success)
+    {
+        SoundManager.Instance.PlaySFX("SFX_Component_OnRegistered");
+    }
+    else
+    {
+        SoundManager.Instance.PlaySFX("SFX_Component_OnRelease");
+    }
+
+    // Snap back mandatory items to their last equipped position
+    if (!success && !firstEquip && itemScript.itemData.mandatoryItem)
+    {
+        rectTransform.anchoredPosition = equippedPos;
+        AttachToInventory();
+    }
+
+    // Handle other managers
+    RewardManager.Instance?.OnItemReleased(gameObject);
+    TransactionManager.Instance?.OnItemReleased(gameObject);
+}
 
     private void RightClick()
     {
@@ -354,4 +350,3 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
     }
     #endregion
 }
-

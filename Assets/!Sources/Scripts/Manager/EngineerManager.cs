@@ -111,6 +111,9 @@ public class EngineerManager : MonoBehaviour
             return;
         }
 
+        // Delete all unequipped items BEFORE opening
+        DeleteUnequippedItems();
+
         // CRITICAL: Completely clear all slots to prevent data retention
         ForceCleanAllSlots();
         
@@ -121,7 +124,7 @@ public class EngineerManager : MonoBehaviour
         if (feedbackText != null)
             feedbackText.text = "Drag two identical items to merge";
 
-        Debug.Log("[EngineerManager] Engineer UI opened fresh");
+        Debug.Log("[EngineerManager] Engineer UI opened fresh - unequipped items deleted");
     }
 
     public void OnItemDragStarted(GameObject item)
@@ -360,18 +363,37 @@ public class EngineerManager : MonoBehaviour
     /// <summary>
     /// Force return item to inventory using drag manager
     /// </summary>
-    private void ForceReturnToInventory(GameObject item, ItemDragManager dragManager)
+private void ForceReturnToInventory(GameObject item, ItemDragManager dragManager)
+{
+    if (item == null || dragManager == null) return;
+
+    Debug.Log($"[EngineerManager] Force returning item to inventory");
+
+    RemoveTemporaryCanvas(item);
+    
+    // Check if item has ever been in inventory
+    Item itemScript = item.GetComponent<Item>();
+    if (itemScript != null && itemScript.state == Item.itemState.equipped)
     {
-        if (item == null || dragManager == null) return;
-
-        Debug.Log($"[EngineerManager] Force returning item to inventory");
-
-        RemoveTemporaryCanvas(item);
+        // Item was previously in inventory - use normal attachment
         dragManager.AttachToInventory();
-
-        if (feedbackText != null)
-            feedbackText.text = "Item returned to inventory";
     }
+    else
+    {
+        // Item has NEVER been in inventory - find a spot for it
+        InventoryGridScript inventory = FindFirstObjectByType<InventoryGridScript>();
+        if (inventory != null)
+        {
+            // Use AddItem to properly place it
+            inventory.AddItem(inventory.ItemSpawnPrefab, itemScript.itemData);
+            // Destroy the current orphaned instance
+            Destroy(item);
+        }
+    }
+
+    if (feedbackText != null)
+        feedbackText.text = "Item returned to inventory";
+}
 
     /// <summary>
     /// Return a single item from a slot to inventory
@@ -713,5 +735,33 @@ public class EngineerManager : MonoBehaviour
 
         if (declineButton != null)
             declineButton.onClick.RemoveListener(OnDeclineButtonClicked);
+    }
+
+    /// <summary>
+    /// Deletes all items that are not equipped in the inventory
+    /// </summary>
+    private void DeleteUnequippedItems()
+    {
+        if (inventoryGrid == null)
+        {
+            Debug.LogWarning("[EngineerManager] Cannot delete unequipped items - inventory reference missing");
+            return;
+        }
+
+        Item[] items = FindObjectsByType<Item>(FindObjectsSortMode.None);
+        int deletedCount = 0;
+
+        foreach (Item item in items)
+        {
+            // Check if item is NOT in the equipped items list
+            if (item != null && item.state != Item.itemState.equipped)
+            {
+                Debug.Log($"[EngineerManager] Deleting unequipped item: {item.itemData?.itemName ?? "Unknown"}");
+                item.PrepareDeletion();
+                deletedCount++;
+            }
+        }
+
+        Debug.Log($"<color=orange>[EngineerManager] Deleted {deletedCount} unequipped item(s)</color>");
     }
 }
