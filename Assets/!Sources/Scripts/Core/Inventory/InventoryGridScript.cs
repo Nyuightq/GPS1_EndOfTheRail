@@ -166,7 +166,7 @@ public class InventoryGridScript : MonoBehaviour
         
         //Debug.Log($"Local mouse: {mouse}, success={success}");
 
-        if (inventoryGrid != null && GameStateManager.Instance.IsPausing == false)
+        if (inventoryGrid != null && GameStateManager.Instance != null && GameStateManager.Instance.IsPausing == false)
         {
             Vector2Int cellPos = GetCellAtPos(mouseBottomLeft);
             EnlargeOnHover(cellPos);
