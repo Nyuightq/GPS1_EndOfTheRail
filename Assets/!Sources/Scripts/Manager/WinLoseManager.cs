@@ -36,22 +36,22 @@ public class WinLoseManager : MonoBehaviour
     [SerializeField] private UnityEngine.UI.Button mainMenuButtonWin;
     [SerializeField] private UnityEngine.UI.Button mainMenuButtonLose;
     
-[Header("Win Panel Stats Text")]
-[SerializeField] private TMPro.TextMeshProUGUI winHpText;
-[SerializeField] private TMPro.TextMeshProUGUI winCrystalHpText;
-[SerializeField] private TMPro.TextMeshProUGUI winScrapsText;
-[SerializeField] private TMPro.TextMeshProUGUI winDaysText;
-[SerializeField] private TMPro.TextMeshProUGUI winCombatsText;
-[SerializeField] private TMPro.TextMeshProUGUI winTotalScrapsText;
-[SerializeField] private TMPro.TextMeshProUGUI winTotalTilesText;
+    [Header("Win Panel Stats Text")]
+    [SerializeField] private TMPro.TextMeshProUGUI winHpText;
+    [SerializeField] private TMPro.TextMeshProUGUI winCrystalHpText;
+    [SerializeField] private TMPro.TextMeshProUGUI winScrapsText;
+    [SerializeField] private TMPro.TextMeshProUGUI winDaysText;
+    [SerializeField] private TMPro.TextMeshProUGUI winCombatsText;
+    [SerializeField] private TMPro.TextMeshProUGUI winTotalScrapsText;
+    [SerializeField] private TMPro.TextMeshProUGUI winTotalTilesText;
 
-[Header("Lose Panel Stats Text")]
-[SerializeField] private TMPro.TextMeshProUGUI loseReasonText;
-[SerializeField] private TMPro.TextMeshProUGUI loseScrapsText;
-[SerializeField] private TMPro.TextMeshProUGUI loseDaysText;
-[SerializeField] private TMPro.TextMeshProUGUI loseCombatsText;
-[SerializeField] private TMPro.TextMeshProUGUI loseTotalScrapsText;
-[SerializeField] private TMPro.TextMeshProUGUI loseTotalTilesText; 
+    [Header("Lose Panel Stats Text")]
+    [SerializeField] private TMPro.TextMeshProUGUI loseReasonText;
+    [SerializeField] private TMPro.TextMeshProUGUI loseScrapsText;
+    [SerializeField] private TMPro.TextMeshProUGUI loseDaysText;
+    [SerializeField] private TMPro.TextMeshProUGUI loseCombatsText;
+    [SerializeField] private TMPro.TextMeshProUGUI loseTotalScrapsText;
+    [SerializeField] private TMPro.TextMeshProUGUI loseTotalTilesText; 
 
     [Header("Scene Settings")]
     [SerializeField] private string mainMenuSceneName = "MainMenu";

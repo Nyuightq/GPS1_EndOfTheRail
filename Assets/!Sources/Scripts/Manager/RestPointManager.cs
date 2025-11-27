@@ -35,6 +35,7 @@ public class RestPointManager : MonoBehaviour
     
     private bool isOnRestPoint = false;
     private TrainMovement trainMovement;
+    public int RestPointCount = 0;
 
     private void Start()
     {
@@ -85,6 +86,8 @@ public class RestPointManager : MonoBehaviour
         // Put SFX - UI_PlanPhase_SlideIn
         SoundManager.Instance.PlaySFX("SFX_UI_PlanPhase_SlideIn");
         Debug.Log("Play - UI_PlanPhase_SlideIn");
+
+        RestPointCount++;
         
         isOnRestPoint = true;
         trainMovement = train;
