@@ -53,7 +53,7 @@ public class GameStateManager : MonoBehaviour
     [SerializeField] private GameObject _asidePanel;
     private RectTransform _topPanelRect;
     private RectTransform _asidePanelRect;
-    private BuildRails _buildRails;
+    [SerializeField] private BuildRails _buildRails;
     private GameObject _railBuilderManager;
 
     private void Awake()
@@ -81,7 +81,7 @@ public class GameStateManager : MonoBehaviour
         if (_topPanel != null ) _topPanelRect = _topPanel.GetComponent<RectTransform>();
         if (_asidePanel != null ) _asidePanelRect = _asidePanel.GetComponent<RectTransform>();
 
-        BuildRails _buildRails = FindFirstObjectByType<BuildRails>();
+        if (_buildRails == null) _buildRails = FindFirstObjectByType<BuildRails>(FindObjectsInactive.Include);
         if (_buildRails != null) _railBuilderManager = _buildRails.gameObject;
 
         if (!_isInitial)
@@ -163,14 +163,14 @@ public class GameStateManager : MonoBehaviour
             // Enable camera Move
             // Enable Planning phase related UI
             // Enable Rail building and hover UI
-            _railBuilderManager.SetActive(true);
+            _buildRails.gameObject.SetActive(true);
             //_buildRails.enabled = true;
             TogglePlanPanel(true);
             CameraMovementTemp.ToggleCameraFollowMode(false);
         }
         else if (_phase == Phase.Travel)
         {
-            _railBuilderManager.SetActive(false);
+            _buildRails.gameObject.SetActive(false);
             //_buildRails.enabled = false;
             TogglePlanPanel(false);
             CameraMovementTemp.ToggleCameraFollowMode(true);

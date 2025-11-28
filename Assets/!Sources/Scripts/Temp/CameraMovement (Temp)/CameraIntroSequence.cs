@@ -72,12 +72,14 @@ public class CameraIntroSequence : MonoBehaviour
         // --- STEP 1: Focus on END with zoom-in ---
         cam.transform.position = ClampPositionWithCamera(endWorld);
         // --- STEP 3: Pan END -> START ---
+        yield return new WaitForSeconds(holdTimeAtEnd);
         yield return StartCoroutine(PanToPosition(new Vector3(startWorld.x, startWorld.y, cam.transform.position.z), moveDuration));
 
         // --- STEP 4: Enable UI Canvas once movement is done ---
         if (gameplayCanvas != null)
         {
             gameplayCanvas.enabled = true;
+            Debug.Log("GameStateManager.Instance > " + GameStateManager.Instance != null + " ");
             GameStateManager.Instance.InitialGeneralUI();
         }
 
