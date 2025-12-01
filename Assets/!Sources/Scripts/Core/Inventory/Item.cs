@@ -249,7 +249,7 @@ public class Item : MonoBehaviour
 
     public void PrepareDeletion()
     {
-        if (flaggedForDeletion) return;
+        if (flaggedForDeletion || itemData.mandatoryItem) return;
         flaggedForDeletion = true;
 
         float fadeDuration = 0.5f;
