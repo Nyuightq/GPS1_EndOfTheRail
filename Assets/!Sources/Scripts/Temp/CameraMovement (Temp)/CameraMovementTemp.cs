@@ -13,6 +13,7 @@ public class CameraMovementTemp : MonoBehaviour
     [Header("Camera Movement Settings")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float followSmoothSpeed = 5f;
+    [SerializeField] private float focusSmoothSpeed = 8f; // Speed for focusing on stationary target
 
     [Header("Follow Target Settings")]
     [Tooltip("Optional, Manually assign target.")]
@@ -32,6 +33,11 @@ public class CameraMovementTemp : MonoBehaviour
     private Vector3 moveDirection;
     private bool _isFollowing = false;
     public bool IsFollowing => _isFollowing;
+
+    // Focus mode variables
+    private bool _isFocusing = false;
+    private Vector3 _focusTargetPosition;
+    private float _focusThreshold = 0.01f; // Distance threshold to stop focusing
 
     private float minX, maxX, minY, maxY;
     private bool hasBounds = false;
@@ -56,10 +62,18 @@ public class CameraMovementTemp : MonoBehaviour
 
     void Update()
     {
-        if (_isFollowing)
+        if (_isFocusing)
+        {
+            FocusOnTarget();
+        }
+        else if (_isFollowing)
+        {
             FollowTarget();
+        }
         else
+        {
             HandleMovementInput();
+        }
 
         MoveCamera();
     }
@@ -67,6 +81,71 @@ public class CameraMovementTemp : MonoBehaviour
     public static void ToggleCameraFollowMode(bool value)
     {
         Instance._isFollowing = value;
+    }
+
+    /// <summary>
+    /// Smoothly moves the camera to focus on the train's current position
+    /// </summary>
+    /// <param name="train">Optional: specific train transform to focus on. If null, will find TrainMovement automatically</param>
+    public void FocusCameraOnTrain(Transform train = null)
+    {
+        Transform targetTrain = train;
+        
+        // If no train provided, find it automatically
+        if (targetTrain == null)
+        {
+            TrainMovement trainMovement = FindFirstObjectByType<TrainMovement>();
+            if (trainMovement != null)
+                targetTrain = trainMovement.transform;
+        }
+
+        if (targetTrain == null)
+        {
+            Debug.LogWarning("[CameraMovementTemp] No train found to focus on!");
+            return;
+        }
+
+        // Set focus target position
+        _focusTargetPosition = new Vector3(targetTrain.position.x, targetTrain.position.y, transform.position.z);
+        _isFocusing = true;
+        _isFollowing = false; // Disable follow mode when focusing
+
+        Debug.Log($"[CameraMovementTemp] Focusing camera on train at position: {_focusTargetPosition}");
+    }
+
+    /// <summary>
+    /// Static method to call focus from other scripts
+    /// </summary>
+    public static void FocusOnTrain(Transform train = null)
+    {
+        if (Instance != null)
+            Instance.FocusCameraOnTrain(train);
+    }
+
+    /// <summary>
+    /// Stops the camera from focusing and allows manual control
+    /// </summary>
+    public void StopFocusing()
+    {
+        _isFocusing = false;
+    }
+
+    private void FocusOnTarget()
+    {
+        Vector3 currentPos = transform.position;
+        Vector3 targetPos = ClampPosition(_focusTargetPosition);
+        
+        // Smoothly lerp to target position
+        Vector3 newPos = Vector3.Lerp(currentPos, targetPos, focusSmoothSpeed * Time.deltaTime);
+        transform.position = newPos;
+
+        // Stop focusing when close enough to target
+        if (Vector3.Distance(currentPos, targetPos) < _focusThreshold)
+        {
+            transform.position = targetPos;
+            _isFocusing = false;
+            Debug.Log("[CameraMovementTemp] Focus complete");
+        }
     }
 
     private void FollowTarget()
@@ -97,12 +176,21 @@ public class CameraMovementTemp : MonoBehaviour
 
         moveDirection = new Vector3(moveX, moveY, 0f).normalized;
         if (GameStateManager.Instance != null && GameStateManager.Instance.IsPausing) moveDirection = new Vector3(0f, 0f, 0f).normalized;
+        
+        // Stop focusing if player manually moves camera
+        if (moveDirection != Vector3.zero)
+        {
+            _isFocusing = false;
+        }
     }
 
     private void MoveCamera()
     {
-        Vector3 newPos = transform.position + moveDirection * moveSpeed * Time.deltaTime;
-        transform.position = ClampPosition(newPos);
+        if (!_isFocusing) // Only apply manual movement when not focusing
+        {
+            Vector3 newPos = transform.position + moveDirection * moveSpeed * Time.deltaTime;
+            transform.position = ClampPosition(newPos);
+        }
     }
 
     private void CalculateBoundsFromLargestTilemap()
@@ -181,5 +269,12 @@ public class CameraMovementTemp : MonoBehaviour
         Gizmos.DrawWireSphere(new Vector3(maxX, minY, 0f), markerSize);
         Gizmos.DrawWireSphere(new Vector3(minX, maxY, 0f), markerSize);
         Gizmos.DrawWireSphere(new Vector3(maxX, maxY, 0f), markerSize);
+
+        // Draw focus target if focusing
+        if (_isFocusing)
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireSphere(_focusTargetPosition, 0.5f);
+        }
     }
 }

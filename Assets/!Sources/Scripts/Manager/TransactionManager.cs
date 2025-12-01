@@ -20,6 +20,7 @@ public class TransactionManager : MonoBehaviour
         public RectTransform anchorPoint;
         public TMP_Text nameText;
         public TMP_Text costText;
+        public Image slotImage; // The slot's background/border image
     }
 
     [System.Serializable]
@@ -68,8 +69,9 @@ public class TransactionManager : MonoBehaviour
         public int cost;
         public bool wasPurchased;
         public Coroutine moveRoutine;
+        public int slotIndex; // Track which slot this item belongs to
 
-        public TransactionItemData(GameObject obj, Vector2 initialPos, RectTransform anchor, int itemCost)
+        public TransactionItemData(GameObject obj, Vector2 initialPos, RectTransform anchor, int itemCost, int slot)
         {
             itemObject = obj;
             rectTransform = obj.GetComponent<RectTransform>();
@@ -79,6 +81,7 @@ public class TransactionManager : MonoBehaviour
             cost = itemCost;
             wasPurchased = false;
             moveRoutine = null;
+            slotIndex = slot;
         }
     }
 
@@ -156,12 +159,14 @@ public class TransactionManager : MonoBehaviour
         }
 
         UpdateScrapUI();
+        
+        // Clear feedback when opening
+        if (feedbackText != null)
+            feedbackText.text = "";
+            
         Debug.Log("[TransactionManager] Transaction UI opened with randomized items.");
     }
 
-    /// <summary>
-    /// FIXED: Combined randomization and spawning into single pass
-    /// </summary>
     private void RandomizeAndSpawnTransactionItems()
     {
         if (availableItems.Count == 0)
@@ -175,18 +180,15 @@ public class TransactionManager : MonoBehaviour
 
         for (int i = 0; i < itemsToSelect; i++)
         {
-            // Random selection
             int randomIndex = Random.Range(0, tempPool.Count);
             ItemWithCost selectedItem = tempPool[randomIndex];
             tempPool.RemoveAt(randomIndex);
 
             TransactionSlot slot = transactionSlots[i];
 
-            // Assign to slot
             slot.itemSO = selectedItem.itemSO;
             slot.cost = selectedItem.cost;
 
-            // Update UI texts
             if (slot.nameText != null)
             {
                 slot.nameText.text = selectedItem.itemSO.itemName;
@@ -196,8 +198,13 @@ public class TransactionManager : MonoBehaviour
             {
                 slot.costText.text = $"Cost: {selectedItem.cost}";
             }
+            
+            // Reset slot appearance
+            if (slot.slotImage != null)
+            {
+                slot.slotImage.color = Color.white; // Reset to normal color
+            }
 
-            // Spawn item at anchor (FIXED: happens here, not separately)
             if (slot.anchorPoint == null)
             {
                 Debug.LogWarning($"TransactionManager: Slot {i} anchor point is null!");
@@ -206,14 +213,12 @@ public class TransactionManager : MonoBehaviour
 
             Vector2 spawnPosition = slot.anchorPoint.anchoredPosition;
 
-            // Validate spawn bounds using container's rect
             if (enforceSpawnBounds && !IsPositionInBounds(spawnPosition, transactionContainer))
             {
                 Debug.LogWarning($"TransactionManager: Anchor {i} position {spawnPosition} is out of bounds! Clamping...");
                 spawnPosition = ClampToBounds(spawnPosition, transactionContainer);
             }
 
-            // Instantiate item
             GameObject newItem = Instantiate(itemSpawnPrefab, transactionContainer);
             
             Item itemScript = newItem.GetComponent<Item>();
@@ -225,12 +230,12 @@ public class TransactionManager : MonoBehaviour
             RectTransform itemRect = newItem.GetComponent<RectTransform>();
             itemRect.anchoredPosition = spawnPosition;
 
-            // Store transaction data
             TransactionItemData transData = new TransactionItemData(
                 newItem,
                 spawnPosition,
                 slot.anchorPoint,
-                selectedItem.cost
+                selectedItem.cost,
+                i // Pass slot index
             );
             spawnedItems.Add(transData);
 
@@ -238,9 +243,6 @@ public class TransactionManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Check if position is within the container's rect bounds
-    /// </summary>
     private bool IsPositionInBounds(Vector2 position, RectTransform container)
     {
         if (container == null)
@@ -251,9 +253,6 @@ public class TransactionManager : MonoBehaviour
                position.y >= rect.yMin && position.y <= rect.yMax;
     }
 
-    /// <summary>
-    /// Clamp position to container's rect bounds
-    /// </summary>
     private Vector2 ClampToBounds(Vector2 position, RectTransform container)
     {
         if (container == null)
@@ -276,6 +275,13 @@ public class TransactionManager : MonoBehaviour
         if (transData == null)
             return;
 
+        // Check if already purchased
+        if (transData.wasPurchased)
+        {
+            Debug.Log("Item already purchased, ignoring.");
+            return;
+        }
+
         StopMoveRoutineIfAny(transData);
 
         if (transData.itemScript.state == Item.itemState.equipped)
@@ -289,15 +295,35 @@ public class TransactionManager : MonoBehaviour
                 if (success)
                 {
                     if (feedbackText != null)
-                        feedbackText.text = $"Purchased for {transData.cost} scraps!";
+                        feedbackText.text = $"Purchased {transData.itemScript.itemData.itemName} for {transData.cost} scraps!";
                     
                     Debug.Log($"✓ Transaction successful! Spent {transData.cost} scraps.");
 
                     transData.wasPurchased = true;
-                    spawnedItems.Remove(transData);
+                    
+                    // Dim the slot to show item was purchased
+                    if (transData.slotIndex >= 0 && transData.slotIndex < transactionSlots.Count)
+                    {
+                        TransactionSlot slot = transactionSlots[transData.slotIndex];
+                        if (slot.slotImage != null)
+                        {
+                            // Dim the slot - you can adjust the color/alpha as desired
+                            Color dimmedColor = slot.slotImage.color;
+                            dimmedColor.a = 0.3f; // Make it 30% transparent
+                            slot.slotImage.color = dimmedColor;
+                        }
+                        
+                        // Update cost text to show "SOLD"
+                        if (slot.costText != null)
+                        {
+                            slot.costText.text = "SOLD";
+                        }
+                    }
 
                     UpdateScrapUI();
-                    StartCoroutine(CloseUIAfterDelay(0.5f));
+                    
+                    // Check if all items purchased (optional auto-close)
+                    CheckAllItemsPurchased();
                 }
                 else
                 {
@@ -314,6 +340,28 @@ public class TransactionManager : MonoBehaviour
         {
             Debug.Log("Item not placed in inventory, snapping back to anchor.");
             SnapBackToAnchor(transData, tweenDuration);
+        }
+    }
+
+    private void CheckAllItemsPurchased()
+    {
+        // Optional: Auto-close if all items are purchased
+        // Comment out if you don't want this behavior
+        bool allPurchased = true;
+        foreach (TransactionItemData transData in spawnedItems)
+        {
+            if (!transData.wasPurchased)
+            {
+                allPurchased = false;
+                break;
+            }
+        }
+
+        if (allPurchased)
+        {
+            if (feedbackText != null)
+                feedbackText.text = "All items purchased! Closing...";
+            StartCoroutine(CloseUIAfterDelay(1f));
         }
     }
 
@@ -460,6 +508,9 @@ public class TransactionManager : MonoBehaviour
             
             if (slot.costText != null)
                 slot.costText.text = "";
+                
+            if (slot.slotImage != null)
+                slot.slotImage.color = Color.white;
         }
     }
 
@@ -500,6 +551,9 @@ public class TransactionManager : MonoBehaviour
             
             if (slot.costText != null)
                 slot.costText.text = "";
+                
+            if (slot.slotImage != null)
+                slot.slotImage.color = Color.white;
         }
 
         if (uiPanel != null)
@@ -507,13 +561,11 @@ public class TransactionManager : MonoBehaviour
             uiPanel.HideEventPanel(() => OnTransactionClosed?.Invoke());
             SoundManager.Instance.PlaySFX("SFX_ButtonOnCancel");
         }
-            
 
         playerStatus = null;
         IsTransactionUIActive = false;
 
         Debug.Log("Transaction UI closed.");
-        //OnTransactionClosed?.Invoke();
 
         StartCoroutine(CloseCooldown());
     }
@@ -536,9 +588,9 @@ public class TransactionManager : MonoBehaviour
 
     public void OnDeclineButtonClicked()
     {
-        Debug.Log("=== TRANSACTION DECLINED ===");
+        Debug.Log("=== TRANSACTION CLOSED ===");
         if (feedbackText != null)
-            feedbackText.text = "Transaction declined.";
+            feedbackText.text = "Transaction closed.";
         CloseTransactionUI();
     }
 

@@ -17068,12 +17068,11 @@ MonoBehaviour:
   cameraMovement: {fileID: 1922003436}
   railGrid: {fileID: 689783407}
   buildRail: {fileID: 0}
+  _railBuilderManager: {fileID: 0}
   gameplayCanvas: {fileID: 5940078012676061830}
   holdTimeAtEnd: 0.6
   moveDuration: 0.7
   holdTimeAtStart: 0.5
-  zoomedSize: 3.5
-  zoomSpeed: 2
 --- !u!114 &1922003435
 MonoBehaviour:
   m_ObjectHideFlags: 0

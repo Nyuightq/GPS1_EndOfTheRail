@@ -245,6 +245,16 @@ public class GameStateManager : MonoBehaviour
             inventory.OnToggleInventoryState(true);
         }
     }
+
+    /// <summary>
+    /// Called by UI button in Plan Phase Panel to focus camera on train
+    /// This allows the button to reference this method without needing a serialized field
+    /// </summary>
+    public void OnFocusTrainButtonClicked()
+    {
+        CameraMovementTemp.FocusOnTrain();
+    }
+
     public void DestroyInstance()
     {
         if (Instance != null)
@@ -254,5 +264,4 @@ public class GameStateManager : MonoBehaviour
             Debug.Log("[GameStateManager] Instance destroyed for replay.");
         }
     }
-
 }
