@@ -109,11 +109,6 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
 
         rectTransform.anchoredPosition += shiftOffset;
 
-        //equippedPos = rectTransform.anchoredPosition;
-
-        //Vector2Int newTopLeft = Vector2Int.FloorToInt(inventoryGridScript.GetCellAtPos(rectTransform.anchoredPosition));
-        //topLeftCellPos = newTopLeft;
-
         StartCoroutine(AttachToInventoryNextFrame());
     }
 

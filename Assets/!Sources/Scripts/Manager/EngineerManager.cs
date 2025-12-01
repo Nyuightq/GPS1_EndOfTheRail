@@ -363,37 +363,79 @@ public class EngineerManager : MonoBehaviour
     /// <summary>
     /// Force return item to inventory using drag manager
     /// </summary>
-private void ForceReturnToInventory(GameObject item, ItemDragManager dragManager)
-{
-    if (item == null || dragManager == null) return;
+    //private void ForceReturnToInventory(GameObject item, ItemDragManager dragManager)
+    //{
+    //    if (item == null || dragManager == null) return;
 
-    Debug.Log($"[EngineerManager] Force returning item to inventory");
+    //    Debug.Log($"[EngineerManager] Force returning item to inventory");
 
-    RemoveTemporaryCanvas(item);
-    
-    // Check if item has ever been in inventory
-    Item itemScript = item.GetComponent<Item>();
-    if (itemScript != null && itemScript.state == Item.itemState.equipped)
+    //    RemoveTemporaryCanvas(item);
+
+    //    // Check if item has ever been in inventory
+    //    Item itemScript = item.GetComponent<Item>();
+    //    if (itemScript != null && itemScript.state == Item.itemState.equipped)
+    //    {
+    //        // Item was previously in inventory - use normal attachment
+    //        dragManager.AttachToInventory();
+    //    }
+    //    else
+    //    {
+    //        // Item has NEVER been in inventory - find a spot for it
+    //        InventoryGridScript inventory = FindFirstObjectByType<InventoryGridScript>();
+    //        if (inventory != null)
+    //        {
+    //            // Use AddItem to properly place it
+    //            inventory.AddItem(inventory.ItemSpawnPrefab, itemScript.itemData);
+    //            // Destroy the current orphaned instance
+    //            Destroy(item);
+    //        }
+    //    }
+
+    //    if (feedbackText != null)
+    //        feedbackText.text = "Item returned to inventory";
+    //}
+
+    /// <summary>
+    /// Force return item to inventory using drag manager
+    /// </summary>
+    private void ForceReturnToInventory(GameObject item, ItemDragManager dragManager)
     {
-        // Item was previously in inventory - use normal attachment
-        dragManager.AttachToInventory();
-    }
-    else
-    {
-        // Item has NEVER been in inventory - find a spot for it
-        InventoryGridScript inventory = FindFirstObjectByType<InventoryGridScript>();
-        if (inventory != null)
+        if (item == null || dragManager == null) return;
+
+        Debug.Log($"[EngineerManager] Force returning item to inventory");
+
+        // Remove temporary canvas used during dragging
+        RemoveTemporaryCanvas(item);
+
+        // Ensure inventoryGrid reference
+        if (inventoryGrid == null)
         {
-            // Use AddItem to properly place it
-            inventory.AddItem(inventory.ItemSpawnPrefab, itemScript.itemData);
-            // Destroy the current orphaned instance
-            Destroy(item);
+            inventoryGrid = FindFirstObjectByType<InventoryGridScript>();
+            if (inventoryGrid == null)
+            {
+                Debug.LogError("[EngineerManager] InventoryGridScript not found!");
+                return;
+            }
         }
-    }
 
-    if (feedbackText != null)
-        feedbackText.text = "Item returned to inventory";
-}
+        // Reparent the item to the inventory
+        RectTransform itemRect = item.GetComponent<RectTransform>();
+        Vector2 startAnchored;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            inventoryGrid.inventoryRect,
+            RectTransformUtility.WorldToScreenPoint(null, itemRect.position),
+            null,
+            out startAnchored
+        );
+
+        itemRect.SetParent(inventoryGrid.inventoryRect, false);
+        itemRect.localScale = Vector3.one;
+        itemRect.localRotation = Quaternion.identity;
+        itemRect.anchoredPosition = startAnchored;
+
+        // Tween to target equipped position
+        StartCoroutine(RestoreItemWithAnimation(item, dragManager));
+    }
 
     /// <summary>
     /// Return a single item from a slot to inventory
