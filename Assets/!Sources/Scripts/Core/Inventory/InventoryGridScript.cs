@@ -3,9 +3,11 @@
 // Author: User
 // Description: -
 // --------------------------------------------------------------
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -33,6 +35,9 @@ public class InventoryGridScript : MonoBehaviour
     }
 
     [Header("Inventory Dimensions/Configs")]
+    [SerializeField] public BaseInventorySO inventorySizeBase;
+    private BaseInventoryCell[,] baseInventoryShape;
+    //private BaseInventorySO[,] clonedInventorySizeBase; 
     [SerializeField] public int inventoryWidth;
     [SerializeField] public int inventoryHeight;
     [SerializeField] private int inventoryWidthMax;
@@ -70,7 +75,7 @@ public class InventoryGridScript : MonoBehaviour
     private float canvasWidth;
     private float canvasHeight;
 
-
+    public static event Action<Vector2> OnInventoryExpanded;
 
     public InventoryState CurrentInventoryState
     {
@@ -116,7 +121,8 @@ public class InventoryGridScript : MonoBehaviour
     void Awake()
     {
         inventoryRect = inventoryCanvas.GetComponent<RectTransform>();
-        inventoryGrid = new InvCellData[inventoryWidth, inventoryHeight];
+        inventoryGrid = new InvCellData[inventorySizeBase.width, inventorySizeBase.height];
+        baseInventoryShape = inventorySizeBase.getInventoryShapeGrid();
     }
 
     private void OnEnable()
@@ -133,16 +139,18 @@ public class InventoryGridScript : MonoBehaviour
         canvasHeight = inventoryRect.rect.height;
         CurrentInventoryState = InventoryState.normal;
 
-        for(int x =  0; x < inventoryWidth; x++)
+        for(int x =  0; x < inventoryWidthMax; x++)
         {
-            for(int y = 0; y < inventoryHeight; y++)
+            for(int y = 0; y < inventoryHeightMax; y++)
             {
-                inventoryGrid[x, y] = new InvCellData(null, true);
+                inventoryGrid[x, y] = new InvCellData(null, baseInventoryShape[x,y].filled);
             }
         }
 
+        inventoryWidth = inventoryWidthMax;
+        inventoryHeight = inventoryHeightMax;
+
         GenerateGrid();
-        InputManager.OnLeftClick += LeftClick;
 
         if (spawnItemInInventory)
         {
@@ -208,17 +216,20 @@ public class InventoryGridScript : MonoBehaviour
                 Debug.Log(GetCellAtPos(getMousePosGrid()) == pos);
                 if (GetCellAtPos(getMousePosGrid()) == pos && GameManager.instance.playerStatus.Scraps >= currentCost)
                 {
-                    GameManager.instance.playerStatus.ConsumeScraps(currentCost);
-                    currentCost = (int)(currentCost * costMultiplier);
-                    UpdateCurrentCostText();
-                    ExpandInventory(pos);
+                    bool success = ExpandInventory(pos);
+                    if(success)
+                    {
+                        GameManager.instance.playerStatus.ConsumeScraps(currentCost);
+                        currentCost = (int)(currentCost * costMultiplier);
+                        UpdateCurrentCostText();
+                    }
                     return;
                 }
             }
         }    
     }
     #endregion
-
+    
     private void GenerateGrid()
     {
         foreach(InvCellData cell in inventoryGrid) Destroy(cell.cellObject);
@@ -269,6 +280,12 @@ public class InventoryGridScript : MonoBehaviour
             {
                 if (itemShape[x,y].filled)
                 {
+                    int gridX = startingCell.x + x;
+                    int gridY = startingCell.y + y;
+
+                    // Safety check
+                    if (gridX < 0 || gridX >= inventoryWidth || gridY < 0 || gridY >= inventoryHeight)continue;
+                     
                     InvCellData targetCell = inventoryGrid[startingCell.x + x, startingCell.y + y];
                     if(targetCell.active) targetCell.item = itemId;
                 }
@@ -286,6 +303,12 @@ public class InventoryGridScript : MonoBehaviour
             {
                 if (itemShape[x, y].filled)
                 {
+                    int gridX = startingCell.x + x;
+                    int gridY = startingCell.y + y;
+
+                    // Safety check
+                    if (gridX < 0 || gridX >= inventoryWidth || gridY < 0 || gridY >= inventoryHeight) continue;
+
                     Vector2 targetCellPos = new Vector2(startingCell.x + x, startingCell.y + y);
                     InvCellData targetCell = inventoryGrid[(int)targetCellPos.x,(int)targetCellPos.y];
                     if (targetCell.active && targetCell.item == itemId)
@@ -474,13 +497,18 @@ public class InventoryGridScript : MonoBehaviour
     /// expends the inventory in the given position
     /// </summary>
     /// <param name="cellPos"></param>
-    private void ExpandInventory(Vector2 cellPos)
+    private bool ExpandInventory(Vector2 cellPos)
     {
+        Debug.Log($"ExpandInventory called for cellPos: {cellPos}");
+        Debug.Log($"Before: inventoryWidth={inventoryWidth}, inventoryHeight={inventoryHeight}");
+
+        bool expanded = false;
         InvCellData[,] newInventory;
 
         if (InGrid(cellPos))
         {
             inventoryGrid[(int)cellPos.x, (int)cellPos.y].active = true;
+            expanded = true;
             // foreach (InvCellData cell in inventoryGrid)
             // {
             //     Destroy(cell.cellObject);
@@ -491,10 +519,14 @@ public class InventoryGridScript : MonoBehaviour
             if(!InGrid( new Vector2 (cellPos.x,0)) && inventoryWidth < inventoryWidthMax)
             {
                 inventoryWidth += 1;
+                expanded = true;
+                Debug.Log($"Expanded width: {inventoryWidth}");
             }
             if(!InGrid(new Vector2 (0,cellPos.y)) && inventoryHeight < inventoryHeightMax)
             {
                 inventoryHeight += 1;
+                expanded = true;
+                Debug.Log($"Expanded height: {inventoryHeight}");
             }
 
             newInventory = new InvCellData[inventoryWidth, inventoryHeight];
@@ -504,7 +536,7 @@ public class InventoryGridScript : MonoBehaviour
 
             int expandLeft = (Mathf.Sign(cellPos.x) == -1f) ? 1 : 0;
             int expandDown = ((Mathf.Sign(cellPos.y) == -1f)) ? 1 : 0;
-            int expandRight = (cellPos.x >= oldInventoryWidth) ? 1 : 0;
+            int expandRight = (cellPos.x >= oldInventoryWidth && cellPos.x < inventoryWidthMax) ? 1 : 0;
 
             for (int x=0;x<inventoryWidth;x++)
             {
@@ -529,19 +561,29 @@ public class InventoryGridScript : MonoBehaviour
                 }
             }
 
-            foreach(GameObject item in equippedItems)
-            {
-                if (item != null)
-                {
-                    item.GetComponent<RectTransform>().anchoredPosition += new Vector2(-GameManager.cellSize * expandRight, -GameManager.cellSize * expandDown);
-                }
-            }
+            //foreach(GameObject item in equippedItems)
+            //{
+            //    if (item != null)
+            //    {
+            //        Vector2 shiftOffset = new Vector2(-GameManager.cellSize * expandRight, -GameManager.cellSize * expandDown);
+            //        //item.GetComponent<RectTransform>().anchoredPosition += new Vector2(-GameManager.cellSize * expandRight, -GameManager.cellSize * expandDown);
+            //        //item.GetComponent<ItemDragManager>().AttachToInventory();
+            //        OnInventoryExpanded?.Invoke(shiftOffset);
+            //    }
+            //}
+
+            Vector2 shiftOffset = new Vector2(-GameManager.cellSize * expandRight, -GameManager.cellSize * expandDown);
+            OnInventoryExpanded?.Invoke(shiftOffset);
 
             foreach (InvCellData cell in inventoryGrid){cell.item = null;}
 
             inventoryGrid = newInventory;
         }
         CurrentInventoryState = InventoryState.adding;
+
+        Debug.Log($"After expansion attempt: inventoryWidth={inventoryWidth}, inventoryHeight={inventoryHeight}");
+
+        return expanded;
     }
 
     #region Helper Functions

@@ -495,6 +495,48 @@ public class EngineerManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Force return item to inventory using drag manager
+    /// </summary>
+    private void ForceReturnToInventory(GameObject item, ItemDragManager dragManager)
+    {
+        if (item == null || dragManager == null) return;
+
+        Debug.Log($"[EngineerManager] Force returning item to inventory");
+
+        // Remove temporary canvas used during dragging
+        RemoveTemporaryCanvas(item);
+
+        // Ensure inventoryGrid reference
+        if (inventoryGrid == null)
+        {
+            inventoryGrid = FindFirstObjectByType<InventoryGridScript>();
+            if (inventoryGrid == null)
+            {
+                Debug.LogError("[EngineerManager] InventoryGridScript not found!");
+                return;
+            }
+        }
+
+        // Reparent the item to the inventory
+        RectTransform itemRect = item.GetComponent<RectTransform>();
+        Vector2 startAnchored;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            inventoryGrid.inventoryRect,
+            RectTransformUtility.WorldToScreenPoint(null, itemRect.position),
+            null,
+            out startAnchored
+        );
+
+        itemRect.SetParent(inventoryGrid.inventoryRect, false);
+        itemRect.localScale = Vector3.one;
+        itemRect.localRotation = Quaternion.identity;
+        itemRect.anchoredPosition = startAnchored;
+
+        // Tween to target equipped position
+        StartCoroutine(RestoreItemWithAnimation(item, dragManager));
+    }
+
+    /// <summary>
     /// Perform merge and move result to slot3
     /// </summary>
     private IEnumerator CompleteMergeAndReset()

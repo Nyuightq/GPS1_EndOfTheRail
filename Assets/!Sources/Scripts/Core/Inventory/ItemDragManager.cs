@@ -3,7 +3,7 @@
 // Author: User
 // Description: Cleaned up with proper encapsulation - Refactored for Singleton Tooltip
 // --------------------------------------------------------------
-using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -47,6 +47,8 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
         InputManager.OnLeftClick += LeftClick;
         InputManager.OnLeftRelease += LeftRelease;
         InputManager.OnRightClick += RightClick;
+
+        InventoryGridScript.OnInventoryExpanded += ShiftItem;
     }
 
     private void OnDisable()
@@ -54,6 +56,8 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
         InputManager.OnLeftClick -= LeftClick;
         InputManager.OnLeftRelease -= LeftRelease;
         InputManager.OnRightClick -= RightClick;
+
+        InventoryGridScript.OnInventoryExpanded -= ShiftItem;
     }
 
     public void OnDestroy()
@@ -95,6 +99,25 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
         }
     }
     #endregion
+
+    private void ShiftItem(Vector2 shiftOffset)
+    {
+        if (itemScript.state != Item.itemState.equipped)
+            return;
+
+        Unequip();
+
+        rectTransform.anchoredPosition += shiftOffset;
+
+        StartCoroutine(AttachToInventoryNextFrame());
+    }
+
+    private IEnumerator AttachToInventoryNextFrame()
+    {
+        yield return null; // wait one frame
+        AttachToInventory();
+    }
+
 
     #region Pointer & Drag handlers
     public void OnPointerEnter(PointerEventData pointerEventData)
@@ -152,15 +175,9 @@ public class ItemDragManager : MonoBehaviour, IDragHandler, IPointerEnterHandler
         {
             dragging = true;
 
-            if (topLeftCellPos != null && itemScript.state == Item.itemState.equipped)
+            if (topLeftCellPos != null)
             {
-                inventoryGridScript.MarkCells(
-                    Vector2Int.FloorToInt(topLeftCellPos),
-                    itemScript.itemShape,
-                    null
-                );
-                itemScript.state = Item.itemState.unequipped;
-                itemScript.TriggerEffectUnequip();
+                Unequip();
             }
 
             if (EngineerManager.Instance != null && EngineerManager.Instance.IsEngineerUIActive)
@@ -222,10 +239,9 @@ private void LeftRelease()
         {
             Debug.Log("Attempting to rotate");
 
-            if (topLeftCellPos != null && itemScript.state == Item.itemState.equipped)
+            if (topLeftCellPos != null)
             {
-                inventoryGridScript.MarkCells(Vector2Int.FloorToInt(topLeftCellPos), itemScript.itemShape, null);
-                itemScript.state = Item.itemState.unequipped;
+                Unequip();
             }
 
             itemScript.RotateShape(itemScript.itemShape);
@@ -347,6 +363,20 @@ private void LeftRelease()
             
             // Then remove Canvas
             Destroy(itemCanvas);
+        }
+    }
+
+    private void Unequip()
+    {
+        if (itemScript.state == Item.itemState.equipped)
+        {
+            inventoryGridScript.MarkCells(
+                Vector2Int.FloorToInt(topLeftCellPos),
+                itemScript.itemShape,
+                null
+            );
+            itemScript.state = Item.itemState.unequipped;
+            itemScript.TriggerEffectUnequip();
         }
     }
     #endregion
