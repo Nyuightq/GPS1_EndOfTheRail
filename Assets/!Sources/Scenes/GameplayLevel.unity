@@ -3774,6 +3774,14 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5574724289937887799, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 56
+      objectReference: {fileID: 0}
+    - target: {fileID: 5574724289937887799, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -96
+      objectReference: {fileID: 0}
     - target: {fileID: 5770566151289708943, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -4067,8 +4075,12 @@ PrefabInstance:
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: inventorySizeBase
+      value: 
+      objectReference: {fileID: 11400000, guid: dc52be65aa7d4504e8cea2c652b97f4b, type: 2}
+    - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: startingItems.Array.size
-      value: 4
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: 'startingItems.Array.data[0]'
@@ -4086,6 +4098,18 @@ PrefabInstance:
       propertyPath: 'startingItems.Array.data[3]'
       value: 
       objectReference: {fileID: 11400000, guid: 2c956f6cc3ca1a9469d9bf97231581b0, type: 2}
+    - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: 'startingItems.Array.data[4]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 38b25df9320a38243b002e79b1b91941, type: 2}
+    - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: 'startingItems.Array.data[5]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 38b25df9320a38243b002e79b1b91941, type: 2}
+    - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: 'startingItems.Array.data[6]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 38b25df9320a38243b002e79b1b91941, type: 2}
     - target: {fileID: 8938590667546098857, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 

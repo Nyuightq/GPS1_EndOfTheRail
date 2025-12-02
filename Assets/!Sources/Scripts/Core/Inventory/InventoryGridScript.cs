@@ -35,6 +35,9 @@ public class InventoryGridScript : MonoBehaviour
     }
 
     [Header("Inventory Dimensions/Configs")]
+    [SerializeField] public BaseInventorySO inventorySizeBase;
+    private BaseInventoryCell[,] baseInventoryShape;
+    //private BaseInventorySO[,] clonedInventorySizeBase; 
     [SerializeField] public int inventoryWidth;
     [SerializeField] public int inventoryHeight;
     [SerializeField] private int inventoryWidthMax;
@@ -118,7 +121,8 @@ public class InventoryGridScript : MonoBehaviour
     void Awake()
     {
         inventoryRect = inventoryCanvas.GetComponent<RectTransform>();
-        inventoryGrid = new InvCellData[inventoryWidth, inventoryHeight];
+        inventoryGrid = new InvCellData[inventorySizeBase.width, inventorySizeBase.height];
+        baseInventoryShape = inventorySizeBase.getInventoryShapeGrid();
     }
 
     private void OnEnable()
@@ -135,13 +139,16 @@ public class InventoryGridScript : MonoBehaviour
         canvasHeight = inventoryRect.rect.height;
         CurrentInventoryState = InventoryState.normal;
 
-        for(int x =  0; x < inventoryWidth; x++)
+        for(int x =  0; x < inventoryWidthMax; x++)
         {
-            for(int y = 0; y < inventoryHeight; y++)
+            for(int y = 0; y < inventoryHeightMax; y++)
             {
-                inventoryGrid[x, y] = new InvCellData(null, true);
+                inventoryGrid[x, y] = new InvCellData(null, baseInventoryShape[x,y].filled);
             }
         }
+
+        inventoryWidth = inventoryWidthMax;
+        inventoryHeight = inventoryHeightMax;
 
         GenerateGrid();
 
@@ -222,7 +229,7 @@ public class InventoryGridScript : MonoBehaviour
         }    
     }
     #endregion
-
+    
     private void GenerateGrid()
     {
         foreach(InvCellData cell in inventoryGrid) Destroy(cell.cellObject);
