@@ -537,6 +537,70 @@ public class EngineerManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Restore item with smooth animation
+    /// </summary>
+    private IEnumerator RestoreItemWithAnimation(GameObject itemObject, ItemDragManager dragManager)
+    {
+        if (itemObject == null || dragManager == null) 
+        {
+            Debug.LogError("[EngineerManager] RestoreItemWithAnimation: null reference");
+            yield break;
+        }
+
+        Item itemScript = itemObject.GetComponent<Item>();
+        RectTransform itemRect = itemObject.GetComponent<RectTransform>();
+
+        if (inventoryGrid == null || inventoryGrid.inventoryRect == null)
+        {
+            Debug.LogError("[EngineerManager] Inventory reference missing");
+            yield break;
+        }
+
+        // Remove temporary canvas
+        RemoveTemporaryCanvas(itemObject);
+
+        // Get current position in inventory space
+        Vector2 startAnchored;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            inventoryGrid.inventoryRect,
+            RectTransformUtility.WorldToScreenPoint(null, itemRect.position),
+            null,
+            out startAnchored
+        );
+
+        // Reparent to inventory
+        itemRect.SetParent(inventoryGrid.inventoryRect, false);
+        itemRect.localScale = Vector3.one;
+        itemRect.localRotation = Quaternion.identity;
+        itemRect.anchoredPosition = startAnchored;
+
+        // Get target position
+        Vector2 targetPos = dragManager.EquippedPos;
+        Vector2Int topLeftCell = Vector2Int.FloorToInt(dragManager.TopLeftCellPos);
+
+        // Tween to position
+        float elapsed = 0f;
+        while (elapsed < tweenDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = EaseOutBack(Mathf.Clamp01(elapsed / tweenDuration));
+            itemRect.anchoredPosition = Vector2.Lerp(startAnchored, targetPos, t);
+            yield return null;
+        }
+        itemRect.anchoredPosition = targetPos;
+
+        // Re-mark cells
+        if (inventoryGrid != null)
+        {
+            inventoryGrid.MarkCells(topLeftCell, itemScript.itemShape, itemObject);
+            itemScript.state = Item.itemState.equipped;
+            itemScript.TriggerEffectEquip();
+        }
+
+        Debug.Log($"[EngineerManager] Restored {itemScript.itemData.itemName} to inventory");
+    }
+
+    /// <summary>
     /// Perform merge and move result to slot3
     /// </summary>
     private IEnumerator CompleteMergeAndReset()
