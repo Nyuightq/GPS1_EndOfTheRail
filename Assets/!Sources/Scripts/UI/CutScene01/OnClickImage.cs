@@ -114,6 +114,6 @@ public class OnClickImage : MonoBehaviour
             Debug.Log("[WinLoseManager] Destroyed SoundManager");
         }
 
-        SceneManager.LoadScene("GameplayLevel");
+        SceneManager.LoadScene("InstructionsScene");
     }
 }
