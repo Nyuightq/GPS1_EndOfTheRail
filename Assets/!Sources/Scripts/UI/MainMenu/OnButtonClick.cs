@@ -14,18 +14,11 @@ public class OnButtonClick : MonoBehaviour
     [SerializeField] private GameObject shaderToggle;
     [SerializeField] private GameObject volumeToggle;
     [SerializeField] private GameObject volumeIcon;
+    [SerializeField] private GameObject sfxToggle;
+    [SerializeField] private GameObject sfxIcon;
     [SerializeField] private GameObject creditsText;
     [SerializeField] private GameObject creditsNames;
     [SerializeField] private GameObject transitionGO;
-
-    [Header("Audio Sources")]
-    [SerializeField] private AudioSource sfxAudioSource;
-    [SerializeField] private AudioClip startClip;
-    [SerializeField] private AudioClip optionsInClip;
-    [SerializeField] private AudioClip optionsOutClip;
-    [SerializeField] private AudioClip creditsInClip;
-    [SerializeField] private AudioClip creditsOutClip;
-    [SerializeField] private AudioClip exitClip;
 
     [Header("Booleans")]
     private bool isSideSliderOpen = false;
@@ -42,6 +35,8 @@ public class OnButtonClick : MonoBehaviour
         shaderToggle.SetActive(false);
         volumeToggle.SetActive(false);
         volumeIcon.SetActive(false);
+        sfxToggle.SetActive(false);
+        sfxIcon.SetActive(false);
         transitionGO.SetActive(false);
 
         creditsText.SetActive(false);
@@ -81,13 +76,15 @@ public class OnButtonClick : MonoBehaviour
 
     private IEnumerator WaitThenStart()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.5f);
 
         if (SoundManager.Instance != null)
         {
             Destroy(SoundManager.Instance.gameObject);
             Debug.Log("[WinLoseManager] Destroyed SoundManager");
         }
+
+        SoundManager.Instance.PlayMusic("MUSIC_CutScene01");
 
         SceneManager.LoadScene("CutScene01");
         Debug.Log("Dramatic entrance!");
@@ -139,6 +136,8 @@ public class OnButtonClick : MonoBehaviour
             shaderToggle.SetActive(true);
             volumeToggle.SetActive(true);
             volumeIcon.SetActive(true);
+            sfxToggle.SetActive(true);
+            sfxIcon.SetActive(true);
 
             creditsText.SetActive(false);
             creditsNames.SetActive(false);
@@ -193,6 +192,8 @@ public class OnButtonClick : MonoBehaviour
             shaderToggle.SetActive(false);
             volumeToggle.SetActive(false);
             volumeIcon.SetActive(false);
+            sfxToggle.SetActive(false);
+            sfxIcon.SetActive(false);
 
             creditsText.SetActive(true);
             creditsNames.SetActive(true);
@@ -234,12 +235,6 @@ public class OnButtonClick : MonoBehaviour
         Debug.Log("Dramatic exit!");
     }
 
-    private void PlaySFX(AudioClip clip)
-    {
-        if (clip != null && sfxAudioSource != null)
-            sfxAudioSource.PlayOneShot(clip);
-    }
-
     private IEnumerator optionContentsOpen()
     {
         yield return new WaitForSeconds(0.35f);
@@ -248,6 +243,8 @@ public class OnButtonClick : MonoBehaviour
         shaderToggle.SetActive(true);
         volumeToggle.SetActive(true);
         volumeIcon.SetActive(true);
+        sfxToggle.SetActive(true);
+        sfxIcon.SetActive(true);
 
         Debug.Log("Options content displayed!");
     }
@@ -260,6 +257,8 @@ public class OnButtonClick : MonoBehaviour
         shaderToggle.SetActive(false);
         volumeToggle.SetActive(false);
         volumeIcon.SetActive(false);
+        sfxToggle.SetActive(false);
+        sfxIcon.SetActive(false);
 
         Debug.Log("Options content closed!");
     }

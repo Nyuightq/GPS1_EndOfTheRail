@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7089435013816415123}
   - component: {fileID: 3425840353684840689}
+  - component: {fileID: 4699681682271677293}
   m_Layer: 0
   m_Name: MainMenuCRTManager
   m_TagString: Untagged
@@ -49,3 +50,16 @@ MonoBehaviour:
   blendDistance: 0
   weight: 1
   sharedProfile: {fileID: 11400000, guid: 9d28c10605a50104291c92839653e860, type: 2}
+--- !u!114 &4699681682271677293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4174770510483464703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1690cdbbd8ed9cd42a3efb29ec930e4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  toggleShaderOn: 1

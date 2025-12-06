@@ -1,11 +1,11 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class OnVolumeToggle : MonoBehaviour
+public class OnSFXToggle : MonoBehaviour
 {
     [Header("Volume Settings")]
-    [SerializeField] private Slider volumeSlider;
-    private const string VolumePrefKey = "MusicVolume";
+    [SerializeField] private Slider sfxSlider;
+    private const string VolumePrefKey = "SFXVolume";
 
     [Header("Mute Settings")]
     [SerializeField] private Button muteVolumeIcon;
@@ -26,20 +26,20 @@ public class OnVolumeToggle : MonoBehaviour
         lastVolume = savedVolume;
 
         //Set slider's value based on savedVolume
-        volumeSlider.value = savedVolume;
+        sfxSlider.value = savedVolume;
 
         UpdateMuteStateUI();
 
         //Get from SoundManager
         if (SoundManager.Instance != null)
         {
-            SoundManager.Instance.SetMusicVolume(isMuted ? 0f : savedVolume);
+            SoundManager.Instance.SetSFXVolume(isMuted ? 0f : savedVolume);
         }
 
         //Listen for changes
-        volumeSlider.onValueChanged.AddListener(UpdateVolume);
+        sfxSlider.onValueChanged.AddListener(UpdateVolume);
 
-        //Mute volume toggle
+        //Mute sfx toggle
         if (muteVolumeIcon != null)
         {
             muteVolumeIcon.onClick.AddListener(ToggleMute);
@@ -53,7 +53,7 @@ public class OnVolumeToggle : MonoBehaviour
         //Update the SoundManager
         if (!isMuted && SoundManager.Instance != null)
         {
-            SoundManager.Instance.SetMusicVolume(volume);
+            SoundManager.Instance.SetSFXVolume(volume);
         }
 
         PlayerPrefs.SetFloat(VolumePrefKey, volume);
@@ -84,7 +84,7 @@ public class OnVolumeToggle : MonoBehaviour
         //Update the SoundManager
         if (SoundManager.Instance != null)
         {
-            SoundManager.Instance.SetMusicVolume(isMuted ? 0f : lastVolume);
+            SoundManager.Instance.SetSFXVolume(isMuted ? 0f : lastVolume);
         }
     }
 

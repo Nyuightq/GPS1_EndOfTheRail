@@ -283,7 +283,25 @@ MonoBehaviour:
     pitch: 1
     loop: 0
     source: {fileID: 0}
+  - name: SFX_PageFlip
+    clip: {fileID: 8300000, guid: d50c48a8a9e3b6a43b9eb6004ea48daf, type: 3}
+    volume: 0.9
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
   musicTracks:
+  - name: MUSIC_MainMenu
+    clip: {fileID: 8300000, guid: 7b788f9d446b8af4ea65838c5119cce7, type: 3}
+    volume: 0.7
+    pitch: 1
+    loop: 1
+    source: {fileID: 0}
+  - name: MUSIC_CutScene01
+    clip: {fileID: 8300000, guid: e09e83f3f29089c4a87d7d11df323b5c, type: 3}
+    volume: 0.7
+    pitch: 1
+    loop: 1
+    source: {fileID: 0}
   - name: MUSIC_Gameplay
     clip: {fileID: 8300000, guid: d1463501745abf548a65792f66b361c2, type: 3}
     volume: 0.7
@@ -293,6 +311,7 @@ MonoBehaviour:
   masterVolume: 1
   musicVolume: 0.6
   sfxVolume: 1
+  startMusic: 
 --- !u!82 &2797861959186537362
 AudioSource:
   m_ObjectHideFlags: 0
