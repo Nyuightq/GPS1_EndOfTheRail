@@ -25,6 +25,8 @@ public class OnClickImage : MonoBehaviour
 
     [SerializeField] private GameObject blackBarNar3;
 
+    private bool hasClicked = false;
+
     public void Start()
     {
         pixelBallIn.SetActive(true);
@@ -85,8 +87,13 @@ public class OnClickImage : MonoBehaviour
 
     public void OnNarrative4()
     {
+        if (hasClicked) return; //Prevent double click
+        hasClicked = true;
+
         pixelBallOut.SetActive(true);
         pixelBallOutAnimator.Play("PixelBallOutAnim", 0, 0f);
+
+        SoundManager.Instance.PlaySFX("SFX_StartNewGame");
 
         narrative4.SetActive(true);
         narrative4Text.SetActive(true);
@@ -94,14 +101,12 @@ public class OnClickImage : MonoBehaviour
         narrative1.SetActive(false);
         narrative1Text.SetActive(false);
 
-        SoundManager.Instance.PlaySFX("SFX_StartNewGame");
-
         StartCoroutine(TransitionOutToNextScene());
     }
 
     private IEnumerator TransitionOutToNextScene()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.8f);
 
         if (SoundManager.Instance != null)
         {

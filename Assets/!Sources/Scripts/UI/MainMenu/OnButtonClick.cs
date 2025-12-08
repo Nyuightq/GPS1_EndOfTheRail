@@ -24,12 +24,15 @@ public class OnButtonClick : MonoBehaviour
     private bool isSideSliderOpen = false;
     private bool optionsClicked = false;
     private bool creditsClicked = false;
+    private bool hasClicked = false;
+    private bool hasExit = false;
 
     public void Start()
     {
         isSideSliderOpen = false;
         optionsClicked = false;
         creditsClicked = false;
+        hasExit = false;
 
         optionMenuText.SetActive(false);
         shaderToggle.SetActive(false);
@@ -47,6 +50,9 @@ public class OnButtonClick : MonoBehaviour
     {
         SoundManager.Instance.PlaySFX("SFX_StartNewGame");
         Debug.Log($"SFX_StartNewGame");
+
+        if (hasClicked) return; //Prevent double click
+        hasClicked = true;
 
         if (isSideSliderOpen)
         {
@@ -203,7 +209,10 @@ public class OnButtonClick : MonoBehaviour
     }
 
     public void OnExitButton()
-    {        
+    {
+        if (hasExit) return; //Prevent double click
+        hasExit = true;
+
         SoundManager.Instance.PlaySFX("SFX_Exit_2");
         Debug.Log($"SFX_Exit_2");
 
