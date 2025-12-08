@@ -233,7 +233,7 @@ private void LeftRelease()
 
     private void RightClick()
     {
-        if (!dragging) return;
+        if (!dragging || EngineerManager.Instance.IsEngineerUIActive) return;
         
         if (itemScript.state == Item.itemState.equipped)
         {

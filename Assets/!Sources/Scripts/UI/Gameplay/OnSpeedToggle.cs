@@ -20,8 +20,13 @@ public class OnSpeedToggle : MonoBehaviour
     {
         Instance = this;
         onPausePlay = FindFirstObjectByType<OnPausePlay>();
-
+        SpeedMultiplier = 1f;
         onPausePlay.onTogglePauseEvent += OnChangeSpeedMultiplier;
+    }
+
+    private void OnDisable()
+    {
+        onPausePlay.onTogglePauseEvent -= OnChangeSpeedMultiplier;
     }
 
     private void OnChangeSpeedMultiplier(bool pausing = false)

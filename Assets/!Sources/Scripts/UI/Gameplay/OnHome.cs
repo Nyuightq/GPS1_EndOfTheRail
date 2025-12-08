@@ -66,73 +66,64 @@ public class OnHome : MonoBehaviour
     {
         //Unpause the time before switching to Main Menu scene
         Time.timeScale = 1f;
-        CleanupPersistentManagers();
+        CleanupAllManagers();
         SceneManager.LoadScene("MainMenu");
 
         Debug.Log("Back to square 1~");
     }
 
-    private void CleanupPersistentManagers()
+    private void CleanupAllManagers()
     {
-        Debug.Log("[WinLoseUIPanel] Cleaning up persistent managers before replay...");
+        Debug.Log("[WinLoseManager] Cleaning up all singleton managers...");
 
-        // Safely destroy CombatManager
+        // Destroy all singleton managers to ensure clean reload
         if (CombatManager.Instance != null)
         {
-            CombatManager.Instance.DestroyInstance();
-            Debug.Log("[WinLoseUIPanel] Destroyed old CombatManager instance.");
+            Destroy(CombatManager.Instance.gameObject);
+            Debug.Log("[WinLoseManager] Destroyed CombatManager");
         }
 
-        // Safely destroy GameStateManager
         if (GameStateManager.Instance != null)
         {
-            GameStateManager.Instance.DestroyInstance();
-            Debug.Log("[WinLoseUIPanel] Destroyed old GameStateManager instance.");
+            Destroy(GameStateManager.Instance.gameObject);
+            Debug.Log("[WinLoseManager] Destroyed GameStateManager");
         }
-        
-        // Safely destroy RewardManager
+
         if (RewardManager.Instance != null)
         {
-            RewardManager.Instance.DestroyInstance();
-            Debug.Log("[WinLoseUIPanel] Destroyed old RewardManager instance.");
+            Destroy(RewardManager.Instance.gameObject);
+            Debug.Log("[WinLoseManager] Destroyed RewardManager");
         }
 
-        // Safely destroy TransactionManager
         if (TransactionManager.Instance != null)
         {
-            TransactionManager.Instance.DestroyInstance();
-            Debug.Log("[WinLoseUIPanel] Destroyed old TransactionManager instance.");
+            Destroy(TransactionManager.Instance.gameObject);
+            Debug.Log("[WinLoseManager] Destroyed TransactionManager");
         }
 
-        // Safely destroy ChurchManager
         if (ChurchManager.Instance != null)
         {
-            ChurchManager.Instance.DestroyInstance();
-            Debug.Log("[WinLoseUIPanel] Destroyed old ChurchManager instance.");
+            Destroy(ChurchManager.Instance.gameObject);
+            Debug.Log("[WinLoseManager] Destroyed ChurchManager");
         }
 
-        // Safely destroy StoryManager
-        if (StoryManager.Instance != null)
+        if (EngineerManager.Instance != null)
         {
-            StoryManager.Instance.DestroyInstance();
-            Debug.Log("[WinLoseUIPanel] Destroyed old StoryManager instance.");
+            Destroy(EngineerManager.Instance.gameObject);
+            Debug.Log("[WinLoseManager] Destroyed EngineerManager");
         }
-        
-        // Destroy RestPointManager? (No instance)
-        // Destroy DayNightCycleManager? (No instance)
-        // WinLoseManager Should not need DestroyInstance()
 
         if (SoundManager.Instance != null)
         {
-            SoundManager.Instance.DestroyInstance();
-            Debug.Log("[WinLoseUIPanel] Destroyed old SoundManager instance.");
+            Destroy(SoundManager.Instance.gameObject);
+            Debug.Log("[WinLoseManager] Destroyed SoundManager");
         }
 
-        // Destroy other managers as needed — for example:
-        // if (AudioManager.Instance != null) { Destroy(AudioManager.Instance.gameObject); AudioManager.Instance = null; }
-        // if (UIManager.Instance != null) { Destroy(UIManager.Instance.gameObject); UIManager.Instance = null; }
-        // etc.
+        
 
-        Debug.Log("[WinLoseUIPanel] Cleanup complete.");
+        // Add any other singleton managers here
+        // if (InventoryItemManager.Instance != null) { Destroy(...); }
+
+        Debug.Log("[WinLoseManager] All managers cleaned up successfully");
     }
 }
