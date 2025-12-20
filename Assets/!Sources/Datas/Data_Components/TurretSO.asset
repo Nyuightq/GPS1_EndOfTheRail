@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemSprite: {fileID: -425339959, guid: 05cd47249d8725c44b6c4bfff6e68d28, type: 3}
   itemName: Turret
+  useItemDescription: 0
   itemDescription: 
   mandatoryItem: 0
   itemWidth: 2
   itemHeight: 2
   effects:
   - rid: 6451219851714232399
-  itemEffectPrefab: {fileID: 0}
   itemShape:
   - filled: 1
   - filled: 1
@@ -35,6 +35,7 @@ MonoBehaviour:
         trigger: 0
         triggerOnConditionOnce: 0
         conditions: []
+        conditionMetSprite: {fileID: 0}
         weaponName: Turret
         baseAttackDamage: 4
         baseAttackSpeed: 5
