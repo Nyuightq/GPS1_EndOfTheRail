@@ -434,7 +434,8 @@ public class EngineerManager : MonoBehaviour
         itemRect.anchoredPosition = startAnchored;
 
         // Tween to target equipped position
-        StartCoroutine(RestoreItemWithAnimation(item, dragManager));
+        //StartCoroutine(RestoreItemWithAnimation(item, dragManager));
+        ReparentToInventory(item);
     }
 
     /// <summary>
@@ -453,7 +454,8 @@ public class EngineerManager : MonoBehaviour
         // Return item
         if (dragManager != null)
         {
-            StartCoroutine(RestoreItemWithAnimation(item, dragManager));
+            //StartCoroutine(RestoreItemWithAnimation(item, dragManager));
+            ReparentToInventory(item);
         }
         else
         {
@@ -561,6 +563,36 @@ public class EngineerManager : MonoBehaviour
         }
 
         CloseEngineerUI();
+    }
+
+    private void ReparentToInventory(GameObject itemObject)
+    {
+        Item itemScript = itemObject.GetComponent<Item>();
+        RectTransform itemRect = itemObject.GetComponent<RectTransform>();
+
+        
+
+        // Get current position in inventory space
+        Vector2 startAnchored;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            inventoryGrid.inventoryRect,
+            RectTransformUtility.WorldToScreenPoint(null, itemRect.position),
+            null,
+            out startAnchored
+        );
+
+        // Reparent to inventory
+        itemRect.SetParent(inventoryGrid.inventoryRect, false);
+        itemRect.localScale = Vector3.one;
+        itemRect.localRotation = Quaternion.identity;
+        itemRect.anchoredPosition = startAnchored;
+        //itemRect.anchoredPosition += Vector2.one * 0.01f;
+
+        // Remove temporary canvas
+        RemoveTemporaryCanvas(itemObject);
+
+        //itemScript.spriteRectTransform.gameObject.SetActive(false);
+        //itemScript.spriteRectTransform.gameObject.SetActive(true);
     }
 
     /// <summary>
@@ -690,10 +722,18 @@ public class EngineerManager : MonoBehaviour
     {
         if (isProcessing) return;
 
+        if(HasSlottedItems())
+        {
+            feedbackText.text = "Please return your items";
+            return;
+        }
+
         isProcessing = true;
 
+        /*
         if (feedbackText != null)
             feedbackText.text = "Returning all items...";
+        */
 
         StartCoroutine(ReturnAllItemsAndClose());
     }
@@ -712,6 +752,11 @@ public class EngineerManager : MonoBehaviour
 
         if (feedbackText != null && !isProcessing)
             feedbackText.text = "Drag two identical items to merge";
+    }
+
+    private bool HasSlottedItems()
+    {
+        return slot1.IsOccupied() || slot2.IsOccupied() || slot3.IsOccupied();
     }
 
     /// <summary>

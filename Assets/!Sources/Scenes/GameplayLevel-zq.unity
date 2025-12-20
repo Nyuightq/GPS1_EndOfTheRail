@@ -3862,6 +3862,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
+  sprintMultiplier: 2
   followSmoothSpeed: 5
   focusSmoothSpeed: 8
   followTarget: {fileID: 0}
@@ -3870,6 +3871,7 @@ MonoBehaviour:
   rightPaddingTiles: 6
   topPaddingTiles: 3
   bottomPaddingTiles: 3
+  inputActions: {fileID: 0}
 --- !u!114 &1922003437
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4705,7 +4707,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6901276280529704430, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7102173720522385143, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_Camera
