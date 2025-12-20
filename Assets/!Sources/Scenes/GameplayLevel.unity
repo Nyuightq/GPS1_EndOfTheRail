@@ -3810,10 +3810,6 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 4533721689424346781, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
-      propertyPath: m_Type
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 4584386392450220788, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 14
@@ -3990,10 +3986,6 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 1922003439}
-    - target: {fileID: 7102173720522385143, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
-      propertyPath: m_RenderMode
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 7102173720522385143, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_SortingLayerID
       value: -1471210343

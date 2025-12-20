@@ -283,8 +283,26 @@ MonoBehaviour:
     pitch: 1
     loop: 0
     source: {fileID: 0}
+  - name: SFX_Button_OnHover
+    clip: {fileID: 8300000, guid: 4a1a01dfa3a61224bbe354a9535d4208, type: 3}
+    volume: 0.9
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
   - name: SFX_PageFlip
     clip: {fileID: 8300000, guid: d50c48a8a9e3b6a43b9eb6004ea48daf, type: 3}
+    volume: 0.9
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_CheckOn
+    clip: {fileID: 8300000, guid: 4fd478366c620e4479f4d2f6e8d09f82, type: 3}
+    volume: 0.9
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_CheckOff
+    clip: {fileID: 8300000, guid: db78bc2f65924934c8ae32b4ba8b6a2e, type: 3}
     volume: 0.9
     pitch: 1
     loop: 0
