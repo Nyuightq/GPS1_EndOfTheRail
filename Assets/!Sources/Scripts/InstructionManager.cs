@@ -23,6 +23,7 @@ public class InstructionManager : MonoBehaviour
     [SerializeField] private float transitionDelay = 0.5f;
 
     private int currentNarrativeIndex = 0;
+    private bool hasClicked = false;
 
     public void Start()
     {
@@ -42,17 +43,28 @@ public class InstructionManager : MonoBehaviour
 
 public void OnInstructionClick()
 {
-    // Play click audio
-    if (clickAudio != null)
-        clickAudio.Play();
+     if (hasClicked) return; //Prevent double click
 
-    // CASE 1: Last panel clicked → Do NOT hide it.
+     // Play click audio
+     if (clickAudio != null)
+     clickAudio.Play();
+
+     // CASE 1: Last panel clicked → Do NOT hide it.
     if (currentNarrativeIndex == narrativePanels.Length - 1)
     {
+        if (hasClicked) return; //Prevent double click
+        hasClicked = true;
+
+        // Play click audio
+        if (clickAudio != null)
+        clickAudio.Play();
+
         // Keep last panel visible exactly like your previous script!
 
         pixelBallOut.SetActive(true);
         pixelBallOutAnimator.Play("PixelBallOutAnim", 0, 0f);
+
+        SoundManager.Instance.PlaySFX("SFX_StartNewGame");
 
         StartCoroutine(TransitionToNextScene());
         return;
@@ -71,8 +83,6 @@ public void OnInstructionClick()
     // Show next panel
     narrativePanels[currentNarrativeIndex].SetActive(true);
 }
-
-
 
 
     private IEnumerator TransitionToNextScene()

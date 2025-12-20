@@ -1,13 +1,22 @@
 fileFormatVersion: 2
-guid: a3fa726aaa9767846a1de70c8a106324
+guid: 761c17fbae7533046b24ef2bcd979d3a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2612714123764013599
-    second: BG_gameTitle (2)_0
+      213: -1167412544114859378
+    second: game_title_logo_upscaled_0
   - first:
-      213: 5783283826656099737
-    second: BG_gameTitle (2)_1
+      213: -5070348032733713429
+    second: game_title_logo_upscaled_1
+  - first:
+      213: -1386171377565132230
+    second: game_title_logo_upscaled_2
+  - first:
+      213: 1822962752733190578
+    second: game_title_logo_upscaled_3
+  - first:
+      213: 6771329826989402897
+    second: game_title_logo_upscaled_4
   externalObjects: {}
   serializedVersion: 13
   mipmaps:

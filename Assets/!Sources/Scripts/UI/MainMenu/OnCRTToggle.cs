@@ -6,8 +6,6 @@ public class OnCRTToggle : MonoBehaviour, IPointerClickHandler
 {
     [Header("UI References")]
     [SerializeField] private Image crtToggle;
-    [SerializeField] private AudioSource checkOnAudio;
-    [SerializeField] private AudioSource checkOffAudio;
 
     [Header("Toggle Animation States")]
     [SerializeField] private Animator crtToggleAnimator;
@@ -23,13 +21,13 @@ public class OnCRTToggle : MonoBehaviour, IPointerClickHandler
     {
         isToggled = !isToggled;
 
-        if (isToggled && checkOnAudio != null)
+        if (isToggled)
         {
-            checkOffAudio.Play();
+            SoundManager.Instance.PlaySFX("SFX_CheckOff");
         }
-        else if (!isToggled && checkOffAudio != null)
+        else
         {
-            checkOnAudio.Play();
+            SoundManager.Instance.PlaySFX("SFX_CheckOn");
         }
 
         //Play crt toggle animation based on the state

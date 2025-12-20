@@ -20,20 +20,18 @@ public class OnHome : MonoBehaviour
 
     void Update()
     {
-        // Check for ESC key press
+        //Check for ESC key press
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             isHomePressed = !isHomePressed;
 
-            if (homePanel != null)
+            if (homePanel.activeSelf)
             {
-                homePanel.SetActive(isHomePressed);
+                OnResumeButton();
             }
-
-            // Toggle pause/play whenever Home button is pressed
-            if (pausePlayScript != null)
+            else
             {
-                pausePlayScript.OnSettingButton(true);
+                OnHomeButton();
             }
         }
     }
