@@ -48,6 +48,8 @@ Transform:
   - {fileID: 3626191791564028594}
   - {fileID: 3809420115822534636}
   - {fileID: 4469060591148966470}
+  - {fileID: 6667540045567454660}
+  - {fileID: 2518563710500063335}
   - {fileID: 7274065048636909744}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -88,7 +90,7 @@ MonoBehaviour:
   _planPhasePanel_2: {fileID: 0}
   _topPanel: {fileID: 0}
   _asidePanel: {fileID: 0}
-  _railBuilderManager: {fileID: 0}
+  _buildRails: {fileID: 0}
 --- !u!114 &4921764918400996863
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -360,16 +362,19 @@ MonoBehaviour:
   engineerUIPanel: {fileID: 0}
   slot1:
     slotAnchor: {fileID: 0}
+    slotImage: {fileID: 0}
     slottedItemSO: {fileID: 0}
     slottedItemObject: {fileID: 0}
     dragManager: {fileID: 0}
   slot2:
     slotAnchor: {fileID: 0}
+    slotImage: {fileID: 0}
     slottedItemSO: {fileID: 0}
     slottedItemObject: {fileID: 0}
     dragManager: {fileID: 0}
   slot3:
     slotAnchor: {fileID: 0}
+    slotImage: {fileID: 0}
     slottedItemSO: {fileID: 0}
     slottedItemObject: {fileID: 0}
     dragManager: {fileID: 0}
@@ -377,6 +382,8 @@ MonoBehaviour:
   declineButton: {fileID: 0}
   feedbackText: {fileID: 0}
   tweenDuration: 0.28
+  invalidMergeColor: {r: 1, g: 0.3, b: 0.3, a: 0.5}
+  invalidMergeFlashDuration: 0.3
   successfulMergeCounter: 0
 --- !u!1 &1662941285322990777
 GameObject:
@@ -409,6 +416,62 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1718111857734153875}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2650930949775197563
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6667540045567454660}
+  - component: {fileID: 1036551476092896761}
+  m_Layer: 5
+  m_Name: HelpManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &6667540045567454660
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2650930949775197563}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.079354465}
+  m_LocalScale: {x: 0.59999996, y: 0.59999996, z: 4}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1718111857734153875}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 1865.106, y: 1032.1866}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1036551476092896761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2650930949775197563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f405f5b30fb54b549b8191529db69848, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  instructionContainer: {fileID: 0}
+  instructionPanels:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  previousButton: {fileID: 0}
+  nextButton: {fileID: 0}
 --- !u!1 &3270090759845533203
 GameObject:
   m_ObjectHideFlags: 0
@@ -666,16 +729,19 @@ MonoBehaviour:
     anchorPoint: {fileID: 0}
     nameText: {fileID: 0}
     costText: {fileID: 0}
+    slotImage: {fileID: 0}
   - itemSO: {fileID: 0}
     cost: 0
     anchorPoint: {fileID: 0}
     nameText: {fileID: 0}
     costText: {fileID: 0}
+    slotImage: {fileID: 0}
   - itemSO: {fileID: 0}
     cost: 0
     anchorPoint: {fileID: 0}
     nameText: {fileID: 0}
     costText: {fileID: 0}
+    slotImage: {fileID: 0}
   uiPanel: {fileID: 0}
   declineButton: {fileID: 0}
   transactionContainer: {fileID: 0}
@@ -765,6 +831,11 @@ MonoBehaviour:
   combatManager: {fileID: 0}
   winPanel: {fileID: 0}
   losePanel: {fileID: 0}
+  cutscenePanel: {fileID: 0}
+  cutsceneButton: {fileID: 0}
+  cutsceneImage: {fileID: 0}
+  winCutscenes: []
+  loseCutscenes: []
   inventoryCanvas: {fileID: 0}
   winPanelInventoryAnchor: {fileID: 0}
   losePanelInventoryAnchor: {fileID: 0}
@@ -788,6 +859,37 @@ MonoBehaviour:
   loseTotalTilesText: {fileID: 0}
   mainMenuSceneName: MainMenu
   isGameOver: 0
+--- !u!1 &6461883088430099993
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2518563710500063335}
+  m_Layer: 0
+  m_Name: ------------------------
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &2518563710500063335
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6461883088430099993}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1718111857734153875}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7087296217367625542
 GameObject:
   m_ObjectHideFlags: 0

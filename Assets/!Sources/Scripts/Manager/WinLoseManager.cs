@@ -1,14 +1,11 @@
 // --------------------------------------------------------------
 // Creation Date: 2025-10-31
-// Description: Handles win/lose conditions - shows in-scene results
+// Description: Handles win/lose conditions - shows cutscenes then in-scene results
 // --------------------------------------------------------------
-
-// Add counter for successful merge
-// Pending counter for Item Acquired
-// Perhaps Scraps Spended for Expanding Inventory + Scraps Spended for buying items + total scraps acquired
 
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class WinLoseManager : MonoBehaviour
@@ -24,17 +21,24 @@ public class WinLoseManager : MonoBehaviour
     [SerializeField] private GameObject winPanel;
     [SerializeField] private GameObject losePanel;
     
+    [Header("Cutscene System")]
+    [SerializeField] private GameObject cutscenePanel; // Panel containing the button
+    [SerializeField] private Button cutsceneButton; // The clickable button
+    [SerializeField] private Image cutsceneImage; // Image component on the button
+    [SerializeField] private Sprite[] winCutscenes; // Array of win cutscene sprites
+    [SerializeField] private Sprite[] loseCutscenes; // Array of lose cutscene sprites
+    
     [Header("Inventory Canvas")]
-    [SerializeField] private Canvas inventoryCanvas; // Reference to the InventoryCanvas
-    [SerializeField] private RectTransform winPanelInventoryAnchor; // Anchor point in Win Panel
-    [SerializeField] private RectTransform losePanelInventoryAnchor; // Anchor point in Lose Panel
-    [SerializeField] private bool showInventoryInResults = true; // Toggle inventory display
+    [SerializeField] private Canvas inventoryCanvas;
+    [SerializeField] private RectTransform winPanelInventoryAnchor;
+    [SerializeField] private RectTransform losePanelInventoryAnchor;
+    [SerializeField] private bool showInventoryInResults = true;
     
     [Header("Action Buttons")]
-    [SerializeField] private UnityEngine.UI.Button replayButtonWin;
-    [SerializeField] private UnityEngine.UI.Button replayButtonLose;
-    [SerializeField] private UnityEngine.UI.Button mainMenuButtonWin;
-    [SerializeField] private UnityEngine.UI.Button mainMenuButtonLose;
+    [SerializeField] private Button replayButtonWin;
+    [SerializeField] private Button replayButtonLose;
+    [SerializeField] private Button mainMenuButtonWin;
+    [SerializeField] private Button mainMenuButtonLose;
     
     [Header("Win Panel Stats Text")]
     [SerializeField] private TMPro.TextMeshProUGUI winHpText;
@@ -65,15 +69,22 @@ public class WinLoseManager : MonoBehaviour
     private Vector3 inventoryOriginalPosition;
     private Vector3 inventoryOriginalScale;
     private int inventoryOriginalSortingOrder;
+    
+    // Cutscene state
+    private int currentCutsceneIndex = 0;
+    private Sprite[] currentCutsceneArray;
+    private bool isPlayingWinCutscene = false;
+    private string loseReason = "";
 
     private IEnumerator Start()
     {
-        yield return null; // Wait one frame for dynamic objects to spawn
+        yield return null;
         _initialized = true;
 
         // Hide all panels initially
         if (winPanel != null) winPanel.SetActive(false);
         if (losePanel != null) losePanel.SetActive(false);
+        if (cutscenePanel != null) cutscenePanel.SetActive(false);
 
         // Store inventory canvas original state
         if (inventoryCanvas != null)
@@ -98,6 +109,10 @@ public class WinLoseManager : MonoBehaviour
             mainMenuButtonWin.onClick.AddListener(LoadMainMenu);
         if (mainMenuButtonLose != null)
             mainMenuButtonLose.onClick.AddListener(LoadMainMenu);
+        
+        // Setup cutscene button
+        if (cutsceneButton != null)
+            cutsceneButton.onClick.AddListener(OnCutsceneButtonClicked);
 
         TryAssignReferences();
     }
@@ -106,7 +121,6 @@ public class WinLoseManager : MonoBehaviour
     {
         if (!_initialized || isGameOver) return;
 
-        // Re-assign if still missing
         TryAssignReferences();
 
         if (trainMovement == null || playerStatus == null || gridManager == null)
@@ -123,8 +137,6 @@ public class WinLoseManager : MonoBehaviour
             trainMovement = FindFirstObjectByType<TrainMovement>();
             if (trainMovement != null)
                 Debug.Log($"[WinLoseManager] Found TrainMovement: {trainMovement.name}");
-            // else
-            //     Debug.LogWarning("[WinLoseManager] TrainMovement not found!");
         }
         
         if (playerStatus == null)
@@ -198,17 +210,10 @@ public class WinLoseManager : MonoBehaviour
         isGameOver = true;
         Time.timeScale = 0f;
 
-        Debug.Log("Player Won! Showing Win Panel...");
+        Debug.Log("Player Won! Starting win cutscene...");
 
-        // Display win panel with stats
-        DisplayWinStats();
-        
-        if (winPanel != null) winPanel.SetActive(true);
-        if (losePanel != null) losePanel.SetActive(false);
-
-        // Attach inventory to win panel
-        if (showInventoryInResults)
-            AttachInventoryToPanel(winPanelInventoryAnchor);
+        isPlayingWinCutscene = true;
+        StartCutsceneSequence(winCutscenes);
     }
 
     private void TriggerLose(string reason = "Unknown")
@@ -216,122 +221,179 @@ public class WinLoseManager : MonoBehaviour
         if (isGameOver) return;
 
         isGameOver = true;
+        loseReason = reason;
 
         if (trainMovement != null)
             trainMovement.enabled = false;
 
-        Debug.Log($"Player Lost! Reason: {reason}. Showing Lose Panel...");
+        Debug.Log($"Player Lost! Reason: {reason}. Starting lose cutscene...");
         Time.timeScale = 0f;
 
-        // Display lose panel with stats
-        DisplayLoseStats(reason);
-        
-        if (winPanel != null) winPanel.SetActive(false);
-        if (losePanel != null) losePanel.SetActive(true);
-
-        // Attach inventory to lose panel
-        if (showInventoryInResults)
-            AttachInventoryToPanel(losePanelInventoryAnchor);
+        isPlayingWinCutscene = false;
+        StartCutsceneSequence(loseCutscenes);
     }
 
-private void DisplayWinStats()
-{
-    if (playerStatus == null) return;
-
-    int days = dayCycle != null ? dayCycle.GetDay() : 0;
-    int totalCombats = combatManager != null ? 
-        (combatManager.totalCombatsFaced + combatManager.totalEncountersFaced) : 0;
-    int totalTilesMoved = dayCycle != null ? dayCycle.GetTotalTilesMovedAllTime() : 0;
-    int totalScrapsAcquired = playerStatus.TotalScrapsAcquired; // ADD THIS LINE
-
-    if (winHpText != null)
-        winHpText.text = $"HP: {playerStatus.Hp}/{playerStatus.MaxHp}";
-    
-    if (winCrystalHpText != null)
-        winCrystalHpText.text = $"Crystal HP: {playerStatus.CrystalHp}/{playerStatus.MaxCrystalHp}";
-    
-    if (winScrapsText != null)
-        winScrapsText.text = $"Leftover Scraps: {playerStatus.Scraps}";
-    
-    // MODIFY THIS BLOCK
-    if (winTotalScrapsText != null)
-        winTotalScrapsText.text = $"Total Scraps Acquired: {totalScrapsAcquired}";
-    
-    // ADD THIS BLOCK
-    if (winTotalTilesText != null)
-        winTotalTilesText.text = $"Total Tiles Moved: {totalTilesMoved}";
-    
-    if (winDaysText != null)
-        winDaysText.text = $"Days Survived: {days}";
-    
-    if (winCombatsText != null)
-        winCombatsText.text = $"Combats Faced: {totalCombats}";
-
-    Debug.Log($"[WinLoseManager] Win stats - Days: {days}, Combats: {totalCombats}, Tiles: {totalTilesMoved}, Scraps: {totalScrapsAcquired}");
-}
-
-
-private void DisplayLoseStats(string reason)
-{
-    if (playerStatus == null) return;
-
-    int days = dayCycle != null ? dayCycle.GetDay() : 0;
-    int totalCombats = combatManager != null ? 
-        (combatManager.totalCombatsFaced + combatManager.totalEncountersFaced) : 0;
-    int totalTilesMoved = dayCycle != null ? dayCycle.GetTotalTilesMovedAllTime() : 0;
-    int totalScrapsAcquired = playerStatus.TotalScrapsAcquired; // ADD THIS LINE
-
-    if (loseReasonText != null)
-        loseReasonText.text = $"{reason}";
-    
-    if (loseScrapsText != null)
-        loseScrapsText.text = $"Leftover Scraps: {playerStatus.Scraps}";
-    
-    // MODIFY THIS BLOCK
-    if (loseTotalScrapsText != null)
-        loseTotalScrapsText.text = $"Total Scraps Acquired: {totalScrapsAcquired}";
-    
-    // ADD THIS BLOCK
-    if (loseTotalTilesText != null)
-        loseTotalTilesText.text = $"Total Tiles Moved: {totalTilesMoved}";
-    
-    if (loseDaysText != null)
-        loseDaysText.text = $"Days Survived: {days}";
-    
-    if (loseCombatsText != null)
-        loseCombatsText.text = $"Combats Faced: {totalCombats}";
-
-    Debug.Log($"[WinLoseManager] Lose stats - Reason: {reason}, Days: {days}, Tiles: {totalTilesMoved}, Scraps: {totalScrapsAcquired}");
-}
-
-/// <summary>
-/// Attaches the inventory canvas to a specific anchor point in the result panel
-/// </summary>
-private void AttachInventoryToPanel(RectTransform anchorPoint)
-{
-    if (inventoryCanvas == null || inventoryRectTransform == null || anchorPoint == null)
+    private void StartCutsceneSequence(Sprite[] cutscenes)
     {
-        Debug.LogWarning("[WinLoseManager] Cannot attach inventory - missing references");
-        return;
+        currentCutsceneArray = cutscenes;
+        currentCutsceneIndex = 0;
+
+        // Check if cutscenes exist
+        if (currentCutsceneArray == null || currentCutsceneArray.Length == 0)
+        {
+            Debug.LogWarning("[WinLoseManager] No cutscenes found, skipping to results panel");
+            ShowResultsPanel();
+            return;
+        }
+
+        // Show first cutscene
+        ShowCutscene(currentCutsceneIndex);
     }
 
-    // Reparent inventory to the anchor point
-    inventoryRectTransform.SetParent(anchorPoint, false);
-    
-    // Reset local position and apply scaled size (0.8 for margin)
-    inventoryRectTransform.localPosition = Vector3.zero;
-    inventoryRectTransform.localScale = new Vector3(0.8f, 0.8f, 1f);
-    
-    // Ensure inventory canvas is visible and on top
-    inventoryCanvas.gameObject.SetActive(true);
-    inventoryCanvas.sortingOrder = 100; // High value to ensure visibility
-    
-    Debug.Log($"[WinLoseManager] Inventory canvas attached to {anchorPoint.name} with 0.8 scale");
-}
+    private void ShowCutscene(int index)
+    {
+        if (cutscenePanel == null || cutsceneImage == null)
+        {
+            Debug.LogError("[WinLoseManager] Cutscene panel or image not assigned!");
+            ShowResultsPanel();
+            return;
+        }
 
-    /// <summary>
-    /// Restores inventory canvas to its original parent and state
-    /// </summary>
+        // Display the cutscene
+        cutsceneImage.sprite = currentCutsceneArray[index];
+        cutscenePanel.SetActive(true);
+
+        Debug.Log($"[WinLoseManager] Showing cutscene {index + 1}/{currentCutsceneArray.Length}");
+    }
+
+    private void OnCutsceneButtonClicked()
+    {
+        currentCutsceneIndex++;
+
+        // Check if there are more cutscenes
+        if (currentCutsceneIndex < currentCutsceneArray.Length)
+        {
+            ShowCutscene(currentCutsceneIndex);
+        }
+        else
+        {
+            // All cutscenes finished, show results panel
+            cutscenePanel.SetActive(false);
+            ShowResultsPanel();
+        }
+    }
+
+    private void ShowResultsPanel()
+    {
+        if (isPlayingWinCutscene)
+        {
+            // Show win panel
+            DisplayWinStats();
+            if (winPanel != null) winPanel.SetActive(true);
+            if (losePanel != null) losePanel.SetActive(false);
+
+            if (showInventoryInResults)
+                AttachInventoryToPanel(winPanelInventoryAnchor);
+            
+            Debug.Log("[WinLoseManager] Showing win panel after cutscene");
+        }
+        else
+        {
+            // Show lose panel
+            DisplayLoseStats(loseReason);
+            if (winPanel != null) winPanel.SetActive(false);
+            if (losePanel != null) losePanel.SetActive(true);
+
+            if (showInventoryInResults)
+                AttachInventoryToPanel(losePanelInventoryAnchor);
+            
+            Debug.Log("[WinLoseManager] Showing lose panel after cutscene");
+        }
+    }
+
+    private void DisplayWinStats()
+    {
+        if (playerStatus == null) return;
+
+        int days = dayCycle != null ? dayCycle.GetDay() : 0;
+        int totalCombats = combatManager != null ? 
+            (combatManager.totalCombatsFaced + combatManager.totalEncountersFaced) : 0;
+        int totalTilesMoved = dayCycle != null ? dayCycle.GetTotalTilesMovedAllTime() : 0;
+        int totalScrapsAcquired = playerStatus.TotalScrapsAcquired;
+
+        if (winHpText != null)
+            winHpText.text = $"HP: {playerStatus.Hp}/{playerStatus.MaxHp}";
+        
+        if (winCrystalHpText != null)
+            winCrystalHpText.text = $"Crystal HP: {playerStatus.CrystalHp}/{playerStatus.MaxCrystalHp}";
+        
+        if (winScrapsText != null)
+            winScrapsText.text = $"Leftover Scraps: {playerStatus.Scraps}";
+        
+        if (winTotalScrapsText != null)
+            winTotalScrapsText.text = $"Total Scraps Acquired: {totalScrapsAcquired}";
+        
+        if (winTotalTilesText != null)
+            winTotalTilesText.text = $"Total Tiles Moved: {totalTilesMoved}";
+        
+        if (winDaysText != null)
+            winDaysText.text = $"Days Survived: {days}";
+        
+        if (winCombatsText != null)
+            winCombatsText.text = $"Combats Faced: {totalCombats}";
+
+        Debug.Log($"[WinLoseManager] Win stats - Days: {days}, Combats: {totalCombats}, Tiles: {totalTilesMoved}, Scraps: {totalScrapsAcquired}");
+    }
+
+    private void DisplayLoseStats(string reason)
+    {
+        if (playerStatus == null) return;
+
+        int days = dayCycle != null ? dayCycle.GetDay() : 0;
+        int totalCombats = combatManager != null ? 
+            (combatManager.totalCombatsFaced + combatManager.totalEncountersFaced) : 0;
+        int totalTilesMoved = dayCycle != null ? dayCycle.GetTotalTilesMovedAllTime() : 0;
+        int totalScrapsAcquired = playerStatus.TotalScrapsAcquired;
+
+        if (loseReasonText != null)
+            loseReasonText.text = $"{reason}";
+        
+        if (loseScrapsText != null)
+            loseScrapsText.text = $"Leftover Scraps: {playerStatus.Scraps}";
+        
+        if (loseTotalScrapsText != null)
+            loseTotalScrapsText.text = $"Total Scraps Acquired: {totalScrapsAcquired}";
+        
+        if (loseTotalTilesText != null)
+            loseTotalTilesText.text = $"Total Tiles Moved: {totalTilesMoved}";
+        
+        if (loseDaysText != null)
+            loseDaysText.text = $"Days Survived: {days}";
+        
+        if (loseCombatsText != null)
+            loseCombatsText.text = $"Combats Faced: {totalCombats}";
+
+        Debug.Log($"[WinLoseManager] Lose stats - Reason: {reason}, Days: {days}, Tiles: {totalTilesMoved}, Scraps: {totalScrapsAcquired}");
+    }
+
+    private void AttachInventoryToPanel(RectTransform anchorPoint)
+    {
+        if (inventoryCanvas == null || inventoryRectTransform == null || anchorPoint == null)
+        {
+            Debug.LogWarning("[WinLoseManager] Cannot attach inventory - missing references");
+            return;
+        }
+
+        inventoryRectTransform.SetParent(anchorPoint, false);
+        inventoryRectTransform.localPosition = Vector3.zero;
+        inventoryRectTransform.localScale = new Vector3(0.8f, 0.8f, 1f);
+        
+        inventoryCanvas.gameObject.SetActive(true);
+        inventoryCanvas.sortingOrder = 100;
+        
+        Debug.Log($"[WinLoseManager] Inventory canvas attached to {anchorPoint.name} with 0.8 scale");
+    }
+
     private void RestoreInventoryCanvas()
     {
         if (inventoryCanvas == null || inventoryRectTransform == null || inventoryOriginalParent == null)
@@ -352,16 +414,10 @@ private void AttachInventoryToPanel(RectTransform anchorPoint)
     {
         Debug.Log("[WinLoseManager] Reloading scene for new game...");
 
-        // Restore inventory canvas before cleanup
         RestoreInventoryCanvas();
-
-        // Clean up ALL singleton managers before reload
         CleanupAllManagers();
-
-        // Reset timescale
         Time.timeScale = 1f;
 
-        // Reload current scene
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
@@ -369,9 +425,7 @@ private void AttachInventoryToPanel(RectTransform anchorPoint)
     {
         Debug.Log("[WinLoseManager] Loading main menu...");
         
-        // Restore inventory canvas before cleanup
         RestoreInventoryCanvas();
-        
         CleanupAllManagers();
         Time.timeScale = 1f;
 
@@ -389,7 +443,6 @@ private void AttachInventoryToPanel(RectTransform anchorPoint)
     {
         Debug.Log("[WinLoseManager] Cleaning up all singleton managers...");
 
-        // Destroy all singleton managers to ensure clean reload
         if (CombatManager.Instance != null)
         {
             Destroy(CombatManager.Instance.gameObject);
@@ -432,15 +485,11 @@ private void AttachInventoryToPanel(RectTransform anchorPoint)
             Debug.Log("[WinLoseManager] Destroyed SoundManager");
         }
 
-        // Add any other singleton managers here
-        // if (InventoryItemManager.Instance != null) { Destroy(...); }
-
         Debug.Log("[WinLoseManager] All managers cleaned up successfully");
     }
 
     private void OnDestroy()
     {
-        // Clean up button listeners
         if (replayButtonWin != null)
             replayButtonWin.onClick.RemoveListener(ReloadScene);
         if (replayButtonLose != null)
@@ -449,5 +498,7 @@ private void AttachInventoryToPanel(RectTransform anchorPoint)
             mainMenuButtonWin.onClick.RemoveListener(LoadMainMenu);
         if (mainMenuButtonLose != null)
             mainMenuButtonLose.onClick.RemoveListener(LoadMainMenu);
+        if (cutsceneButton != null)
+            cutsceneButton.onClick.RemoveListener(OnCutsceneButtonClicked);
     }
 }
