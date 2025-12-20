@@ -3254,7 +3254,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6470af03f705074459d7fbcdb00a5b8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
+  moveSpeed: 7
+  sprintMultiplier: 2
   followSmoothSpeed: 5
   focusSmoothSpeed: 8
   followTarget: {fileID: 0}
@@ -3263,6 +3264,7 @@ MonoBehaviour:
   rightPaddingTiles: 6
   topPaddingTiles: 3
   bottomPaddingTiles: 3
+  inputActions: {fileID: 0}
 --- !u!114 &1922003437
 MonoBehaviour:
   m_ObjectHideFlags: 0

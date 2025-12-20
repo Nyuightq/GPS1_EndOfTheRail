@@ -2,9 +2,11 @@
 // Creation Date: 2025-10-12
 // Author: ZQlie
 // Description: Basic 2D Camera Movement using W, A, S, D keys
+// Modified: Added Sprint Feature using Input System
 // --------------------------------------------------------------
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.InputSystem;
 
 public class CameraMovementTemp : MonoBehaviour
 {
@@ -12,6 +14,7 @@ public class CameraMovementTemp : MonoBehaviour
 
     [Header("Camera Movement Settings")]
     [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float sprintMultiplier = 2f;
     [SerializeField] private float followSmoothSpeed = 5f;
     [SerializeField] private float focusSmoothSpeed = 8f; // Speed for focusing on stationary target
 
@@ -30,6 +33,9 @@ public class CameraMovementTemp : MonoBehaviour
     [SerializeField] private int topPaddingTiles = 3;
     [SerializeField] private int bottomPaddingTiles = 3;
 
+    [Header("Input System")]
+    [SerializeField] private InputActionAsset inputActions;
+
     private Vector3 moveDirection;
     private bool _isFollowing = false;
     public bool IsFollowing => _isFollowing;
@@ -43,6 +49,12 @@ public class CameraMovementTemp : MonoBehaviour
     private bool hasBounds = false;
     private Camera cam;
     private float tileSize = 1f; // Assuming 1 unit per tile, adjust if different
+
+    // Input System variables
+    private InputActionMap playerActionMap;
+    private InputAction moveAction;
+    private InputAction sprintAction;
+    private bool isSprinting = false;
 
     void Awake()
     {
@@ -58,6 +70,50 @@ public class CameraMovementTemp : MonoBehaviour
 
         if (gridScript != null)
             CalculateBoundsFromLargestTilemap();
+
+        // Setup Input System
+        SetupInputSystem();
+    }
+
+    private void SetupInputSystem()
+    {
+        if (inputActions == null)
+        {
+            Debug.LogWarning("[CameraMovementTemp] InputActionAsset not assigned! Using legacy input as fallback.");
+            return;
+        }
+
+        playerActionMap = inputActions.FindActionMap("Player");
+        
+        if (playerActionMap == null)
+        {
+            Debug.LogWarning("[CameraMovementTemp] 'Player' action map not found! Using legacy input as fallback.");
+            return;
+        }
+
+        // Try to find camera movement action (you may need to create this in your Input Actions asset)
+        moveAction = playerActionMap.FindAction("CameraMove");
+        sprintAction = playerActionMap.FindAction("Sprint");
+
+        if (sprintAction != null)
+        {
+            sprintAction.performed += _ => isSprinting = true;
+            sprintAction.canceled += _ => isSprinting = false;
+        }
+
+        playerActionMap.Enable();
+    }
+
+    private void OnEnable()
+    {
+        if (playerActionMap != null)
+            playerActionMap.Enable();
+    }
+
+    private void OnDisable()
+    {
+        if (playerActionMap != null)
+            playerActionMap.Disable();
     }
 
     void Update()
@@ -169,13 +225,31 @@ public class CameraMovementTemp : MonoBehaviour
         float moveX = 0f;
         float moveY = 0f;
 
-        if (Input.GetKey(KeyCode.W)) moveY = 1f;
-        if (Input.GetKey(KeyCode.S)) moveY = -1f;
-        if (Input.GetKey(KeyCode.A)) moveX = -1f;
-        if (Input.GetKey(KeyCode.D)) moveX = 1f;
+        // Use Input System if available, otherwise fall back to legacy input
+        if (moveAction != null)
+        {
+            Vector2 moveInput = moveAction.ReadValue<Vector2>();
+            moveX = moveInput.x;
+            moveY = moveInput.y;
+        }
+        else
+        {
+            // Legacy input fallback
+            if (Input.GetKey(KeyCode.W)) moveY = 1f;
+            if (Input.GetKey(KeyCode.S)) moveY = -1f;
+            if (Input.GetKey(KeyCode.A)) moveX = -1f;
+            if (Input.GetKey(KeyCode.D)) moveX = 1f;
+
+            // Legacy sprint (LeftShift)
+            if (sprintAction == null)
+            {
+                isSprinting = Input.GetKey(KeyCode.LeftShift);
+            }
+        }
 
         moveDirection = new Vector3(moveX, moveY, 0f).normalized;
-        if (GameStateManager.Instance != null && GameStateManager.Instance.IsPausing) moveDirection = new Vector3(0f, 0f, 0f).normalized;
+        if (GameStateManager.Instance != null && GameStateManager.Instance.IsPausing) 
+            moveDirection = new Vector3(0f, 0f, 0f).normalized;
         
         // Stop focusing if player manually moves camera
         if (moveDirection != Vector3.zero)
@@ -188,7 +262,8 @@ public class CameraMovementTemp : MonoBehaviour
     {
         if (!_isFocusing) // Only apply manual movement when not focusing
         {
-            Vector3 newPos = transform.position + moveDirection * moveSpeed * Time.deltaTime;
+            float currentSpeed = isSprinting ? moveSpeed * sprintMultiplier : moveSpeed;
+            Vector3 newPos = transform.position + moveDirection * currentSpeed * Time.deltaTime;
             transform.position = ClampPosition(newPos);
         }
     }
