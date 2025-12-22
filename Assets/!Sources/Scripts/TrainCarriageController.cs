@@ -65,11 +65,11 @@ public class TrainCarriageController : MonoBehaviour
         // Initialize position history with current position
         positionHistory.Add(transform.position);
         
-        // Calculate initial inventory size
+        // Calculate initial inventory size (count ACTIVE cells)
         if (inventoryGrid != null)
         {
-            lastInventorySize = inventoryGrid.inventoryWidth * inventoryGrid.inventoryHeight;
-            Debug.Log($"Initial inventory size: {lastInventorySize}");
+            lastInventorySize = CountActiveCells();
+            Debug.Log($"[TrainCarriageController] Initial active inventory cells: {lastInventorySize}");
         }
         
         // Don't spawn any carriages at start - they'll spawn as inventory grows
@@ -82,7 +82,14 @@ public class TrainCarriageController : MonoBehaviour
     {
         if (inventoryGrid == null) return;
         
-        int currentInventorySize = inventoryGrid.inventoryWidth * inventoryGrid.inventoryHeight;
+        // Count ACTIVE cells instead of just dimensions
+        int currentInventorySize = CountActiveCells();
+        
+        // Debug log to track changes
+        if (currentInventorySize != lastInventorySize)
+        {
+            Debug.Log($"[TrainCarriageController] Active inventory cells changed: {lastInventorySize} -> {currentInventorySize}");
+        }
         
         // Check if inventory size increased
         if (currentInventorySize > lastInventorySize)
@@ -91,15 +98,17 @@ public class TrainCarriageController : MonoBehaviour
             lastInventorySize = currentInventorySize;
             
             // Calculate how many carriages should exist based on total inventory size
-            int baseInventorySize = 20; // Initial size
+            int baseInventorySize = 20; // Initial size (adjust this to match your actual initial inventory)
             int additionalSlots = currentInventorySize - baseInventorySize;
             int targetCarriageCount = Mathf.Min(additionalSlots / inventorySlotsPerCarriage, maxCarriages);
+            
+            Debug.Log($"[TrainCarriageController] Additional slots: {additionalSlots}, Target carriages: {targetCarriageCount}, Current carriages: {carriages.Count}");
             
             // Spawn carriages if we need more
             while (carriages.Count < targetCarriageCount)
             {
                 SpawnSingleCarriage();
-                Debug.Log($"Carriage spawned! Total carriages: {carriages.Count}/{maxCarriages}");
+                Debug.Log($"[TrainCarriageController] ✓ Carriage spawned! Total carriages: {carriages.Count}/{maxCarriages}");
             }
         }
     }
@@ -162,6 +171,8 @@ public class TrainCarriageController : MonoBehaviour
         
         // Add spawn position to history
         positionHistory.Add(spawnPos);
+        
+        Debug.Log($"[TrainCarriageController] Carriage spawned at position: {spawnPos}");
     }
     
     private void LateUpdate()
@@ -307,10 +318,29 @@ public class TrainCarriageController : MonoBehaviour
     {
         if (inventoryGrid == null) return 0;
         
-        int currentInventorySize = inventoryGrid.inventoryWidth * inventoryGrid.inventoryHeight;
+        int currentInventorySize = CountActiveCells();
         int baseInventorySize = 20;
         int additionalSlots = currentInventorySize - baseInventorySize;
         return Mathf.Min(additionalSlots / inventorySlotsPerCarriage, maxCarriages);
+    }
+    
+    /// <summary>
+    /// Counts the number of ACTIVE cells in the inventory grid
+    /// </summary>
+    private int CountActiveCells()
+    {
+        if (inventoryGrid == null || inventoryGrid.inventoryGrid == null)
+            return 0;
+            
+        int activeCells = 0;
+        foreach (var cell in inventoryGrid.inventoryGrid)
+        {
+            if (cell != null && cell.active)
+            {
+                activeCells++;
+            }
+        }
+        return activeCells;
     }
     
     /// <summary>
@@ -323,6 +353,14 @@ public class TrainCarriageController : MonoBehaviour
             return carriages[index];
         }
         return null;
+    }
+    
+    /// <summary>
+    /// Manual trigger to check and spawn carriages (useful for debugging)
+    /// </summary>
+    public void ForceCheckCarriages()
+    {
+        CheckInventorySizeAndSpawnCarriages();
     }
     
     private void OnDestroy()

@@ -2943,6 +2943,33 @@ Animator:
   m_CorrespondingSourceObject: {fileID: 223333184251527622, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
   m_PrefabInstance: {fileID: 612508012920358858}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1079588732 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3194560625472726582, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+  m_PrefabInstance: {fileID: 612508012920358858}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1079588733 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1252687569466497692, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+  m_PrefabInstance: {fileID: 612508012920358858}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &1079588734 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2674117126957069575, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+  m_PrefabInstance: {fileID: 612508012920358858}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1102400622 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 603519051463053461, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
@@ -3731,6 +3758,10 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 689783407}
+    - target: {fileID: 2674117126957069575, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2898954876053112127, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: hoverAudio
       value: 
@@ -5108,6 +5139,14 @@ PrefabInstance:
       propertyPath: playerSpawnPoint
       value: 
       objectReference: {fileID: 6036120041561867322}
+    - target: {fileID: 4921764918400996863, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: _scraps
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4921764918400996863, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: _totalScrapsAcquired
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4926789502135262990, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: acceptButton
       value: 
@@ -5181,9 +5220,21 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 945212318}
     - target: {fileID: 7030176318696570325, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: cutsceneImage
+      value: 
+      objectReference: {fileID: 1079588733}
+    - target: {fileID: 7030176318696570325, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: cutscenePanel
+      value: 
+      objectReference: {fileID: 1079588734}
+    - target: {fileID: 7030176318696570325, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: winScrapsText
       value: 
       objectReference: {fileID: 199514213}
+    - target: {fileID: 7030176318696570325, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: cutsceneButton
+      value: 
+      objectReference: {fileID: 1079588732}
     - target: {fileID: 7030176318696570325, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: loseReasonText
       value: 
@@ -5241,13 +5292,29 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1263999117}
     - target: {fileID: 7030176318696570325, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: winCutscenes.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7030176318696570325, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: winPanelInventoryAnchor
       value: 
       objectReference: {fileID: 1904221335}
     - target: {fileID: 7030176318696570325, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: loseCutscenes.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7030176318696570325, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: losePanelInventoryAnchor
       value: 
       objectReference: {fileID: 96534849}
+    - target: {fileID: 7030176318696570325, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: 'winCutscenes.Array.data[0]'
+      value: 
+      objectReference: {fileID: 21300000, guid: eeb1056e653f1774aa416abdcf69ef2f, type: 3}
+    - target: {fileID: 7030176318696570325, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: 'loseCutscenes.Array.data[0]'
+      value: 
+      objectReference: {fileID: 21300000, guid: bbc9e939703726248860b71beb05fe7e, type: 3}
     - target: {fileID: 7285569548920745536, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: transitionGO
       value: 
