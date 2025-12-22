@@ -180,8 +180,8 @@ public class HealEffect : Effect
 {
     [SerializeField] private InputType inputType;
     [SerializeField] private float healAmount;
-    [SerializeField] private bool limitedUses;
-    [SerializeField] private int uses;
+    [SerializeField] public bool limitedUses { get; private set; }
+    [SerializeField] public int uses { get; private set; }
     [SerializeField] private Sprite usedSprite;
 
     public HealEffect(triggers trigger, bool triggerOnConditionOnce, Conditions[] conditions, Sprite conditionMetSprite, InputType inputType, float healAmount, bool limitedUses, int uses, Sprite usedSprite) : base(trigger, triggerOnConditionOnce, conditions, conditionMetSprite)

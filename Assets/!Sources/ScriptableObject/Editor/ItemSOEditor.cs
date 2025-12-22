@@ -25,8 +25,13 @@ public class ItemSOEditor : Editor
 
         // ----------------- Basic Fields -----------------
         item.itemName = EditorGUILayout.TextField("Item Name", item.itemName);
-        EditorGUILayout.LabelField("Item Description", EditorStyles.boldLabel);
-        item.itemDescription = EditorGUILayout.TextArea(item.itemDescription, GUILayout.Height(60));
+        item.useItemDescription = EditorGUILayout.Toggle("Use Description", item.useItemDescription);
+
+        if (item.useItemDescription)
+        {
+            EditorGUILayout.LabelField("Item Description", EditorStyles.boldLabel);
+            item.itemDescription = EditorGUILayout.TextArea(item.itemDescription, GUILayout.Height(60));
+        }
         item.itemSprite = (Sprite)EditorGUILayout.ObjectField("Item Sprite", item.itemSprite, typeof(Sprite), false);
         item.mandatoryItem = EditorGUILayout.Toggle("Mandatory Item", item.mandatoryItem);
         item.itemWidth = Mathf.Max(1, EditorGUILayout.IntField("Item Width", item.itemWidth));

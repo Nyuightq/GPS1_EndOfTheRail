@@ -203,8 +203,8 @@ private void LeftRelease()
         // Let Engineer handle everything - don't try to attach to inventory
         EngineerManager.Instance.OnItemReleased(gameObject);
         RemoveTemporaryCanvas();
-        return; // EXIT HERE - don't continue with inventory logic
-    }
+                                   //return; // EXIT HERE - don't continue with inventory logic
+        }
 
     // Only proceed with inventory attachment if NOT in engineer mode
     bool success = AttachToInventory();
@@ -233,7 +233,7 @@ private void LeftRelease()
 
     private void RightClick()
     {
-        if (!dragging || EngineerManager.Instance.IsEngineerUIActive) return;
+        if (!dragging /*|| EngineerManager.Instance.IsEngineerUIActive*/) return;
         
         if (itemScript.state == Item.itemState.equipped)
         {
