@@ -1253,7 +1253,7 @@ MonoBehaviour:
   m_text: "\r\n\tLeft Click \tto build.\\n\\n\r\n\tRight click \tto remove.\\n\\n\r\n\tHold
     Left Click \t\tto build a set of rails.\\n\\n\r\n\tWASD to move the camera.\\n\r\n\tClick
     on Reset button    to reset all builded rails.\\n\r\n\tClick on Travel button    
-    to move out.\\n\r\n\tRails MUST be connected to either rest point \tOR end point
+    to move out.\\n\r\n\tRails MUST be connected to either rest point \tOR The Portal
     \t\\n\tto travel."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f3e19c02e8b2a0944b425876dd12117d, type: 2}
@@ -3125,6 +3125,7 @@ GameObject:
   - component: {fileID: 1657670937}
   - component: {fileID: 1657670939}
   - component: {fileID: 1657670938}
+  - component: {fileID: 1657670940}
   m_Layer: 5
   m_Name: Image (3)
   m_TagString: Untagged
@@ -3141,14 +3142,14 @@ RectTransform:
   m_GameObject: {fileID: 1657670936}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.6, y: 0.6, z: 1}
+  m_LocalScale: {x: 1.8, y: 1.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 883107906}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 1439, y: -724}
+  m_AnchoredPosition: {x: 1515.4, y: -709}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1657670938
@@ -3164,14 +3165,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.6037736, g: 0.6037736, b: 0.6037736, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: cb35d34daeb576c4abeb6034e49dc0cc, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a3e57ac7fe663614faa71941b0385050, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3189,6 +3190,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1657670936}
   m_CullTransparentMesh: 1
+--- !u!114 &1657670940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1657670936}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5490d83aa7e4540419fbf55c4d6115c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  degreesPerSecond: 2
 --- !u!1 &1694996894
 GameObject:
   m_ObjectHideFlags: 0
@@ -4653,6 +4667,10 @@ PrefabInstance:
     - target: {fileID: 4532181742138753070, guid: 83f827a0d38083944a99f9816ba336a3, type: 3}
       propertyPath: m_Name
       value: Narrative01CRTManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 4532181742138753070, guid: 83f827a0d38083944a99f9816ba336a3, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
