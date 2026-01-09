@@ -220,6 +220,7 @@ public class InventoryGridScript : MonoBehaviour
                     if(success)
                     {
                         GameManager.instance.playerStatus.ConsumeScraps(currentCost);
+                        SoundManager.Instance.PlaySFX("SFX_UnlockInventorySlot");
                         currentCost = (int)(currentCost * costMultiplier);
                         UpdateCurrentCostText();
                     }

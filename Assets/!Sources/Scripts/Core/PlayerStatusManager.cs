@@ -99,6 +99,7 @@ public class PlayerStatusManager : MonoBehaviour
         _hp += amount;
         _hp = Mathf.Clamp(_hp, 0, MaxHp);
         OnHpChanged?.Invoke(_hp, MaxHp);
+        SoundManager.Instance.PlaySFX("SFX_TrainHeal");
     }
 
     public void CrystalTakeDamage(int amount)
@@ -113,6 +114,7 @@ public class PlayerStatusManager : MonoBehaviour
         _crystalHp += amount;
         _crystalHp = Mathf.Clamp(_crystalHp, 0, _maxCrystalHp);
         OnCrystalHpChanged?.Invoke(_crystalHp, _maxCrystalHp);
+        SoundManager.Instance.PlaySFX("SFX_CrystalHeal");
     }
 
     public bool ConsumeScraps(int value)

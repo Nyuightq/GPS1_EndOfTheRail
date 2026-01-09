@@ -307,6 +307,24 @@ MonoBehaviour:
     pitch: 1
     loop: 0
     source: {fileID: 0}
+  - name: SFX_CrystalHeal
+    clip: {fileID: 8300000, guid: 9dab61105dcbbbb46bbf4404e5650a00, type: 3}
+    volume: 0.655
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_TrainHeal
+    clip: {fileID: 8300000, guid: 6d7b79b4c116bc4448a1a44b11f808d4, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: SFX_UnlockInventorySlot
+    clip: {fileID: 8300000, guid: 6f6af9099d060f344a0c3666f47165d9, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
   musicTracks:
   - name: MUSIC_MainMenu
     clip: {fileID: 8300000, guid: 7b788f9d446b8af4ea65838c5119cce7, type: 3}
