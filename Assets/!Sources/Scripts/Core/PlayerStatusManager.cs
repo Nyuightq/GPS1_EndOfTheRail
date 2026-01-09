@@ -65,6 +65,7 @@ public class PlayerStatusManager : MonoBehaviour
     {
         _hp = _baseMaxHp;
         _crystalHp = _maxCrystalHp;
+        mediator = new StatsMediator<BuffableStats>(); // Re-initialize mediator to avoid carrying over modifiers between different rounds
     }
 
     public void Start()
