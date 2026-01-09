@@ -63,6 +63,7 @@ public class InventoryGridScript : MonoBehaviour
     [Header("Do Not Change")]
     [SerializeField] private InventoryState currentInventoryState;
     [SerializeField] private int currentCost;
+    private static int s_maximumCost = 999;
 
     public RectTransform inventoryRect { get; private set; }
     public InvCellData[,] inventoryGrid;
@@ -222,6 +223,7 @@ public class InventoryGridScript : MonoBehaviour
                         GameManager.instance.playerStatus.ConsumeScraps(currentCost);
                         SoundManager.Instance.PlaySFX("SFX_UnlockInventorySlot");
                         currentCost = (int)(currentCost * costMultiplier);
+                        currentCost = Math.Min(currentCost, s_maximumCost); // Restrict to maximum cost 999, else the text will overflow behind the UI
                         UpdateCurrentCostText();
                     }
                     return;
