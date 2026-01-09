@@ -103657,6 +103657,10 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 144616152984997629, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_TextWrappingMode
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 157957309528835958, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -103740,6 +103744,10 @@ PrefabInstance:
     - target: {fileID: 725546667205972033, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 825286006989497594, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_TextWrappingMode
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 954942585510287129, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_AnchorMax.x
@@ -104027,7 +104035,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5188049483304509265, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5368224136193988919, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_IsActive
@@ -104261,6 +104269,10 @@ PrefabInstance:
       propertyPath: CRTShaderVolume
       value: 
       objectReference: {fileID: 303467814}
+    - target: {fileID: 7885458316474352739, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: m_TextWrappingMode
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7886288694330704607, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -105474,6 +105486,10 @@ PrefabInstance:
       propertyPath: _topPanel
       value: 
       objectReference: {fileID: 4244179449349847808}
+    - target: {fileID: 8456088590381804051, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: _isInitial
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8456088590381804051, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: _asidePanel
       value: 
