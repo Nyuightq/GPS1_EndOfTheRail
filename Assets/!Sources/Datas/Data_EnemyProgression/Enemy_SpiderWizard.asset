@@ -19,7 +19,7 @@ MonoBehaviour:
       maxHp: 12
       attackDamage: 1
       attackSpeed: 1
-      attackVariance: 5
+      attackVariance: 4
       defense: 0
     scrapsReward:
       baseCount: 6
@@ -29,7 +29,7 @@ MonoBehaviour:
       maxHp: 18
       attackDamage: 1
       attackSpeed: 2
-      attackVariance: 6
+      attackVariance: 4
       defense: 0
     scrapsReward:
       baseCount: 10
@@ -39,7 +39,7 @@ MonoBehaviour:
       maxHp: 24
       attackDamage: 2
       attackSpeed: 2
-      attackVariance: 6
+      attackVariance: 4
       defense: 0
     scrapsReward:
       baseCount: 15

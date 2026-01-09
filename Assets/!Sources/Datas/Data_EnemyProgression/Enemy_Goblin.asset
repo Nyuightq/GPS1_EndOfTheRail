@@ -27,8 +27,8 @@ MonoBehaviour:
   - dayNumber: 4
     combatStats:
       maxHp: 20
-      attackDamage: 3
-      attackSpeed: 4
+      attackDamage: 2
+      attackSpeed: 3
       attackVariance: 2
       defense: 0
     scrapsReward:
@@ -38,8 +38,8 @@ MonoBehaviour:
     combatStats:
       maxHp: 27
       attackDamage: 3
-      attackSpeed: 4
-      attackVariance: 3
+      attackSpeed: 3
+      attackVariance: 2
       defense: 0
     scrapsReward:
       baseCount: 18
