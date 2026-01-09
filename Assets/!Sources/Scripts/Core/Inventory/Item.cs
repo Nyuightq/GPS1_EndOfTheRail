@@ -195,9 +195,21 @@ public class Item : MonoBehaviour
 
     public void ShowPreview(bool showPreview)
     {
+        // Changes made:
+        //      From - Active or deactive the preview cells
+        //      To   - Change the alpha of the preview cells to show/hide them
+        //      FOR? Make preview cells also act as item's collider when hovering / interacting.
+        
+        float alpha = showPreview ? shapePreviewAlpha : 0f;
         foreach (GameObject cellPreview in shape)
         {
-            cellPreview.SetActive(showPreview);
+            // cellPreview.SetActive(showPreview);
+            Image img = cellPreview.GetComponent<Image>();
+            if (!img) continue;
+
+            Color c = img.color;
+            c.a = alpha;
+            img.color = c;
         }
     }
 

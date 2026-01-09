@@ -93,11 +93,14 @@ MonoBehaviour:
   state: 1
   sprite: {fileID: 7090436357072761648}
   itemData: {fileID: 11400000, guid: d044c032c2424e545937da643f79d6a6, type: 2}
+  itemEffect: {fileID: 0}
   inventoryCellPrefab: {fileID: 4300450558859377986, guid: e00446c319aa05b42b284c6bc5658876, type: 3}
   shapePreviewAlpha: 0.3
   spriteRectTransform: {fileID: 0}
   itemRect: {fileID: 0}
   shape: []
+  maxLevel: 3
+  flaggedForDeletion: 0
 --- !u!114 &5478319767521092018
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -110,7 +113,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bae5eec83259b024b93b476aee042b41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpd: 1
+  canDrag: 0
 --- !u!1 &4127480681589932744
 GameObject:
   m_ObjectHideFlags: 0
@@ -170,7 +173,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
