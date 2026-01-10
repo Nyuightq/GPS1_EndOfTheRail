@@ -1,5 +1,3 @@
-# End Of The Rail
-
 [![Game Banner](https://img.itch.zone/aW1nLzI0NjIyMzg2LnBuZw==/original/ETzqQK.png)](https://uowmgames.itch.io/end-of-the-rail)
 <div align="center">
   <a href="https://uowmgames.itch.io/end-of-the-rail"> Available at itch.io </a>
