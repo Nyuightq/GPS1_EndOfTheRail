@@ -517,7 +517,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &184661764
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5573,7 +5573,6 @@ MonoBehaviour:
   - {fileID: 167158977}
   - {fileID: 111697653}
   - {fileID: 2044906192}
-  - {fileID: 184661763}
   pixelBallIn: {fileID: 1698026340}
   pixelBallOut: {fileID: 1144579604}
   clickAudio: {fileID: 8699974132417164056}

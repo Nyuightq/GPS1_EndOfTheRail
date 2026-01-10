@@ -122,7 +122,7 @@ public class EngineerManager : MonoBehaviour
         IsEngineerUIActive = true;
 
         if (feedbackText != null)
-            feedbackText.text = "Drag two identical items to merge";
+            feedbackText.text = "Drag 2 same items to merge";
 
         Debug.Log("[EngineerManager] Engineer UI opened fresh - unequipped items deleted");
     }
