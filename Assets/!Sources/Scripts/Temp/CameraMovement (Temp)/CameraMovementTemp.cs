@@ -33,6 +33,9 @@ public class CameraMovementTemp : MonoBehaviour
     [SerializeField] private int topPaddingTiles = 3;
     [SerializeField] private int bottomPaddingTiles = 3;
 
+    [Tooltip("Assign a BoxCollider2D here to set exact bounds. If empty, falls back to Tilemap method.")]
+    [SerializeField] private Collider2D cameraBoundsOverride;
+
     [Header("Input System")]
     [SerializeField] private InputActionAsset inputActions;
 
@@ -68,8 +71,15 @@ public class CameraMovementTemp : MonoBehaviour
         if (gridScript == null)
             gridScript = FindFirstObjectByType<RailGridScript>();
 
-        if (gridScript != null)
+        // NEW: Check for collider first, fallback to tilemap
+        if (cameraBoundsOverride != null)
+        {
+            CalculateBoundsFromCollider();
+        }
+        else if (gridScript != null)
+        {
             CalculateBoundsFromLargestTilemap();
+        }
 
         // Setup Input System
         SetupInputSystem();
@@ -351,5 +361,20 @@ public class CameraMovementTemp : MonoBehaviour
             Gizmos.color = Color.cyan;
             Gizmos.DrawWireSphere(_focusTargetPosition, 0.5f);
         }
+    }
+
+    private void CalculateBoundsFromCollider()
+    {
+        Bounds b = cameraBoundsOverride.bounds;
+
+        // When using a custom collider, you can ignore the padding variables 
+        // since you will manually size the box in the editor to exactly what you want.
+        minX = b.min.x;
+        maxX = b.max.x;
+        minY = b.min.y;
+        maxY = b.max.y;
+
+        hasBounds = true;
+        Debug.Log($"[CameraMovementTemp] Using bounds from BoxCollider2D. X:[{minX}, {maxX}], Y:[{minY}, {maxY}]");
     }
 }

@@ -19,7 +19,7 @@ public class InstructionManager : MonoBehaviour
     [SerializeField] private AudioSource clickAudio;
 
     [Header("Scene Settings")]
-    [SerializeField] private string nextSceneName = "GameplayScene";
+    [SerializeField] private string[] possibleMapScenes;
     [SerializeField] private float transitionDelay = 0.5f;
 
     private int currentNarrativeIndex = 0;
@@ -95,6 +95,22 @@ public void OnInstructionClick()
             Debug.Log("[OnClickImage] Destroyed SoundManager");
         }
 
-        SceneManager.LoadScene(nextSceneName);
+        // --- RANDOMIZED MAP LOADING LOGIC ---
+
+        // Safety check to prevent errors if the array is empty in the Inspector
+        if (possibleMapScenes == null || possibleMapScenes.Length == 0)
+        {
+            Debug.LogError("No maps assigned in the possibleMapScenes array! Please add scene names in the Inspector.");
+            yield break;
+        }
+
+        // Generate a random number between 0 and the array's length
+        int randomIndex = Random.Range(0, possibleMapScenes.Length);
+
+        // Retrieve the randomly selected scene name
+        string selectedSceneName = possibleMapScenes[randomIndex];
+
+        // Load the chosen scene
+        SceneManager.LoadScene(selectedSceneName);
     }
 }

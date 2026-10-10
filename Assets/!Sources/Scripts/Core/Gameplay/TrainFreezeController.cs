@@ -25,6 +25,7 @@ public class TrainFreezeController : MonoBehaviour
         CombatManager.OnCombatClosed += ResumeTrain; 
         StoryManager.OnStoryClosed += ResumeTrain; 
         EngineerManager.OnEngineerClosed += ResumeTrain;
+        TutorialUIManager.OnTutorialClosed += ResumeTrain;
     }
 
     private void OnDisable()
@@ -35,6 +36,7 @@ public class TrainFreezeController : MonoBehaviour
         CombatManager.OnCombatClosed -= ResumeTrain; 
         StoryManager.OnStoryClosed -= ResumeTrain; 
         EngineerManager.OnEngineerClosed -= ResumeTrain;
+        TutorialUIManager.OnTutorialClosed -= ResumeTrain;
     }
 
     public void FreezeTrain()

@@ -60,6 +60,9 @@ public class WinLoseManager : MonoBehaviour
     [Header("Scene Settings")]
     [SerializeField] private string mainMenuSceneName = "MainMenu";
 
+    [Header("Map Randomizer Settings")]
+    [SerializeField] private string[] possibleMapScenes;
+
     [Header("Game State")]
     public bool isGameOver = false;
 
@@ -412,13 +415,30 @@ public class WinLoseManager : MonoBehaviour
 
     private void ReloadScene()
     {
-        Debug.Log("[WinLoseManager] Reloading scene for new game...");
+        Debug.Log("[WinLoseManager] Reloading random scene for new game...");
 
         RestoreInventoryCanvas();
         CleanupAllManagers();
         Time.timeScale = 1f;
 
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        // RANDOMIZED MAP  
+
+        // Fallback safety check: If array is empty, load the active scene like before
+        if (possibleMapScenes == null || possibleMapScenes.Length == 0)
+        {
+            Debug.LogWarning("[WinLoseManager] No maps assigned in possibleMapScenes! Falling back to current scene.");
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            return;
+        }
+
+        // Generate a random number between 0 and the array's length
+        int randomIndex = Random.Range(0, possibleMapScenes.Length);
+
+        // Retrieve the randomly selected scene name
+        string selectedSceneName = possibleMapScenes[randomIndex];
+
+        // Load the chosen scene
+        SceneManager.LoadScene(selectedSceneName);
     }
 
     private void LoadMainMenu()
