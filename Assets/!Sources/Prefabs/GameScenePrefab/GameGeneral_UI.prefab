@@ -23102,7 +23102,7 @@ GameObject:
   - component: {fileID: 6195073318631294649}
   - component: {fileID: 2706757283670655249}
   m_Layer: 5
-  m_Name: HelpPanel4 (Items + Tile)
+  m_Name: HelpPanel5 (Items + Tile)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
