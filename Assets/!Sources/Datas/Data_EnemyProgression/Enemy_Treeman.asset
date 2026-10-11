@@ -27,7 +27,7 @@ MonoBehaviour:
   - dayNumber: 4
     combatStats:
       maxHp: 20
-      attackDamage: 6
+      attackDamage: 5
       attackSpeed: 1
       attackVariance: 3
       defense: 0
@@ -37,7 +37,7 @@ MonoBehaviour:
   - dayNumber: 7
     combatStats:
       maxHp: 22
-      attackDamage: 8
+      attackDamage: 6
       attackSpeed: 2
       attackVariance: 3
       defense: 0

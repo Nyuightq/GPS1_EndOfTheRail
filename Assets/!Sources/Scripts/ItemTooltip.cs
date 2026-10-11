@@ -103,8 +103,12 @@ public class ItemTooltip : MonoBehaviour
         Debug.Log($"<color=cyan>Effects count: {(_currentItem.itemData.effects != null ? _currentItem.itemData.effects.Length : 0)}</color>");
 
         // Set item name with styling
-       // itemNameText.text = $"<size=110%><b>{_currentItem.itemData.itemName}</b></size>";
-        itemNameText.text =$"<size=110%><b>{_currentItem.itemData.itemName}</b></size> " + $"<size=90%>Lv {_currentItem.level}</size>";
+        itemNameText.text = $"<size=110%><b>{_currentItem.itemData.itemName}</b></size>";
+        // If mandatory item, no level shown.
+        if (_currentItem.itemData.mandatoryItem == false)
+        {
+            itemNameText.text = $"<size=110%><b>{_currentItem.itemData.itemName}</b></size> " + $"<size=90%>Lv {_currentItem.level}</size>";
+        }
 
         //if you use descriptions instead
         if (_currentItem.itemData.useItemDescription)

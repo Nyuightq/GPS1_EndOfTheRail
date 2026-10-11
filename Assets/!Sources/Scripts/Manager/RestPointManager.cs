@@ -156,8 +156,8 @@ public class RestPointManager : MonoBehaviour
         bool hasEnoughScraps = playerStatusManager.Scraps >= scrapCost;
         
         string description = hasEnoughScraps 
-            ? $"Heal {healAmount} HP for {scrapCost} scraps?\nCurrent HP: {playerStatusManager.Hp}/{playerStatusManager.MaxHp}\nCurrent Scraps: {playerStatusManager.Scraps}"
-            : $"Not enough scraps!\nNeed: {scrapCost}\nHave: {playerStatusManager.Scraps}";
+            ? $"Consume {scrapCost} scraps to heal {healAmount} Train HP?"
+            : $"Not enough scraps!\nNeed {scrapCost} scraps to heal!";
 
         ShowConfirmPanel(description, hasEnoughScraps);
     }
