@@ -184,5 +184,45 @@ public enum InputType
         return false;
     }
 }
+
+// LEVEL UP KL YSAAC GARBAGE CODE
+[System.Serializable]
+public class NotAdjacentCondition : Conditions
+{
+    [SerializeField] bool specificAdjacentItem;
+    [SerializeField] ItemSO requiredAdjacentItem;
+
+    public NotAdjacentCondition(bool specificAdjacentItem, ItemSO requiredAdjacentItem) : base()
+    {
+        this.specificAdjacentItem = specificAdjacentItem;
+        this.requiredAdjacentItem = requiredAdjacentItem;
+    }
+
+    public override Conditions clone()
+    {
+        return new NotAdjacentCondition(specificAdjacentItem, requiredAdjacentItem);
+    }
+
+    public override bool check()
+    {
+        if (owner is Item item && item != null && item.gameObject != null)
+        {
+            List<GameObject> adjacentList = GameManager.instance.inventoryScript.GetAdjacentComponents(Vector2Int.FloorToInt(item.GetComponent<ItemDragManager>().topLeftCellPos), item.itemShape, item.gameObject);
+            if (specificAdjacentItem)
+            {
+                foreach (GameObject adjacent in adjacentList)
+                {
+                    if (adjacent.GetComponent<Item>().itemData == requiredAdjacentItem) return false;
+                }
+                return true;
+            }
+            else
+            {
+                if (adjacentList.Count == 0) return true; else return false;
+            }
+        }
+        return false;
+    }
+}
 #endregion
 

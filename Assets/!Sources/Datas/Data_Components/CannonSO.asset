@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemSprite: {fileID: 21300000, guid: c4cf5474f8f00ca4e95f490d6029b496, type: 3}
   itemName: Cannon
+  useItemDescription: 0
   itemDescription: xxx
   mandatoryItem: 0
   itemWidth: 3
   itemHeight: 2
   effects:
   - rid: 3736806105115263048
-  itemEffectPrefab: {fileID: 0}
   itemShape:
   - filled: 1
   - filled: 1
@@ -37,10 +37,12 @@ MonoBehaviour:
         trigger: 0
         triggerOnConditionOnce: 0
         conditions: []
+        conditionMetSprite: {fileID: 0}
         weaponName: Cannon
         baseAttackDamage: 8
         baseAttackSpeed: 3
         baseAttackVariance: 1
+        baseAttackCount: 1
         weaponSprite: {fileID: 0}
         animationClip: {fileID: 11400000, guid: c4bb63be47326d8468413196d4a00ba2, type: 2}
         attackSfxName: SFX_CannonAttack

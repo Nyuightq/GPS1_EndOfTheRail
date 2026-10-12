@@ -40,6 +40,7 @@ MonoBehaviour:
         baseAttackDamage: 4
         baseAttackSpeed: 5
         baseAttackVariance: 2
+        baseAttackCount: 1
         weaponSprite: {fileID: 0}
         animationClip: {fileID: 11400000, guid: 483be9dd426cc144e87b5d5eedd3ece3, type: 2}
         attackSfxName: SFX_TurretAttack

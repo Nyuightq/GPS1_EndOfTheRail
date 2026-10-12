@@ -45,10 +45,12 @@ public class CombatComponentEntity : CombatEntity
         _attackDamage = _weaponStats.AttackDamage;
         _attackSpeed = _weaponStats.AttackSpeed;
         _attackDamageVariance = _weaponStats.AttackVariance;
+        _attackCount = _weaponStats.AttackCount;
 
         Debug.Log($"<color=red>attackDamage : {_weaponStats.AttackDamage}</color>");
         Debug.Log($"<color=red>attackSpeed : {_weaponStats.AttackSpeed}</color>");
         Debug.Log($"<color=red>attackDamageVariance : {_weaponStats.AttackVariance}</color>");
+        Debug.Log($"<color=red>attackCount : {_weaponStats.AttackCount}</color>");
     }
 
     public override void Attack(CombatEntity target)
