@@ -239,6 +239,11 @@ public class TrainMovement : MonoBehaviour
                     {
                         deteriorator.OnTileMoved();
                     }
+
+                    foreach (GameObject item in GameManager.instance.inventoryScript.equippedItems)
+                    {
+                        item.GetComponent<Item>().TriggerEffectMove();
+                    }
                 }
 
                 transform.position = gridScript.snapToGrid(targetTile);

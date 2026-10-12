@@ -207337,6 +207337,22 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 5400548508822991153}
     - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: availableRewards.Array.size
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: 'availableRewards.Array.data[6]'
+      value: 
+      objectReference: {fileID: 11400000, guid: baf47f410da8f4b45a423ab75410dd82, type: 2}
+    - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: 'availableRewards.Array.data[7]'
+      value: 
+      objectReference: {fileID: 11400000, guid: baf47f410da8f4b45a423ab75410dd82, type: 2}
+    - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: 'availableRewards.Array.data[8]'
+      value: 
+      objectReference: {fileID: 11400000, guid: baf47f410da8f4b45a423ab75410dd82, type: 2}
+    - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: rewardSlots.Array.data[0].nameText
       value: 
       objectReference: {fileID: 1429620358171450863}

@@ -195,6 +195,13 @@ public class ItemTooltip : MonoBehaviour
             effectDesc.AppendLine($"<color=#FFA500><b>{FormatCamelCase(effectTypeName)}</b></color>");
         }
 
+        //THIS IS A YSAAC SPECIFIC ASS CODE
+        // Only display the trigger if it is OnMove
+        if (effect.trigger == triggers.OnMove)
+        {
+            effectDesc.AppendLine("<color=#FFFF88><b>Trigger: On Move</b></color>");
+        }
+
         // Add conditions if present
         if (effect.conditions != null && effect.conditions.Length > 0)
         {

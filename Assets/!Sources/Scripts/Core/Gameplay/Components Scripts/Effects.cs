@@ -79,7 +79,8 @@ public enum triggers
     OnBattleStart,
     OnBattleUpdate,
     OnBattleEnd,
-    OnDayStart
+    OnDayStart,
+    OnMove
 }
 #endregion
 
