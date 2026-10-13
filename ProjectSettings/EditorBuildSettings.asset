@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/!Sources/Scenes/YsaacGameplayLevel.unity
+    guid: 384ba530e12f68e48a310a140ba6fc6e
+  - enabled: 1
     path: Assets/!Sources/Scenes/MainMenu.unity
     guid: 11c8addfc836f1f4aa0a4e31da769e96
   - enabled: 1
