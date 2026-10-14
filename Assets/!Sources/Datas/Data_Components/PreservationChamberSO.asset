@@ -30,8 +30,8 @@ MonoBehaviour:
     - rid: 6451219851714232418
       type: {class: BuffStatEffect, ns: , asm: Assembly-CSharp}
       data:
-        trigger: 2
-        triggerOnConditionOnce: 0
+        trigger: 1
+        triggerOnConditionOnce: 1
         conditions:
         - rid: 6451219851714232419
         conditionMetSprite: {fileID: 21300000, guid: 8c0f6d1e78f2e4c4f8affdf76c4ed3dc, type: 3}
