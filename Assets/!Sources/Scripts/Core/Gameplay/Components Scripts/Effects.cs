@@ -486,7 +486,7 @@ public class AdjacentWeaponBoosterEffect : Effect
 
 //LEVEL UP CONTENT BY YSAAC TS SUCKS
 [System.Serializable]
-public class NoAdjacentComponentWeaponBoosterEffect : Effect
+public class AllWeaponBuffEffect : Effect
 {
     [SerializeField] private BuffableWeaponStats statType;
     [SerializeField] private InputType inputType;
@@ -495,7 +495,7 @@ public class NoAdjacentComponentWeaponBoosterEffect : Effect
     private Dictionary<WeaponStats, AdditionModifier<BuffableWeaponStats>>
         activeModifiers = new Dictionary<WeaponStats, AdditionModifier<BuffableWeaponStats>>();
 
-    public NoAdjacentComponentWeaponBoosterEffect(
+    public AllWeaponBuffEffect(
         triggers trigger,
         bool triggerOnConditionOnce,
         Conditions[] conditions,
@@ -512,7 +512,7 @@ public class NoAdjacentComponentWeaponBoosterEffect : Effect
 
     public override Effect clone()
     {
-        return new NoAdjacentComponentWeaponBoosterEffect(
+        return new AllWeaponBuffEffect(
             trigger,
             triggerOnConditionOnce,
             conditions,
@@ -532,22 +532,13 @@ public class NoAdjacentComponentWeaponBoosterEffect : Effect
 
         var inventory = GameManager.instance.inventoryScript;
 
-        // Check for adjacent components.
-        List<GameObject> adjacentComponents = inventory.GetAdjacentComponents(
-            Vector2Int.FloorToInt(dragManager.topLeftCellPos),
-            item.itemShape,
-            item.gameObject
-        );
-
-        bool hasNoAdjacentComponents = adjacentComponents.Count == 0;
-
         // Remove all buffs if the booster is adjacent to another component.
-        if (!hasNoAdjacentComponents || !checkCondition())
+        if (!checkCondition())
         {
             RemoveAllModifiers();
 
-            if (conditionMetSprite != null)
-                item.changeSprite(item.itemData.itemSprite);
+            //if (conditionMetSprite != null)
+            //    item.changeSprite(item.itemData.itemSprite);
 
             return;
         }

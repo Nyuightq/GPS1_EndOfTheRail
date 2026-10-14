@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Reflection;
 using System.Text;
 using TMPro;
@@ -21,6 +23,12 @@ public class ItemTooltip : MonoBehaviour
     private Item _currentItem;
     private Canvas canvas;
     private Canvas tooltipCanvas;
+
+    string TooltipColorBuff = "#77FF77";
+    string TooltipColorWeaponBuff = "#FFAAFF";
+    string TooltipColorCondition = "#AAAAFF";
+    string ToolTipColorHealing = "#6dba79";
+
 
     private void Awake()
     {
@@ -195,9 +203,9 @@ public class ItemTooltip : MonoBehaviour
         {
             effectDesc.Append(GetAdjacentBoosterDescription(boosterEffect));
         }
-        else if (effect is NoAdjacentComponentWeaponBoosterEffect noBoosterEffect)
+        else if (effect is AllWeaponBuffEffect allBoosterEffect)
         {
-            effectDesc.Append(GetNoAdjacentComponentWeaponBoosterEffectDescription(noBoosterEffect));
+            effectDesc.Append(GetAllWeaponBuffEffectDescription(allBoosterEffect));
         }
         else
         {
@@ -326,12 +334,12 @@ public class ItemTooltip : MonoBehaviour
             if (inputType == InputType.percentage)
             {
                 float actualHeal = healAmount * _currentItem.level;
-                desc.AppendLine($"<color=#77FF77><b>Heal: {actualHeal}% Max HP</b></color>");
+                desc.AppendLine($"<color={ToolTipColorHealing}><b>Heal: {actualHeal}% Max HP</b></color>");
             }
             else
             {
                 int actualHeal = Mathf.FloorToInt(healAmount * _currentItem.level);
-                desc.AppendLine($"<color=#77FF77><b>Heal: +{actualHeal} HP</b></color>");
+                desc.AppendLine($"<color={ToolTipColorHealing}><b>Heal: +{actualHeal} HP</b></color>");
             }
         }
 
@@ -345,10 +353,10 @@ public class ItemTooltip : MonoBehaviour
         return desc.ToString();
     }
 
+
     /// <summary>
-    /// Gets description for BuffStatEffect using reflection
+    /// Helper function for other stat buff descriptions
     /// </summary>
-    
     private string GetStatBuffDesc(Effect effect, string color)
     {
         Type effectType = effect.GetType();
@@ -363,6 +371,13 @@ public class ItemTooltip : MonoBehaviour
         {
             object statValue = statTypeField.GetValue(effect);
             if (statValue != null) statName = FormatCamelCase(statValue.ToString());
+
+            switch(statName)
+            {
+                case "Tile Per Crystal Damage":
+                    statName = "Crystal Endurance";
+                    break;
+            }
         }
 
         if (buffAmountField != null)
@@ -395,51 +410,16 @@ public class ItemTooltip : MonoBehaviour
         return "";
     }
 
+    /// <summary>
+    /// Gets description for BuffStatEffect using reflection
+    /// </summary>
     private string GetBuffStatDescription(BuffStatEffect effect)
     {
         StringBuilder desc = new StringBuilder();
         Type effectType = effect.GetType();
 
-        var inputTypeField = effectType.GetField("inputType", 
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var buffAmountField = effectType.GetField("buffAmount", 
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var statTypeField = effectType.GetField("statType", 
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-        string statName = "Stat";
-        if (statTypeField != null)
-        {
-            object statValue = statTypeField.GetValue(effect);
-            if (statValue != null)
-                statName = FormatCamelCase(statValue.ToString());
-        }
-
-        if (buffAmountField != null)
-        {
-            float buffAmount = Convert.ToSingle(buffAmountField.GetValue(effect) ?? 0f);
-            InputType inputType = InputType.flat;
-            
-            if (inputTypeField != null)
-            {
-                inputType = (InputType)(inputTypeField.GetValue(effect) ?? InputType.flat);
-            }
-
-            if (inputType == InputType.percentage)
-            {
-                float actualBuff = buffAmount * _currentItem.level;
-                string sign = actualBuff > 0 ? "+" : "";
-                string color = actualBuff > 0 ? "#77FF77" : "#FF7777";
-                desc.AppendLine($"<color={color}><b>{statName}: {sign}{actualBuff}%</b></color>");
-            }
-            else
-            {
-                int actualBuff = Mathf.FloorToInt(buffAmount * _currentItem.level);
-                string sign = actualBuff > 0 ? "+" : "";
-                string color = actualBuff > 0 ? "#77FF77" : "#FF7777";
-                desc.AppendLine($"<color={color}><b>{statName}: {sign}{actualBuff}</b></color>");
-            }
-        }
+        string buff = GetStatBuffDesc(effect, TooltipColorBuff);
+        desc.AppendLine(buff);
 
         return desc.ToString();
     }
@@ -452,93 +432,24 @@ public class ItemTooltip : MonoBehaviour
         StringBuilder desc = new StringBuilder();
         Type effectType = effect.GetType();
 
-        desc.AppendLine("<color=#FF88FF><b>Adjacent Weapons Get</b></color>");
+        desc.AppendLine("<color=#FF88FF><b>Adjacent Weapons</b> Get</color>");
 
-        var statTypeField = effectType.GetField("statType", 
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var inputTypeField = effectType.GetField("inputType", 
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var buffAmountField = effectType.GetField("buffAmount", 
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-        string statName = "Stat";
-        if (statTypeField != null)
-        {
-            object statValue = statTypeField.GetValue(effect);
-            if (statValue != null)
-                statName = FormatCamelCase(statValue.ToString());
-        }
-
-        if (buffAmountField != null)
-        {
-            int buffAmount = Convert.ToInt32(buffAmountField.GetValue(effect) ?? 0);
-            InputType inputType = InputType.flat;
-            
-            if (inputTypeField != null)
-            {
-                inputType = (InputType)(inputTypeField.GetValue(effect) ?? InputType.flat);
-            }
-
-            int actualBuff = buffAmount * _currentItem.level;
-            string sign = actualBuff > 0 ? "+" : "";
-            
-            if (inputType == InputType.percentage)
-            {
-                desc.AppendLine($"<color=#FFAAFF> {statName}: {sign}{actualBuff}%</color>");
-            }
-            else
-            {
-                desc.AppendLine($"<color=#FFAAFF> {statName}: {sign}{actualBuff}</color>");
-            }
-        }
+        string buff = GetStatBuffDesc(effect, TooltipColorBuff);
+        desc.AppendLine(" " + buff);
 
         return desc.ToString();
     }
 
-    private string GetNoAdjacentComponentWeaponBoosterEffectDescription(NoAdjacentComponentWeaponBoosterEffect effect)
+    private string GetAllWeaponBuffEffectDescription(AllWeaponBuffEffect effect)
     {
         StringBuilder desc = new StringBuilder();
         Type effectType = effect.GetType();
 
-        desc.AppendLine("<color=#FF88FF><b>When Not Adjacent To Any Item\nAll Weapons Get</b></color>");
+        //desc.AppendLine("<color=#FF88FF><b>When Not Adjacent To Any Item\nAll Weapons Get</b></color>");
+        desc.AppendLine("<color=#FF88FF><b>All Weapons Get</b></color>");
 
-        var statTypeField = effectType.GetField("statType",
-           System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var inputTypeField = effectType.GetField("inputType",
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var buffAmountField = effectType.GetField("buffAmount",
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-        string statName = "Stat";
-        if (statTypeField != null)
-        {
-            object statValue = statTypeField.GetValue(effect);
-            if (statValue != null)
-                statName = FormatCamelCase(statValue.ToString());
-        }
-
-        if (buffAmountField != null)
-        {
-            int buffAmount = Convert.ToInt32(buffAmountField.GetValue(effect) ?? 0);
-            InputType inputType = InputType.flat;
-
-            if (inputTypeField != null)
-            {
-                inputType = (InputType)(inputTypeField.GetValue(effect) ?? InputType.flat);
-            }
-
-            int actualBuff = buffAmount * _currentItem.level;
-            string sign = actualBuff > 0 ? "+" : "";
-
-            if (inputType == InputType.percentage)
-            {
-                desc.AppendLine($"<color=#FFAAFF> {statName}: {sign}{actualBuff}%</color>");
-            }
-            else
-            {
-                desc.AppendLine($"<color=#FFAAFF> {statName}: {sign}{actualBuff}</color>");
-            }
-        }
+        string buff = GetStatBuffDesc(effect, TooltipColorBuff);
+        desc.AppendLine(" " + buff);
 
         return desc.ToString();
     }
@@ -559,7 +470,7 @@ public class ItemTooltip : MonoBehaviour
             {
                 string singleCondDesc = GetConditionDescription(condition);
                 if (!string.IsNullOrEmpty(singleCondDesc))
-                    condDesc.AppendLine($"  • {singleCondDesc}");
+                    condDesc.AppendLine($"{singleCondDesc}");
             }
         }
 
@@ -582,17 +493,15 @@ public class ItemTooltip : MonoBehaviour
 
         StringBuilder condDesc = new StringBuilder();
 
+        BindingFlags flags = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+
         // Handle specific condition types
         if (condition is LessThanEqualCondition || condition is MoreThanEqualCondition || condition is EqualCondition)
         {
-            var valueTypeField = conditionType.GetField("valueType", 
-                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var thresholdField = conditionType.GetField("threshold", 
-                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var comparedValueField = conditionType.GetField("comparedValue", 
-                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var maxValueTypeField = conditionType.GetField("maxValueType", 
-                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var valueTypeField = conditionType.GetField("valueType", flags);
+            var thresholdField = conditionType.GetField("threshold", flags);
+            var comparedValueField = conditionType.GetField("comparedValue", flags);
+            var maxValueTypeField = conditionType.GetField("maxValueType", flags);
 
             string valueTypeName = "Value";
             if (valueTypeField != null)
@@ -612,9 +521,9 @@ public class ItemTooltip : MonoBehaviour
             }
 
             string comparisonOperator = "";
-            if (condition is LessThanEqualCondition) comparisonOperator = "<";
-            else if (condition is MoreThanEqualCondition) comparisonOperator = ">";
-            else if (condition is EqualCondition) comparisonOperator = "=";
+            if (condition is LessThanEqualCondition) comparisonOperator = "less than";
+            else if (condition is MoreThanEqualCondition) comparisonOperator = "more than";
+            else if (condition is EqualCondition) comparisonOperator = "equals"; 
 
             if (threshold <= 1f)
             {
@@ -624,11 +533,12 @@ public class ItemTooltip : MonoBehaviour
                     object maxVal = maxValueTypeField.GetValue(condition);
                     if (maxVal != null) maxValueTypeName = FormatCamelCase(maxVal.ToString());
                 }
-                condDesc.Append($"<color=#88AAFF>{valueTypeName} {comparisonOperator} {threshold * 100}% {maxValueTypeName}</color>");
+                condDesc.Append($"<color=#88AAFF>When <b>{valueTypeName} {comparisonOperator} {threshold * 100}% {maxValueTypeName}</b></color>");
             }
             else
             {
-                condDesc.Append($"<color=#88AAFF>{valueTypeName} {comparisonOperator} {threshold}</color>");
+                condDesc.Append($"<color={TooltipColorWeaponBuff}F>When <b>{valueTypeName} {comparisonOperator} {threshold}</b></color>");
+                
             }
         }
         else if (condition is AdjacentCondition)
@@ -649,16 +559,43 @@ public class ItemTooltip : MonoBehaviour
                 ItemSO requiredItem = requiredAdjacentField.GetValue(condition) as ItemSO;
                 if (requiredItem != null)
                 {
-                    condDesc.Append($"<color=#88AAFF>Adjacent to: {requiredItem.itemName}</color>");
+                    condDesc.Append($"<color=#88AAFF>When <b>Adjacent</b> to <b>{requiredItem.itemName}</b></color>");
                 }
                 else
                 {
-                    condDesc.Append("<color=#88AAFF>Adjacent to specific item</color>");
+                    condDesc.Append("<color=#88AAFF>When <b>Adjacent</b> to specific item</color>");
                 }
             }
             else
             {
-                condDesc.Append("<color=#88AAFF>Has adjacent items</color>");
+                condDesc.Append("<color=#88AAFF>has <b>Adjacent</b> items</color>");
+            }
+        }
+        else if (condition is NotAdjacentCondition)
+        {
+            var specificAdjacentField = conditionType.GetField("specificAdjacentItem", flags);
+            var requiredAdjacentField = conditionType.GetField("requiredAdjacentItem", flags);
+
+            bool specificAdjacent = false;
+            if(specificAdjacentField != null)
+            {
+                specificAdjacent = Convert.ToBoolean(specificAdjacentField.GetValue(condition) ?? false);
+            }
+            if (specificAdjacent && requiredAdjacentField != null)
+            {
+                ItemSO requiredItem = requiredAdjacentField.GetValue(condition) as ItemSO;
+                if (requiredItem != null)
+                {
+                    condDesc.Append($"<color=#88AAFF>When <b>Not</b> <b>Adjacent</b> to <b>{requiredItem.itemName}</b></color>");
+                }
+                else
+                {
+                    condDesc.Append("<color=#88AAFF><b>Adjacent</b> specific item</color>");
+                }
+            }
+            else
+            {
+                condDesc.Append("<color=#88AAFF>When <b>Not </b> <b>Adjacent</b> to <b>Any Item</b></color>");
             }
         }
         else
@@ -668,7 +605,7 @@ public class ItemTooltip : MonoBehaviour
 
             // Try to get all public fields
             var fields = conditionType.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-            
+
             if (fields.Length > 0)
             {
                 condDesc.Append(": ");

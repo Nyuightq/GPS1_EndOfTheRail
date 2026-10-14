@@ -17,6 +17,7 @@ public class CameraMovementTemp : MonoBehaviour
     [SerializeField] private float sprintMultiplier = 2f;
     [SerializeField] private float followSmoothSpeed = 5f;
     [SerializeField] private float focusSmoothSpeed = 8f; // Speed for focusing on stationary target
+    [SerializeField] private int mouseMoveSpeed = 45;
 
     [Header("Follow Target Settings")]
     [Tooltip("Optional, Manually assign target.")]
@@ -58,6 +59,8 @@ public class CameraMovementTemp : MonoBehaviour
     private InputAction moveAction;
     private InputAction sprintAction;
     private bool isSprinting = false;
+
+    private Vector2 camVelocity = Vector2.zero;
 
     void Awake()
     {
@@ -260,20 +263,33 @@ public class CameraMovementTemp : MonoBehaviour
         moveDirection = new Vector3(moveX, moveY, 0f).normalized;
         if (GameStateManager.Instance != null && GameStateManager.Instance.IsPausing) 
             moveDirection = new Vector3(0f, 0f, 0f).normalized;
-        
+
+        float currentSpeed = isSprinting ? moveSpeed * sprintMultiplier : moveSpeed;
+        Vector2 keyboardVelocity = moveDirection * currentSpeed;
+        camVelocity = keyboardVelocity;
+
+        if (Mouse.current.middleButton.isPressed)
+        {
+            moveDirection = -(Mouse.current.delta.ReadValue().normalized);
+            Vector2 mouseVelocity = moveDirection * mouseMoveSpeed;
+            camVelocity = mouseVelocity;
+        }
+
         // Stop focusing if player manually moves camera
         if (moveDirection != Vector3.zero)
         {
             _isFocusing = false;
         }
+
     }
 
     private void MoveCamera()
     {
         if (!_isFocusing) // Only apply manual movement when not focusing
         {
-            float currentSpeed = isSprinting ? moveSpeed * sprintMultiplier : moveSpeed;
-            Vector3 newPos = transform.position + moveDirection * currentSpeed * Time.deltaTime;
+            
+
+            Vector3 newPos = Vector3.Lerp(transform.position,transform.position + (Vector3)camVelocity * Time.deltaTime, 0.5f);
             transform.position = ClampPosition(newPos);
         }
     }
