@@ -38,8 +38,8 @@ MonoBehaviour:
         - rid: 4411406970640662529
         conditionMetSprite: {fileID: 21300000, guid: 8b7a4b2f912846e41a994bbf8635e38c, type: 3}
         statType: 1
-        inputType: 0
-        buffAmount: 30
+        inputType: 1
+        buffAmount: 1
     - rid: 4411406970640662529
       type: {class: AdjacentCondition, ns: , asm: Assembly-CSharp}
       data:
