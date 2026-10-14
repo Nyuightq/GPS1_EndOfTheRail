@@ -210850,7 +210850,7 @@ PrefabInstance:
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: 'startingItems.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: 2c956f6cc3ca1a9469d9bf97231581b0, type: 2}
+      objectReference: {fileID: 11400000, guid: 8954b3060434ee741aaad485af64b021, type: 2}
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: 'startingItems.Array.data[1]'
       value: 
@@ -210858,7 +210858,7 @@ PrefabInstance:
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: 'startingItems.Array.data[2]'
       value: 
-      objectReference: {fileID: 11400000, guid: 2c956f6cc3ca1a9469d9bf97231581b0, type: 2}
+      objectReference: {fileID: 11400000, guid: 8954b3060434ee741aaad485af64b021, type: 2}
     - target: {fileID: 8796015745757621625, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: 'startingItems.Array.data[3]'
       value: 
@@ -211426,6 +211426,30 @@ PrefabInstance:
       propertyPath: rewardContainer
       value: 
       objectReference: {fileID: 5400548508822991153}
+    - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: availableRewards.Array.size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: 'availableRewards.Array.data[6]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 2c956f6cc3ca1a9469d9bf97231581b0, type: 2}
+    - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: 'availableRewards.Array.data[7]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 2c956f6cc3ca1a9469d9bf97231581b0, type: 2}
+    - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: 'availableRewards.Array.data[8]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 93c80f1e8b624c247b45a87254dc271d, type: 2}
+    - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: 'availableRewards.Array.data[9]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 93c80f1e8b624c247b45a87254dc271d, type: 2}
+    - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: 'availableRewards.Array.data[10]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 93c80f1e8b624c247b45a87254dc271d, type: 2}
     - target: {fileID: 151022957440275722, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: rewardSlots.Array.data[0].nameText
       value: 

@@ -11,15 +11,16 @@ using UnityEngine;
 #region Weapon data/stats 
 public class WeaponStats
 {
-    private int baseAttackDamage, baseAttackSpeed, baseAttackVariance;
+    private int baseAttackDamage, baseAttackSpeed, baseAttackVariance, baseAttackCount;
     private Item item;
     public StatsMediator<BuffableWeaponStats> weaponMediator = new StatsMediator<BuffableWeaponStats>();
-    public WeaponStats(Item item, int baseAttackDamage, int baseAttackSpeed, int baseAttackVariance)
+    public WeaponStats(Item item, int baseAttackDamage, int baseAttackSpeed, int baseAttackVariance, int baseAttackCount = 1)
     {
         this.item = item;
         this.baseAttackDamage = baseAttackDamage;
         this.baseAttackSpeed = baseAttackSpeed;
         this.baseAttackVariance = baseAttackVariance;
+        this.baseAttackCount = baseAttackCount;
     }
 
     public int AttackDamage
@@ -37,7 +38,12 @@ public class WeaponStats
         {
             var q = new Query<BuffableWeaponStats>(BuffableWeaponStats.AttackSpeed, baseAttackSpeed);
             weaponMediator.PerformQuery(this, q);
-            return Mathf.FloorToInt(q.value);
+            return Mathf.Min(Mathf.FloorToInt(q.value), 9); 
+            // weird hardcoded value here, due to attackSpeed should not be >= 10
+            // CombatEntity.cs:
+            //      public static int COMBAT_MAX_SPEED = 10;
+            //      public static float COMBAT_BASIC_INTERVAL = 2.6f;
+            //      private float _attackTakenTime => COMBAT_BASIC_INTERVAL - (COMBAT_BASIC_INTERVAL / COMBAT_MAX_SPEED) * _attackSpeed;
         }
     }
     public int AttackVariance
@@ -45,6 +51,16 @@ public class WeaponStats
         get
         {
             var q = new Query<BuffableWeaponStats>(BuffableWeaponStats.AttackVariance, baseAttackVariance);
+            weaponMediator.PerformQuery(this, q);
+            return Mathf.FloorToInt(q.value);
+        }
+    }
+
+    public int AttackCount
+    {
+        get
+        {
+            var q = new Query<BuffableWeaponStats>(BuffableWeaponStats.AttackCount, baseAttackCount);
             weaponMediator.PerformQuery(this, q);
             return Mathf.FloorToInt(q.value);
         }
@@ -68,7 +84,8 @@ public enum BuffableWeaponStats
 {
     AttackDamage,
     AttackSpeed,
-    AttackVariance
+    AttackVariance,
+    AttackCount
 }
 
 public enum triggers
@@ -79,7 +96,8 @@ public enum triggers
     OnBattleStart,
     OnBattleUpdate,
     OnBattleEnd,
-    OnDayStart
+    OnDayStart,
+    OnMove
 }
 #endregion
 
@@ -312,6 +330,7 @@ public class WeaponSpawnEffect : Effect
     [SerializeField] private int baseAttackDamage;
     [SerializeField] private int baseAttackSpeed;
     [SerializeField] private int baseAttackVariance;
+    [SerializeField] private int baseAttackCount = 1;
     [SerializeField] private Sprite weaponSprite;
     [SerializeField] private CombatAnimationClip animationClip;
     [SerializeField] private string attackSfxName;
@@ -323,19 +342,20 @@ public class WeaponSpawnEffect : Effect
         {
             if (_weaponStats == null && owner is Item item)
             {
-                _weaponStats = new WeaponStats(item, baseAttackDamage, baseAttackSpeed, baseAttackVariance);
+                _weaponStats = new WeaponStats(item, baseAttackDamage, baseAttackSpeed, baseAttackVariance, baseAttackCount);
             }
             return _weaponStats;
         }
         set => _weaponStats = value;
     }
 
-    public WeaponSpawnEffect(triggers trigger, bool triggerOnConditionOnce, Conditions[] conditions, Sprite conditionMetSprite, string weaponName, int baseAttackDamage, int baseAttackSpeed, int baseAttackVariance, Sprite weaponSprite, CombatAnimationClip animationClip, string attackSfxName) : base(trigger, triggerOnConditionOnce, conditions, conditionMetSprite)
+    public WeaponSpawnEffect(triggers trigger, bool triggerOnConditionOnce, Conditions[] conditions, Sprite conditionMetSprite, string weaponName, int baseAttackDamage, int baseAttackSpeed, int baseAttackVariance, int baseAttackCount , Sprite weaponSprite, CombatAnimationClip animationClip, string attackSfxName) : base(trigger, triggerOnConditionOnce, conditions, conditionMetSprite)
     {
         this.weaponName = weaponName;
         this.baseAttackDamage = baseAttackDamage;
         this.baseAttackSpeed = baseAttackSpeed;
         this.baseAttackVariance = baseAttackVariance;
+        this.baseAttackCount = baseAttackCount;
         this.weaponSprite = weaponSprite;
         this.animationClip = animationClip;
         this.attackSfxName = attackSfxName;
@@ -343,7 +363,7 @@ public class WeaponSpawnEffect : Effect
 
     public override Effect clone()
     {
-        return new WeaponSpawnEffect(trigger, triggerOnConditionOnce, conditions, conditionMetSprite, weaponName, baseAttackDamage, baseAttackSpeed, baseAttackVariance, weaponSprite, animationClip, attackSfxName);
+        return new WeaponSpawnEffect(trigger, triggerOnConditionOnce, conditions, conditionMetSprite, weaponName, baseAttackDamage, baseAttackSpeed, baseAttackVariance, baseAttackCount, weaponSprite, animationClip, attackSfxName);
     }
 
     public CombatComponentData OnPrepareBattleComponent()
@@ -466,6 +486,147 @@ public class AdjacentWeaponBoosterEffect : Effect
             mod.Dispose();
         }
         activeModifiers.Clear();
+    }
+}
+
+//LEVEL UP CONTENT BY YSAAC TS SUCKS
+[System.Serializable]
+public class AllWeaponBuffEffect : Effect
+{
+    [SerializeField] private BuffableWeaponStats statType;
+    [SerializeField] private InputType inputType;
+    [SerializeField] private int buffAmount;
+
+    private Dictionary<WeaponStats, AdditionModifier<BuffableWeaponStats>>
+        activeModifiers = new Dictionary<WeaponStats, AdditionModifier<BuffableWeaponStats>>();
+
+    public AllWeaponBuffEffect(
+        triggers trigger,
+        bool triggerOnConditionOnce,
+        Conditions[] conditions,
+        Sprite conditionMetSprite,
+        BuffableWeaponStats statType,
+        InputType inputType,
+        int buffAmount
+    ) : base(trigger, triggerOnConditionOnce, conditions, conditionMetSprite)
+    {
+        this.statType = statType;
+        this.inputType = inputType;
+        this.buffAmount = buffAmount;
+    }
+
+    public override Effect clone()
+    {
+        return new AllWeaponBuffEffect(
+            trigger,
+            triggerOnConditionOnce,
+            conditions,
+            conditionMetSprite,
+            statType,
+            inputType,
+            buffAmount
+        );
+    }
+
+    public override void apply()
+    {
+        if (owner is not Item item) return;
+
+        ItemDragManager dragManager = item.GetComponent<ItemDragManager>();
+        if (dragManager == null) return;
+
+        var inventory = GameManager.instance.inventoryScript;
+
+        // Remove all buffs if the booster is adjacent to another component.
+        if (!checkCondition())
+        {
+            RemoveAllModifiers();
+
+            //if (conditionMetSprite != null)
+            //    item.changeSprite(item.itemData.itemSprite);
+
+            return;
+        }
+
+        // Track weapons currently equipped.
+        HashSet<WeaponStats> currentWeapons = new HashSet<WeaponStats>();
+
+        foreach (GameObject equippedItem in inventory.equippedItems)
+        {
+            if (equippedItem == null) continue;
+
+            Item equippedItemData = equippedItem.GetComponent<Item>();
+            if (equippedItemData == null || equippedItemData.effects == null)
+                continue;
+
+            foreach (WeaponSpawnEffect weaponEffect in
+                equippedItemData.effects.OfType<WeaponSpawnEffect>())
+            {
+                WeaponStats weaponStats = weaponEffect.weaponStats;
+                if (weaponStats == null) continue;
+
+                currentWeapons.Add(weaponStats);
+
+                // Don't apply the same modifier twice.
+                if (activeModifiers.ContainsKey(weaponStats))
+                    continue;
+
+                float finalBuffAmount = buffAmount * item.level;
+
+                AdditionModifier<BuffableWeaponStats> mod = null;
+
+                switch (inputType)
+                {
+                    case InputType.percentage:
+                        mod = new AdditionModifier<BuffableWeaponStats>(
+                            statType,
+                            finalBuffAmount,
+                            AdditionModifier<BuffableWeaponStats>.AdditionType.percentage
+                        );
+                        break;
+
+                    case InputType.flat:
+                        mod = new AdditionModifier<BuffableWeaponStats>(
+                            statType,
+                            finalBuffAmount,
+                            AdditionModifier<BuffableWeaponStats>.AdditionType.flat
+                        );
+                        break;
+                }
+
+                if (mod != null)
+                {
+                    weaponStats.weaponMediator.AddModifier(mod);
+                    activeModifiers.Add(weaponStats, mod);
+                }
+            }
+        }
+
+        // Remove buffs from weapons that are no longer equipped.
+        List<WeaponStats> removedWeapons = activeModifiers.Keys
+            .Where(weapon => !currentWeapons.Contains(weapon))
+            .ToList();
+
+        foreach (WeaponStats weapon in removedWeapons)
+        {
+            activeModifiers[weapon].Dispose();
+            activeModifiers.Remove(weapon);
+        }
+    }
+
+    private void RemoveAllModifiers()
+    {
+        foreach (var mod in activeModifiers.Values)
+        {
+            mod.Dispose();
+        }
+
+        activeModifiers.Clear();
+    }
+
+    public override void remove()
+    {
+        RemoveAllModifiers();
     }
 }
 #endregion
