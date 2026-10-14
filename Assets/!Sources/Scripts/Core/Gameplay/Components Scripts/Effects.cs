@@ -38,7 +38,12 @@ public class WeaponStats
         {
             var q = new Query<BuffableWeaponStats>(BuffableWeaponStats.AttackSpeed, baseAttackSpeed);
             weaponMediator.PerformQuery(this, q);
-            return Mathf.FloorToInt(q.value);
+            return Mathf.Min(Mathf.FloorToInt(q.value), 9); 
+            // weird hardcoded value here, due to attackSpeed should not be >= 10
+            // CombatEntity.cs:
+            //      public static int COMBAT_MAX_SPEED = 10;
+            //      public static float COMBAT_BASIC_INTERVAL = 2.6f;
+            //      private float _attackTakenTime => COMBAT_BASIC_INTERVAL - (COMBAT_BASIC_INTERVAL / COMBAT_MAX_SPEED) * _attackSpeed;
         }
     }
     public int AttackVariance
