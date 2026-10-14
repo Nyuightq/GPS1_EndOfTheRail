@@ -490,51 +490,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &244803276
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 244803278}
-  - component: {fileID: 244803277}
-  m_Layer: 0
-  m_Name: Rail Build Tutorial UI
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &244803277
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 244803276}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be01d56fea8296b419abda9f3a22099e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  popUpPanel: {fileID: 612508012920358862}
---- !u!4 &244803278
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 244803276}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -6.8674045, y: 8.241926, z: 0.42350546}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &260551560 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 865337876675110432, guid: 054ad38d8249dec429272a81c6293258, type: 3}
@@ -103982,7 +103937,7 @@ PrefabInstance:
     - target: {fileID: 2545996976469770360, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 244803277}
+      objectReference: {fileID: 0}
     - target: {fileID: 2545996976469770360, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: OnButtonClicked
@@ -104748,6 +104703,7 @@ PrefabInstance:
     - {fileID: 7094106101616790462, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
     - {fileID: 6306126523627119080, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
     - {fileID: 4807119033286472477, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+    - {fileID: 9025940656647184408, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
@@ -104778,11 +104734,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &612508012920358862 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 9025940656647184408, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
-  m_PrefabInstance: {fileID: 612508012920358858}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &612508012920358863 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8582033390931825630, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
@@ -105253,6 +105204,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8357573535980051196}
     - target: {fileID: 865337876675110432, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: availableItems.Array.size
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 865337876675110432, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: availableItems.Array.data[0].cost
       value: 17
       objectReference: {fileID: 0}
@@ -105277,9 +105232,33 @@ PrefabInstance:
       value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 865337876675110432, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: availableItems.Array.data[6].cost
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 865337876675110432, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: availableItems.Array.data[7].cost
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 865337876675110432, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: availableItems.Array.data[8].cost
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 865337876675110432, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: availableItems.Array.data[5].itemSO
       value: 
       objectReference: {fileID: 11400000, guid: 2c956f6cc3ca1a9469d9bf97231581b0, type: 2}
+    - target: {fileID: 865337876675110432, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: availableItems.Array.data[6].itemSO
+      value: 
+      objectReference: {fileID: 11400000, guid: 01e884e83163c034cad7ffa54a5f22a3, type: 2}
+    - target: {fileID: 865337876675110432, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: availableItems.Array.data[7].itemSO
+      value: 
+      objectReference: {fileID: 11400000, guid: 8954b3060434ee741aaad485af64b021, type: 2}
+    - target: {fileID: 865337876675110432, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: availableItems.Array.data[8].itemSO
+      value: 
+      objectReference: {fileID: 11400000, guid: baf47f410da8f4b45a423ab75410dd82, type: 2}
     - target: {fileID: 865337876675110432, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: transactionSlots.Array.data[0].costText
       value: 
@@ -106017,4 +105996,3 @@ SceneRoots:
   - {fileID: 1938301661}
   - {fileID: 1090403271742546959}
   - {fileID: 125124231}
-  - {fileID: 244803278}

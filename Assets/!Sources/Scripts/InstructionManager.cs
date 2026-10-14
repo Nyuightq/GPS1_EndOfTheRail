@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class InstructionManager : MonoBehaviour
 {
@@ -10,6 +11,10 @@ public class InstructionManager : MonoBehaviour
 
     [Header("Narrative Panels")]
     [SerializeField] private GameObject[] narrativePanels;
+
+    [Header("Navigation Buttons")]
+    [SerializeField] private Button previousButton;
+    [SerializeField] private Button nextButton;
 
     [Header("Pixel Ball")]
     [SerializeField] private GameObject pixelBallIn;
@@ -32,58 +37,91 @@ public class InstructionManager : MonoBehaviour
         pixelBallInAnimator.Play("PixelBallInAnim", 0, 0f);
         pixelBallOut.SetActive(false);
 
-        // Hide all narrative panels except the first one
-        for (int i = 0; i < narrativePanels.Length; i++)
-        {
-            narrativePanels[i].SetActive(i == 0);
-        }
+        // Setup Navigation Buttons
+        if (previousButton != null)
+            previousButton.onClick.AddListener(OnPreviousButtonClicked);
+
+        if (nextButton != null)
+            nextButton.onClick.AddListener(OnNextButtonClicked);
 
         currentNarrativeIndex = 0;
+        ShowCurrentPanel();
+        UpdateButtonStates();
     }
 
-public void OnInstructionClick()
-{
-     if (hasClicked) return; //Prevent double click
-
-     // Play click audio
-     if (clickAudio != null)
-     clickAudio.Play();
-
-     // CASE 1: Last panel clicked → Do NOT hide it.
-    if (currentNarrativeIndex == narrativePanels.Length - 1)
+    public void OnPreviousButtonClicked()
     {
-        if (hasClicked) return; //Prevent double click
-        hasClicked = true;
+        if (hasClicked) return;
 
-        // Play click audio
         if (clickAudio != null)
-        clickAudio.Play();
+            clickAudio.Play();
 
-        // Keep last panel visible exactly like your previous script!
-
-        pixelBallOut.SetActive(true);
-        pixelBallOutAnimator.Play("PixelBallOutAnim", 0, 0f);
-
-        SoundManager.Instance.PlaySFX("SFX_StartNewGame");
-
-        StartCoroutine(TransitionToNextScene());
-        return;
+        if (currentNarrativeIndex > 0)
+        {
+            currentNarrativeIndex--;
+            ShowCurrentPanel();
+            UpdateButtonStates();
+        }
     }
 
-    // CASE 2: First panel special rule
-    if (currentNarrativeIndex == 0)
-        pixelBallIn.SetActive(false);
+    public void OnNextButtonClicked()
+    {
+        if (hasClicked) return; // Prevent clicking while transitioning to next scene
 
-    // Hide current panel
-    narrativePanels[currentNarrativeIndex].SetActive(false);
+        if (clickAudio != null)
+            clickAudio.Play();
 
-    // Move to next
-    currentNarrativeIndex++;
+        // CASE 1: Last panel clicked → Start game sequence
+        if (currentNarrativeIndex >= narrativePanels.Length - 1)
+        {
+            hasClicked = true;
 
-    // Show next panel
-    narrativePanels[currentNarrativeIndex].SetActive(true);
-}
+            pixelBallOut.SetActive(true);
+            pixelBallOutAnimator.Play("PixelBallOutAnim", 0, 0f);
 
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.PlaySFX("SFX_StartNewGame");
+
+            StartCoroutine(TransitionToNextScene());
+            return;
+        }
+
+        // Move to next
+        currentNarrativeIndex++;
+        ShowCurrentPanel();
+        UpdateButtonStates();
+    }
+
+    private void ShowCurrentPanel()
+    {
+        // Toggle Narrative Panels
+        for (int i = 0; i < narrativePanels.Length; i++)
+        {
+            if (narrativePanels[i] != null)
+                narrativePanels[i].SetActive(i == currentNarrativeIndex);
+        }
+
+        // CASE 2: First panel special rule
+        if (currentNarrativeIndex == 0)
+            pixelBallIn.SetActive(true);
+        else
+            pixelBallIn.SetActive(false);
+    }
+
+    private void UpdateButtonStates()
+    {
+        if (previousButton != null)
+            previousButton.interactable = currentNarrativeIndex > 0;
+
+        if (nextButton != null)
+        {
+            nextButton.interactable = true;
+
+            var buttonText = nextButton.GetComponentInChildren<Text>();
+            if (buttonText != null)
+                buttonText.text = currentNarrativeIndex >= narrativePanels.Length - 1 ? "Start" : "Next";
+        }
+    }
 
     private IEnumerator TransitionToNextScene()
     {
@@ -96,21 +134,24 @@ public void OnInstructionClick()
         }
 
         // --- RANDOMIZED MAP LOADING LOGIC ---
-
-        // Safety check to prevent errors if the array is empty in the Inspector
         if (possibleMapScenes == null || possibleMapScenes.Length == 0)
         {
             Debug.LogError("No maps assigned in the possibleMapScenes array! Please add scene names in the Inspector.");
             yield break;
         }
 
-        // Generate a random number between 0 and the array's length
         int randomIndex = Random.Range(0, possibleMapScenes.Length);
-
-        // Retrieve the randomly selected scene name
         string selectedSceneName = possibleMapScenes[randomIndex];
 
-        // Load the chosen scene
         SceneManager.LoadScene(selectedSceneName);
+    }
+
+    private void OnDestroy()
+    {
+        if (previousButton != null)
+            previousButton.onClick.RemoveListener(OnPreviousButtonClicked);
+
+        if (nextButton != null)
+            nextButton.onClick.RemoveListener(OnNextButtonClicked);
     }
 }

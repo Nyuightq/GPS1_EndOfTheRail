@@ -519,6 +519,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f3de200ed1fea48419bf05080c643993, type: 2}
   - {fileID: 11400000, guid: b210a5f8f71120044a4da9fc512b9cfb, type: 2}
   - {fileID: 11400000, guid: 2c956f6cc3ca1a9469d9bf97231581b0, type: 2}
+  - {fileID: 11400000, guid: 8954b3060434ee741aaad485af64b021, type: 2}
+  - {fileID: 11400000, guid: baf47f410da8f4b45a423ab75410dd82, type: 2}
+  - {fileID: 11400000, guid: 01e884e83163c034cad7ffa54a5f22a3, type: 2}
   rewardSlots:
   - itemSO: {fileID: 11400000, guid: de151c82ef045eb4eac3cca1d519370a, type: 2}
     anchorPoint: {fileID: 0}
@@ -718,6 +721,12 @@ MonoBehaviour:
     cost: 9
   - itemSO: {fileID: 11400000, guid: 2c956f6cc3ca1a9469d9bf97231581b0, type: 2}
     cost: 10
+  - itemSO: {fileID: 11400000, guid: 01e884e83163c034cad7ffa54a5f22a3, type: 2}
+    cost: 30
+  - itemSO: {fileID: 11400000, guid: 8954b3060434ee741aaad485af64b021, type: 2}
+    cost: 10
+  - itemSO: {fileID: 11400000, guid: baf47f410da8f4b45a423ab75410dd82, type: 2}
+    cost: 12
   transactionSlots:
   - itemSO: {fileID: 0}
     cost: 0
@@ -856,6 +865,7 @@ MonoBehaviour:
   loseTotalTilesText: {fileID: 0}
   mainMenuSceneName: MainMenu
   possibleMapScenes: []
+  selectedSceneName: 
   isGameOver: 0
 --- !u!1 &6461883088430099993
 GameObject:
