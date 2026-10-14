@@ -37,12 +37,18 @@ public class InstructionManager : MonoBehaviour
         pixelBallInAnimator.Play("PixelBallInAnim", 0, 0f);
         pixelBallOut.SetActive(false);
 
-        // Setup Navigation Buttons
+        // ALWAYS remove existing listeners before adding to prevent multi-firing
         if (previousButton != null)
+        {
+            previousButton.onClick.RemoveAllListeners();
             previousButton.onClick.AddListener(OnPreviousButtonClicked);
+        }
 
         if (nextButton != null)
+        {
+            nextButton.onClick.RemoveAllListeners();
             nextButton.onClick.AddListener(OnNextButtonClicked);
+        }
 
         currentNarrativeIndex = 0;
         ShowCurrentPanel();
@@ -66,6 +72,7 @@ public class InstructionManager : MonoBehaviour
 
     public void OnNextButtonClicked()
     {
+        Debug.Log("Next Clicked! Current Index BEFORE adding is: " + currentNarrativeIndex);
         if (hasClicked) return; // Prevent clicking while transitioning to next scene
 
         if (clickAudio != null)
