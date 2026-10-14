@@ -362,19 +362,16 @@ MonoBehaviour:
   engineerUIPanel: {fileID: 0}
   slot1:
     slotAnchor: {fileID: 0}
-    slotImage: {fileID: 0}
     slottedItemSO: {fileID: 0}
     slottedItemObject: {fileID: 0}
     dragManager: {fileID: 0}
   slot2:
     slotAnchor: {fileID: 0}
-    slotImage: {fileID: 0}
     slottedItemSO: {fileID: 0}
     slottedItemObject: {fileID: 0}
     dragManager: {fileID: 0}
   slot3:
     slotAnchor: {fileID: 0}
-    slotImage: {fileID: 0}
     slottedItemSO: {fileID: 0}
     slottedItemObject: {fileID: 0}
     dragManager: {fileID: 0}
@@ -382,8 +379,6 @@ MonoBehaviour:
   declineButton: {fileID: 0}
   feedbackText: {fileID: 0}
   tweenDuration: 0.28
-  invalidMergeColor: {r: 1, g: 0.3, b: 0.3, a: 0.5}
-  invalidMergeFlashDuration: 0.3
   successfulMergeCounter: 0
 --- !u!1 &1662941285322990777
 GameObject:
@@ -834,7 +829,9 @@ MonoBehaviour:
   cutscenePanel: {fileID: 0}
   cutsceneButton: {fileID: 0}
   cutsceneImage: {fileID: 0}
-  winCutscenes: []
+  winCutscenes:
+  - {fileID: 21300000, guid: bbc9e939703726248860b71beb05fe7e, type: 3}
+  - {fileID: 21300000, guid: eeb1056e653f1774aa416abdcf69ef2f, type: 3}
   loseCutscenes: []
   inventoryCanvas: {fileID: 0}
   winPanelInventoryAnchor: {fileID: 0}
@@ -858,6 +855,7 @@ MonoBehaviour:
   loseTotalScrapsText: {fileID: 0}
   loseTotalTilesText: {fileID: 0}
   mainMenuSceneName: MainMenu
+  possibleMapScenes: []
   isGameOver: 0
 --- !u!1 &6461883088430099993
 GameObject:
