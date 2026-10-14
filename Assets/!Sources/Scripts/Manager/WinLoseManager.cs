@@ -62,6 +62,7 @@ public class WinLoseManager : MonoBehaviour
 
     [Header("Map Randomizer Settings")]
     [SerializeField] private string[] possibleMapScenes;
+    [SerializeField] private string selectedSceneName;
 
     [Header("Game State")]
     public bool isGameOver = false;
@@ -78,6 +79,12 @@ public class WinLoseManager : MonoBehaviour
     private Sprite[] currentCutsceneArray;
     private bool isPlayingWinCutscene = false;
     private string loseReason = "";
+
+    public string SelectedSceneName
+    {
+        get { return selectedSceneName; }
+        set { selectedSceneName = value; }
+    }
 
     private IEnumerator Start()
     {
@@ -435,9 +442,35 @@ public class WinLoseManager : MonoBehaviour
         int randomIndex = Random.Range(0, possibleMapScenes.Length);
 
         // Retrieve the randomly selected scene name
-        string selectedSceneName = possibleMapScenes[randomIndex];
+        selectedSceneName = possibleMapScenes[randomIndex];
 
         // Load the chosen scene
+        SceneManager.LoadScene(selectedSceneName);
+    }
+
+    /// <summary>
+    /// Publicly accessible method to restart the game on a random map.
+    /// Handles all necessary manager cleanup and inventory restoration internally.
+    /// </summary>
+    public void LoadRandomMap()
+    {
+        Debug.Log("[WinLoseManager] Loading random scene for new game...");
+
+        // Keep the state cleanup encapsulated so other scripts don't have to worry about it
+        RestoreInventoryCanvas();
+        CleanupAllManagers();
+        Time.timeScale = 1f;
+
+        // RANDOMIZED MAP LOGIC
+        if (possibleMapScenes == null || possibleMapScenes.Length == 0)
+        {
+            Debug.LogWarning("[WinLoseManager] No maps assigned in possibleMapScenes! Falling back to current scene.");
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            return;
+        }
+
+        int randomIndex = Random.Range(0, possibleMapScenes.Length);
+        string selectedSceneName = possibleMapScenes[randomIndex];
         SceneManager.LoadScene(selectedSceneName);
     }
 
