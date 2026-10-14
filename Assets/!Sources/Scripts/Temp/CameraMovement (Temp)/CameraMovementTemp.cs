@@ -289,7 +289,7 @@ public class CameraMovementTemp : MonoBehaviour
         {
             
 
-            Vector3 newPos = Vector3.Lerp(transform.position,transform.position + (Vector3)camVelocity * Time.deltaTime, 0.5f);
+            Vector3 newPos = transform.position + (Vector3)camVelocity * Time.deltaTime;
             transform.position = ClampPosition(newPos);
         }
     }
