@@ -16,13 +16,15 @@ public class OnTrainLight : MonoBehaviour
     [SerializeField] private float orbNightAlpha = 0.627f;
 
     [Header("Transition Duration")]
-    [SerializeField] private float transitionDuration = 1.5f;
+    [SerializeField] private float transitionDuration = 2.5f;
+    [SerializeField] private float secondTransitionDuration = 0.2f;
+    [Range(0f, 1f)]
+    [SerializeField] private float splitRatio = 0.5f;
 
     private SpriteRenderer orbRenderer;
-    private bool trainLightTween = false;
-    private bool trainOrbTween = false;
-
-    private DayCycleScript.TimeState lastPhase;
+    private bool dayToNightTween = false;
+    private bool nightToDayTween = false;
+    private bool skipInProgress = false;
 
     private void Start()
     {
@@ -38,8 +40,6 @@ public class OnTrainLight : MonoBehaviour
 
         if (orbRenderer != null)
             orbRenderer.color = new Color(1, 1, 1, orbDayAlpha);
-
-        lastPhase = dayCycle.CurrentTime;
     }
 
     private void Update()
@@ -47,74 +47,80 @@ public class OnTrainLight : MonoBehaviour
         if (dayCycle == null || trainLight == null || orbRenderer == null)
             return;
 
-        // Total tiles in this phase
+        // Determine max tiles based on current phase (matching OnDayToNight logic)
         float maxTiles = (dayCycle.CurrentTime == DayCycleScript.TimeState.Day)
             ? dayCycle.DayLength + dayCycle.DayLengthMod
             : dayCycle.NightLength;
 
-        float progression = Mathf.Clamp(dayCycle.TilesMoved / maxTiles, 0f, 1f);
+        float tilesMoved = Mathf.Clamp(dayCycle.TilesMoved, 0, maxTiles);
+        float progression = maxTiles > 0 ? tilesMoved / maxTiles : 0f;
 
-        // Detect phase change
-        if (dayCycle.CurrentTime != lastPhase)
+        //Day to Night transition (Triggers at 65%)
+        if (!dayToNightTween && progression >= 0.65f && dayCycle.CurrentTime == DayCycleScript.TimeState.Day)
         {
-            trainLightTween = false;
-            trainOrbTween = false;
-            lastPhase = dayCycle.CurrentTime;
-        }
+            dayToNightTween = true;
+            nightToDayTween = false;
 
-        // Only start tween at 70%
-        if (progression < 0.70f)
-            return;
-
-        if (skipInProgress)
-            return;
-
-        // ---- LIGHT TWEEN ----
-        if (!trainLightTween && !trainOrbTween)
-        {
-            // Mark both as started
-            trainLightTween = true;
-            trainOrbTween = true;
-
-            bool isDay = dayCycle.CurrentTime == DayCycleScript.TimeState.Day;
-
-            // Kill existing tweens for both
+            //Kill existing tweens
             DOTween.Kill(trainLight.gameObject);
             DOTween.Kill(orbRenderer.gameObject);
 
-            // --- Determine targets ---
-            float targetIntensity = isDay ? nightIntensity : dayIntensity;
-            float targetAlpha = isDay ? orbNightAlpha : orbDayAlpha;
+            RunTwoStageTransition(nightIntensity, orbNightAlpha);
+        }
 
-            // --- LIGHT Tween ---
-            DOTween.To(
-                () => trainLight.intensity,
-                x => trainLight.intensity = x,
-                targetIntensity,
-                transitionDuration
-            )
-            .SetEase(Ease.InOutSine)
-            .SetTarget(trainLight.gameObject);
+        //Night to Day transition (Triggers at 50%)
+        if (!nightToDayTween && progression >= 0.50f && dayCycle.CurrentTime == DayCycleScript.TimeState.Night)
+        {
+            nightToDayTween = true;
+            dayToNightTween = false;
 
-            // --- ORB Tween (your shorter duration for going back to day) ---
-            //float orbDuration = isDay ? transitionDuration : 0.15f;
+            //Kill existing tweens
+            DOTween.Kill(trainLight.gameObject);
+            DOTween.Kill(orbRenderer.gameObject);
 
-            DOTween.To(
-                () => orbRenderer.color.a,
-                a => {
-                    var c = orbRenderer.color;
-                    c.a = a;
-                    orbRenderer.color = c;
-                },
-                targetAlpha,
-                transitionDuration
-            )
-            .SetEase(isDay ? Ease.InOutSine : Ease.Linear)
-            .SetTarget(orbRenderer.gameObject);
+            RunTwoStageTransition(dayIntensity, orbDayAlpha);
         }
     }
 
-    private bool skipInProgress = false;
+    private void RunTwoStageTransition(float targetLightIntensity, float targetOrbAlpha)
+    {
+        //Determine values for two-stage split
+        float startLightIntensity = trainLight.intensity;
+        float intermediateLightIntensity = Mathf.Lerp(startLightIntensity, targetLightIntensity, splitRatio);
+
+        float startOrbAlpha = orbRenderer.color.a;
+        float intermediateOrbAlpha = Mathf.Lerp(startOrbAlpha, targetOrbAlpha, splitRatio);
+
+        //Light Sequence
+        Sequence lightSequence = DOTween.Sequence();
+        lightSequence.SetTarget(trainLight.gameObject);
+
+        lightSequence.Append(DOTween.To(() => trainLight.intensity, x => trainLight.intensity = x, intermediateLightIntensity, transitionDuration)
+            .SetEase(Ease.InSine));
+        lightSequence.Append(DOTween.To(() => trainLight.intensity, x => trainLight.intensity = x, targetLightIntensity, secondTransitionDuration)
+            .SetEase(Ease.OutSine));
+
+        //Train Orb Sequence
+        Sequence orbSequence = DOTween.Sequence();
+        orbSequence.SetTarget(orbRenderer.gameObject);
+
+        orbSequence.Append(DOTween.To(() => orbRenderer.color.a, a =>
+        {
+            var c = orbRenderer.color;
+            c.a = a;
+            orbRenderer.color = c;
+        }, intermediateOrbAlpha, transitionDuration)
+        .SetEase(Ease.InSine));
+
+        //Instant 0, no tween
+        orbSequence.AppendCallback(() =>
+        {
+            var c = orbRenderer.color;
+            c.a = targetOrbAlpha;
+            orbRenderer.color = c;
+        });
+    }
+
     public void ForceResetToDay()
     {
         skipInProgress = true;
@@ -122,19 +128,18 @@ public class OnTrainLight : MonoBehaviour
         DOTween.Kill(trainLight.gameObject);
         DOTween.Kill(orbRenderer.gameObject);
 
-        // Set light to day intensity
-        trainLight.intensity = dayIntensity;
+        if (trainLight != null)
+            trainLight.intensity = dayIntensity;
 
-        // Set orb alpha to day alpha
         if (orbRenderer != null)
         {
             var c = orbRenderer.color;
-            c.a = orbDayAlpha; // <- use day alpha, not 0f
+            c.a = orbDayAlpha;
             orbRenderer.color = c;
         }
 
-        trainLightTween = false;
-        trainOrbTween = false;
+        dayToNightTween = false;
+        nightToDayTween = false;
 
         skipInProgress = false;
     }

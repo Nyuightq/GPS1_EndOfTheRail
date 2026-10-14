@@ -10,7 +10,7 @@ public class OnDayToNight : MonoBehaviour
 
     [Header("Light Settings")]
     [SerializeField] private float dayIntensity = 10f;
-    [SerializeField] private float nightIntensity = 0.4f;
+    [SerializeField] private float nightIntensity = 0.55f;
 
     [Header("Day Night Transition Duration")]
     [SerializeField] private float transitionDuration = 3f;
