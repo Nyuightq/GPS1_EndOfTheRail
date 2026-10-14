@@ -334,6 +334,8 @@ MonoBehaviour:
   orbDayAlpha: 0
   orbNightAlpha: 0.627
   transitionDuration: 2.5
+  secondTransitionDuration: 0.2
+  splitRatio: 0.5
 --- !u!114 &3232622184949731404
 MonoBehaviour:
   m_ObjectHideFlags: 0

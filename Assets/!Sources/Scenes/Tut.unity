@@ -210023,6 +210023,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 462066228069064750, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: muteSprite
+      value: 
+      objectReference: {fileID: -1013344910, guid: 40508586a41619c48a020a3633459dce, type: 3}
+    - target: {fileID: 462066228069064750, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: unMuteSprite
+      value: 
+      objectReference: {fileID: -543305883, guid: 40508586a41619c48a020a3633459dce, type: 3}
+    - target: {fileID: 462066228069064750, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: muteVolumeImage
       value: 
       objectReference: {fileID: 1446926725}
@@ -210057,6 +210065,10 @@ PrefabInstance:
     - target: {fileID: 478342595100268098, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_ConstrainProportionsScale
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 509415783914132541, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: nightIntensity
+      value: 0.55
       objectReference: {fileID: 0}
     - target: {fileID: 537418860151427607, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_IsActive
@@ -210529,7 +210541,7 @@ PrefabInstance:
     - target: {fileID: 6176198516129150576, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 1502112516, guid: 6d5f2dd77051b7141b4d04fc4d12949d, type: 3}
+      objectReference: {fileID: -543305883, guid: 40508586a41619c48a020a3633459dce, type: 3}
     - target: {fileID: 6309024675467241955, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -210745,7 +210757,7 @@ PrefabInstance:
     - target: {fileID: 8184254870374041547, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: -543305883, guid: 40508586a41619c48a020a3633459dce, type: 3}
+      objectReference: {fileID: 1502112516, guid: 6d5f2dd77051b7141b4d04fc4d12949d, type: 3}
     - target: {fileID: 8206769045567167557, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -210794,6 +210806,14 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 62
       objectReference: {fileID: 0}
+    - target: {fileID: 8439966061654577657, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: muteSprite
+      value: 
+      objectReference: {fileID: -1948539731, guid: 6d5f2dd77051b7141b4d04fc4d12949d, type: 3}
+    - target: {fileID: 8439966061654577657, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
+      propertyPath: unMuteSprite
+      value: 
+      objectReference: {fileID: 1502112516, guid: 6d5f2dd77051b7141b4d04fc4d12949d, type: 3}
     - target: {fileID: 8445399911400560231, guid: 9680ce673f52a8d4a88c9d227eccc92c, type: 3}
       propertyPath: m_IsActive
       value: 0
