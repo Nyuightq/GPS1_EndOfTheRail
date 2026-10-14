@@ -206185,6 +206185,18 @@ PrefabInstance:
       propertyPath: 'loseCutscenes.Array.data[0]'
       value: 
       objectReference: {fileID: 21300000, guid: bbc9e939703726248860b71beb05fe7e, type: 3}
+    - target: {fileID: 7030176318696570325, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: possibleMapScenes.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7030176318696570325, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: 'possibleMapScenes.Array.data[0]'
+      value: GameplayLevel02
+      objectReference: {fileID: 0}
+    - target: {fileID: 7030176318696570325, guid: 054ad38d8249dec429272a81c6293258, type: 3}
+      propertyPath: 'possibleMapScenes.Array.data[1]'
+      value: GameplayLevel
+      objectReference: {fileID: 0}
     - target: {fileID: 7285569548920745536, guid: 054ad38d8249dec429272a81c6293258, type: 3}
       propertyPath: transitionGO
       value: 
